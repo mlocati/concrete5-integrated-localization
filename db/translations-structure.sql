@@ -103,10 +103,10 @@ CREATE TABLE TranslatablePlaces (
   tpID int unsigned NOT NULL AUTO_INCREMENT COMMENT 'Translatable place identifier',
   tpTranslatable int unsigned NOT NULL COMMENT 'Translatable identifier',
   tpPackage varchar(64) NOT NULL COMMENT 'Package handle or ''-'' for core',
-  tpVersion varchar(32) NOT NULL COMMENT 'Package/code version (''dev-'' for GItHub versions)',
+  tpVersion varchar(32) NOT NULL COMMENT 'Package/code version (''dev-'' for GitHub versions)',
   tpFile varchar(300) NOT NULL COMMENT 'Path to the file where the translatable string is defined',
-  tpLine int unsigned NOT NULL COMMENT 'Line of the file (may be null in case the translatable string is the file name itself, like for custom block templates)',
-  tpComment text NOT NULL COMMENT 'Comment for the translation',
+  tpLine int unsigned NULL COMMENT 'Line of the file (may be null in case the translatable string is the file name itself, like for custom block templates)',
+  tpComment text NULL COMMENT 'Comment for the translation',
   PRIMARY KEY (tpID),
   KEY tpTranslatable_tpPackage_tpVersion (tpTranslatable,tpPackage,tpVersion),
   CONSTRAINT FK_TranslatablePlaces_Translatables FOREIGN KEY (tpTranslatable) REFERENCES Translatables (tID) ON DELETE CASCADE ON UPDATE CASCADE
