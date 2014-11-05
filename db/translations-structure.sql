@@ -65,9 +65,9 @@ INSERT INTO Locales (lID, lName, lIsSource, lPluralCount, lPluralRule) VALUES
 CREATE TABLE Translatables (
   tID int unsigned NOT NULL AUTO_INCREMENT COMMENT 'Translatable identifier',
   tHash char(32) NOT NULL COMMENT 'Translation hash',
-  tContext varchar(80) NOT NULL DEFAULT '' COMMENT 'Translation context',
+  tContext varchar(80) NULL COMMENT 'Translation context',
   tText text NOT NULL COMMENT 'Translatable string',
-  tPlural text NOT NULL DEFAULT '' COMMENT 'Translatable plural',
+  tPlural text NULL COMMENT 'Translatable plural',
   PRIMARY KEY (tID),
   UNIQUE KEY tHash (tHash)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci COMMENT='List of translatable strings';
@@ -117,11 +117,11 @@ CREATE TABLE Translations (
   tTranslatable int unsigned NOT NULL COMMENT 'Translatable identifier',
   tFuzzy tinyint(1) unsigned NOT NULL COMMENT 'Fuzzy (1), approved (0)',
   tText0 text NOT NULL COMMENT 'Translation (singular / plural 0)',
-  tText1 text NOT NULL DEFAULT '' COMMENT 'Translation (plural 1)',
-  tText2 text NOT NULL DEFAULT '' COMMENT 'Translation (plural 2)',
-  tText3 text NOT NULL DEFAULT '' COMMENT 'Translation (plural 3)',
-  tText4 text NOT NULL DEFAULT '' COMMENT 'Translation (plural 4)',
-  tText5 text NOT NULL DEFAULT '' COMMENT 'Translation (plural 5)',
+  tText1 text NULL COMMENT 'Translation (plural 1)',
+  tText2 text NULL COMMENT 'Translation (plural 2)',
+  tText3 text NULL COMMENT 'Translation (plural 3)',
+  tText4 text NULL COMMENT 'Translation (plural 4)',
+  tText5 text NULL COMMENT 'Translation (plural 5)',
   PRIMARY KEY (tLocale,tTranslatable),
   KEY FK_Translations_Translatables (tTranslatable),
   CONSTRAINT FK_Translations_Translatables FOREIGN KEY (tTranslatable) REFERENCES Translatables (tID) ON DELETE CASCADE ON UPDATE CASCADE,
