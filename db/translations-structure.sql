@@ -1,5 +1,5 @@
 CREATE TABLE Locales (
-  lID varchar(11) NOT NULL COMMENT 'Locale identifier',
+  lID varchar(12) NOT NULL COMMENT 'Locale identifier',
   lName varchar(100) NOT NULL COMMENT 'Locale name',
   lIsSource tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '1 for en_US (source language)',
   lPluralCount tinyint(1) unsigned NOT NULL COMMENT 'Number of plural forms',
@@ -61,14 +61,36 @@ INSERT INTO Locales (lID, lName, lIsSource, lPluralCount, lPluralRule) VALUES
 	('zh_CN', 'Chinese (China)', 0, 1, '0'),
 	('zh_TW', 'Chinese (Taiwan)', 0, 1, '0');
 
+
 CREATE TABLE Translatables (
-  tID int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Translatable identifier',
+  tID int unsigned NOT NULL AUTO_INCREMENT COMMENT 'Translatable identifier',
+  tHash char(32) NOT NULL COMMENT 'Translation hash',
   tContext varchar(80) NOT NULL DEFAULT '' COMMENT 'Translation context',
-  tText varchar(10000) NOT NULL COMMENT 'Translatable string',
-  tPlural varchar(1000) NOT NULL DEFAULT '' COMMENT 'Translatable plural',
+  tText text NOT NULL COMMENT 'Translatable string',
+  tPlural text NOT NULL DEFAULT '' COMMENT 'Translatable plural',
   PRIMARY KEY (tID),
-  KEY tContext_tText (tContext,tText(255))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='List of translatable strings';
+  UNIQUE KEY tHash (tHash)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci COMMENT='List of translatable strings';
+
+SET @OLDTMP_SQL_MODE=@@SQL_MODE, SQL_MODE='';
+DELIMITER //
+CREATE TRIGGER Translatables_before_insert BEFORE INSERT ON Translatables FOR EACH ROW IF (NEW.tContext IS NULL) OR (LENGTH(NEW.tContext) = 0) THEN
+	SET NEW.tHash = MD5(NEW.tText);
+ELSE
+	SET NEW.tHash = MD5(CONCAT(NEW.tContext, CHAR(4), NEW.tText));
+END IF//
+DELIMITER ;
+SET SQL_MODE=@OLDTMP_SQL_MODE;
+
+SET @OLDTMP_SQL_MODE=@@SQL_MODE, SQL_MODE='';
+DELIMITER //
+CREATE TRIGGER Translatables_before_update BEFORE UPDATE ON Translatables FOR EACH ROW IF (NEW.tContext IS NULL) OR (LENGTH(NEW.tContext) = 0) THEN
+	SET NEW.tHash = MD5(NEW.tText);
+ELSE
+	SET NEW.tHash = MD5(CONCAT(NEW.tContext, CHAR(4), NEW.tText));
+END IF//
+DELIMITER ;
+SET SQL_MODE=@OLDTMP_SQL_MODE;
 
 INSERT INTO Translatables (tID, tContext, tText, tPlural) VALUES
 	(1, '', 'OK', ''),
@@ -84,22 +106,22 @@ CREATE TABLE TranslatablePlaces (
   tpVersion varchar(32) NOT NULL COMMENT 'Package/code version (''dev-'' for GItHub versions)',
   tpFile varchar(300) NOT NULL COMMENT 'Path to the file where the translatable string is defined',
   tpLine int unsigned NOT NULL COMMENT 'Line of the file (may be null in case the translatable string is the file name itself, like for custom block templates)',
+  tpComment text NOT NULL COMMENT 'Comment for the translation',
   PRIMARY KEY (tpID),
   KEY tpTranslatable_tpPackage_tpVersion (tpTranslatable,tpPackage,tpVersion),
   CONSTRAINT FK_TranslatablePlaces_Translatables FOREIGN KEY (tpTranslatable) REFERENCES Translatables (tID) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci COMMENT='Places where translatables are defined';
 
-
 CREATE TABLE Translations (
-  tLocale varchar(11) NOT NULL COMMENT 'Locale identifier',
+  tLocale varchar(12) NOT NULL COMMENT 'Locale identifier',
   tTranslatable int unsigned NOT NULL COMMENT 'Translatable identifier',
   tFuzzy tinyint(1) unsigned NOT NULL COMMENT 'Fuzzy (1), approved (0)',
-  tText0 varchar(10000) NOT NULL COMMENT 'Translation (singular / plural 0)',
-  tText1 varchar(1000) NOT NULL DEFAULT '' COMMENT 'Translation (plural 1)',
-  tText2 varchar(1000) NOT NULL DEFAULT '' COMMENT 'Translation (plural 2)',
-  tText3 varchar(1000) NOT NULL DEFAULT '' COMMENT 'Translation (plural 3)',
-  tText4 varchar(1000) NOT NULL DEFAULT '' COMMENT 'Translation (plural 4)',
-  tText5 varchar(1000) NOT NULL DEFAULT '' COMMENT 'Translation (plural 5)',
+  tText0 text NOT NULL COMMENT 'Translation (singular / plural 0)',
+  tText1 text NOT NULL DEFAULT '' COMMENT 'Translation (plural 1)',
+  tText2 text NOT NULL DEFAULT '' COMMENT 'Translation (plural 2)',
+  tText3 text NOT NULL DEFAULT '' COMMENT 'Translation (plural 3)',
+  tText4 text NOT NULL DEFAULT '' COMMENT 'Translation (plural 4)',
+  tText5 text NOT NULL DEFAULT '' COMMENT 'Translation (plural 5)',
   PRIMARY KEY (tLocale,tTranslatable),
   KEY FK_Translations_Translatables (tTranslatable),
   CONSTRAINT FK_Translations_Translatables FOREIGN KEY (tTranslatable) REFERENCES Translatables (tID) ON DELETE CASCADE ON UPDATE CASCADE,
