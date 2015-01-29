@@ -56,7 +56,6 @@ class FetchGitTranslations extends Job
                 t('Found strings: %d', $stats['total']),
                 t('Updated strings: %d', $stats['updated']),
                 t('New strings: %d', $stats['added']),
-                t('Removed entries: %d', $stats['removed']),
             )
         );
     }
