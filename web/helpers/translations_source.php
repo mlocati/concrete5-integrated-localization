@@ -304,10 +304,6 @@ class TranslationsSourceHelper
         }
     }
 
-    public function getAvailableTranslations($packageHandle, $packageVersion, $minTranslationsPerc = null)
-    {
-    }
-
     private function getLocales($where = '', $q = array())
     {
         $result = array();
@@ -333,6 +329,7 @@ class TranslationsSourceHelper
 
         return $result;
     }
+    
     public function getAvailableLocales($excludeSourceLocale = true)
     {
         return $this->getLocales($excludeSourceLocale ? 'lIsSource = 0' : '');
