@@ -114,13 +114,15 @@ class TranslationsSourceHelper
         }
     }
 
-    public function processPackageZip($packageHandle, $packageVersion, $packageZip, $importTranslations = true, $exportTranslations = true)
+    public function processPackageZip($packageHandle, $packageVersion, $packageZip, $exportTranslations = true, $importTranslations = true, $importTranslationsAsApproved = false)
     {
         if(!is_file($packageZip)) {
             throw new Exception(t("Package archive not found: %s", $packageZip));
         }
+        $fh = Loader::helper('file');
+        /* @var $fh FileHelper */
         for($i = 0; ; $i++) {
-            $unzippedFolder = str_replace(DIRECTORY_SEPARATOR, '/', Loader::helper('file')->getTemporaryDirectory()).'/localization/package-'.strtolower(trim(preg_replace('/[^\w\.]+/', '-', $packageHandle), '-'));
+            $unzippedFolder = str_replace(DIRECTORY_SEPARATOR, '/', $fh->getTemporaryDirectory()).'/localization/package-'.strtolower(trim(preg_replace('/[^\w\.]+/', '-', $packageHandle), '-'));
             if($i > 0) {
                 $unzippedFolder .= '-'.$i;
             }
@@ -135,7 +137,7 @@ class TranslationsSourceHelper
         }
         try {
             if(!class_exists('ZipArchive')) {
-                throw new Exception(t('Missing PHP extension: %s'), 'ZIP');
+                throw new Exception(t('Missing PHP extension: %s', 'ZIP'));
             }
             $zip = new ZipArchive();
             $rc = @$zip->open($packageZip);
@@ -145,20 +147,47 @@ class TranslationsSourceHelper
                 if((!is_string($error)) || ($error === '')) {
                     $error = t('Unknown error');
                 }
-                throw new Exception(t('Error extracting files from zip: %s'), $error);
+                throw new Exception(t('Error extracting files from zip: %s', $error));
             }
             @$zip->close();
             unset($zip);
-            if(is_file("$unzippedFolder/controller.php")) {
-                $packageRootDir = $unzippedFolder;
+            $packageFilesChanged = $this->processPackageDirectory($packageHandle, $packageVersion, $unzippedFolder, $exportTranslations, $importTranslations, $importTranslationsAsApproved);
+            if($packageFilesChanged) {
+                $tempZipFilename = tempnam($fh->getTemporaryDirectory().'/localization', 'zip');
+                if(!$tempZipFilename) {
+                    throw new Exception(t('Unable to create a temporary file'));
+                }
+                $zip = new ZipArchive();
+                $rc = $zip->open($tempZipFilename, ZIPARCHIVE::CREATE | ZipArchive::OVERWRITE);
+                self::checkZipOpenResult($rc);
+                $startPath = strlen($unzippedFolder) + 1;
+                $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($unzippedFolder, FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::SELF_FIRST);
+                foreach ($iterator as $splFileInfo) {
+                    /* @var $splFileInfo SplFileInfo */
+                    $fileAbs = str_replace(DIRECTORY_SEPARATOR, '/', $splFileInfo->getRealPath());
+                    if($fileAbs !== $unzippedFolder) {
+                        $fileRel = substr($fileAbs, $startPath);
+                        if (is_dir($fileAbs)) {
+                            $rc = $zip->addEmptyDir($fileRel);
+                        } elseif (is_file($fileAbs)) {
+                            $rc = $zip->addFile($fileAbs, $fileRel);
+                       }
+                        if($rc !== true) {
+                            $error = $zip->getStatusString();
+                            if((!is_string($error)) || ($error === '')) {
+                                $error = t('Unknown error');
+                            }
+                            throw new Exception(t('Error adding files to zip: %s', $error));
+                        }
+                    }
+                }
+                @$zip->close();
+                unset($zip);
+                if(@rename($tempZipFilename, $packageZip) !== true) {
+                    throw new Exception(t('Error moving zip file to its final location'));
+                }
+                unset($tempZipFilename);
             }
-            elseif(is_file("$unzippedFolder/$packageHandle/controller.php")) {
-                $packageRootDir = "$unzippedFolder/$packageHandle";
-            }
-            else {
-                throw new Exception(t('Unable to find the package controller.php'));
-            }
-            $this->processPackageDirectory($packageHandle, $packageVersion, $packageRootDir, $importTranslations, $exportTranslations);
             Loader::helper('file_extended', 'integrated_localization')->deleteFromFileSystem($unzippedFolder);
         }
         catch(Exception $x) {
@@ -169,21 +198,34 @@ class TranslationsSourceHelper
                 catch(Exception $foo) {
                 }
             }
+            if(isset($tempZipFilename) && $tempZipFilename) {
+                @unlink($tempZipFilename);
+            }
             Loader::helper('file_extended', 'integrated_localization')->deleteFromFileSystem($unzippedFolder);
             throw $x;
         }
     }
 
-    public function processPackageDirectory($packageHandle, $packageVersion, $packageRootDir, $importTranslations = true, $exportTranslations = true)
+    public function processPackageDirectory($packageHandle, $packageVersion, $dir, $exportTranslations = true, $importTranslations = true, $importTranslationsAsApproved = false)
     {
-        $result = $this->parseDirectory($packageRootDir, "packages/$packageHandle", $packageHandle, $packageVersion);
+        if(is_file("$dir/controller.php")) {
+            $packageRootDir = $dir;
+        }
+        elseif(is_file("$dir/$packageHandle/controller.php")) {
+            $packageRootDir = "$dir/$packageHandle";
+        }
+        else {
+            throw new Exception(t("Unable to find the package file '%s'", 'controller.php'));
+        }
+        $packageFilesChanged = false;
+        $this->parseDirectory($packageRootDir, "packages/$packageHandle", $packageHandle, $packageVersion);
         if($importTranslations || $exportTranslations) {
             $translationsDir = "$packageRootDir/languages";
             foreach($this->getAvailableLocales() as $localeInfo) {
                 $gettextDir = "$translationsDir/{$localeInfo['id']}/LC_MESSAGES";
                 $poFile = "$gettextDir/messages.po";
-                $importedTranslations = null;
                 $moFile = "$gettextDir/messages.mo";
+                $importedTranslations = null;
                 if(is_dir($gettextDir)) {
                     $importedTranslations = new \Gettext\Translations();
                     if(is_file($poFile)) {
@@ -202,7 +244,7 @@ class TranslationsSourceHelper
                     }
                     if($importedTranslations->count() > 0) {
                         if($importTranslations) {
-                           $this->importTranslations($localeInfo['id'], $importedTranslations, false);
+                           $this->importTranslations($localeInfo['id'], $importedTranslations, $importTranslationsAsApproved);
                         }
                     }
                     else {
@@ -223,19 +265,22 @@ class TranslationsSourceHelper
                             }
                         }
                         if($someTranslated) {
-	                        if(!is_dir($gettextDir)) {
-	                            @mkdir($gettextDir, DIRECTORY_PERMISSIONS_MODE, true);
-	                            if (!is_dir($gettextDir)) {
-	                                throw new Exception(t('Unable to create the directory %s', $gettextDir));
-	                            }
-	                        }
-	                        $translationsToExport->toPoFile($poFile);
-	                        $translationsToExport->toMoFile($moFile);
+                            if(!is_dir($gettextDir)) {
+                                @mkdir($gettextDir, DIRECTORY_PERMISSIONS_MODE, true);
+                                if (!is_dir($gettextDir)) {
+                                    throw new Exception(t('Unable to create the directory %s', $gettextDir));
+                                }
+                            }
+                            $translationsToExport->toPoFile($poFile);
+                            $translationsToExport->toMoFile($moFile);
+                            $packageFilesChanged = true;
                         }
                     }
                 }
             }
         }
+
+        return $packageFilesChanged;
     }
 
     private static function checkZipOpenResult($rc) {
@@ -333,6 +378,15 @@ class TranslationsSourceHelper
                     }
                 }
                 if($translated) {
+                    $markAsApprovedThis = $markAsApproved;
+                    if($markAsApprovedThis === 1) {
+                        foreach($translation->getFlags() as $flag) {
+                            if($flag === 'fuzzy') {
+                                $markAsApprovedThis = 0;
+                                break;
+                            }
+                        }
+                    }
                     $hash = md5($translation->getId());
                     $row = $db->GetRow(
                         '
@@ -360,13 +414,10 @@ class TranslationsSourceHelper
                         $savedPlural = (isset($row['tPlural']) && ($row['tPlural'] !== '')) ? true : false;
                         if($savedPlural === $plural) {
                             if(is_null($row['tText0'])) {
-                                if($plural) {
-                                    
-                                }
                                 $addThis = array(
                                     'tLocale' => $localeInfo['id'],
                                     'tTranslatable' => $translatableID,
-                                    'tApproved' => $markAsApproved,
+                                    'tApproved' => $markAsApprovedThis,
                                     'tText0' => $translation->getTranslation(),
                                 );
                                 if($plural) {
@@ -381,10 +432,10 @@ class TranslationsSourceHelper
                             }
                             else {
                                 $savedApproved = empty($row['tApproved']) ? 0 : 1;
-                                if($markAsApproved || ($savedApproved === 0)) {
+                                if($markAsApprovedThis || ($savedApproved === 0)) {
                                     $sql = 'UPDATE Translations SET';
                                     $q = array();
-                                    $sql .= ' tApproved = '.$markAsApproved;
+                                    $sql .= ' tApproved = '.$markAsApprovedThis;
                                     $sql .= ', tText0 = ?';
                                     $q[] = $translation->getTranslation();
                                     if($plural) {
@@ -452,7 +503,7 @@ class TranslationsSourceHelper
      * @param bool $onlyTranslated
      * @return \Gettext\Translations
      */
-    public function loadPackageTranslations($localeID, $packageHandle, $packageVersion, $onlyTranslated = false)
+    public function loadPackageTranslations($localeID, $packageHandle, $packageVersion, $onlyTranslated = false, $unapprovedAsFuzzy = false)
     {
         $localeInfo = $this->getLocaleByID($localeID);
         if(!isset($localeInfo)) {
@@ -536,7 +587,7 @@ class TranslationsSourceHelper
                         $transation->setPluralTranslation($row['tText'.$i], $i - 1);
                     }
                 }
-                if(empty($row['tApproved'])) {
+                if($unapprovedAsFuzzy && empty($row['tApproved'])) {
                     $transation->addFlag('fuzzy');
                 }
             }
