@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema version="0.3">
+
+	<!-- Available locales for localization -->
+	<table name="Locales">
+		<!-- Locale identifier -->
+		<field name="lID" type="C" size="12">
+			<NOTNULL />
+			<KEY />
+		</field>
+		<!-- Locale name -->
+		<field name="lName" type="C" size="100">
+			<NOTNULL />
+		</field>
+		<!-- Is this locale the source locale (1) or not (0)? Only en_US should have 1 -->
+		<field name="lIsSource" type="I1">
+			<UNSIGNED />
+			<NOTNULL />
+			<DEFAULT value="0" />
+		</field>
+		<!-- Number of plural forms -->
+		<field name="lPluralCount" type="I1">
+			<UNSIGNED />
+			<NOTNULL />
+		</field>
+		<!-- Plural rules -->
+		<field name="lPluralRule" type="C" size="255">
+			<NOTNULL />
+		</field>
+	</table>
+
+	<!-- List of translatable strings -->
+	<table name="Translatables">
+		<!-- Translatable identifier -->
+		<field name="tID" type="I">
+			<UNSIGNED />
+			<NOTNULL />
+			<AUTOINCREMENT />
+			<KEY />
+		</field>
+		<!-- Translation hash -->
+		<field name="tHash" type="C" size="32">
+			<NOTNULL />
+		</field>
+		<!-- Translation context -->
+		<field name="tContext" type="C" size="255">
+		</field>
+		<!-- Translatable string -->
+		<field name="tText" type="X">
+			<NOTNULL />
+		</field>
+		<!-- Translatable plural -->
+		<field name="tPlural" type="X">
+		</field>
+		<!-- For fast lookup of existing translations (it's the MD5 of context+\x04+tText) -->
+		<index name="tHash">
+			<col>tHash</col>
+			<UNIQUE />
+		</index>
+	</table>
+
+	<!-- Packages where translatables are defined -->
+	<table name="TranslatablePlaces">
+		<!-- Translatable identifier -->
+		<field name="tpTranslatable" type="I">
+			<UNSIGNED />
+			<NOTNULL />
+			<KEY />
+		</field>
+		<!-- Package handle (use '-' for core) -->
+		<field name="tpPackage" type="C" size="64">
+			<NOTNULL />
+			<KEY />
+		</field>
+		<!-- Package version (use 'dev-...' for development versions) -->
+		<field name="tpVersion" type="C" size="32">
+			<NOTNULL />
+			<KEY />
+		</field>
+		<!-- Paths to the file where the translatable string is defined (separated by \x04) -->
+		<field name="tpLocations" type="X">
+		</field>
+		<!-- Comments for the translation (separated by \x04) -->
+		<field name="tpComments" type="X">
+		</field>
+		<!-- For fast lookup of translations for a package/version -->
+		<index name="tpPackageVersion">
+			<col>tpPackage</col>
+			<col>tpVersion</col>
+		</index>
+		<!-- For fast lookup of strings by Translatables.tID -->
+		<index name="tpTranslatable">
+			<col>tpTranslatable</col>
+		</index>
+	</table>
+
+	<!-- Translated strings -->
+	<table name="Translations">
+		<!-- Locale identifier -->
+		<field name="tLocale" type="C" size="12">
+			<NOTNULL />
+			<KEY />
+		</field>
+		<!-- Translatable identifier -->
+		<field name="tTranslatable" type="I">
+			<UNSIGNED />
+			<NOTNULL />
+			<KEY />
+		</field>
+		<!-- Is this translation approved? -->
+		<field name="tApproved" type="I1">
+			<UNSIGNED />
+			<NOTNULL />
+			<DEFAULT value="0" />
+		</field>
+		<!-- Translation (singular / plural 0) -->
+		<field name="tText0" type="X">
+			<NOTNULL />
+		</field>
+		<!-- Translation (plural 1) -->
+		<field name="tText1" type="X">
+		</field>
+		<!-- Translation (plural 2) -->
+		<field name="tText2" type="X">
+		</field>
+		<!-- Translation (plural 3) -->
+		<field name="tText3" type="X">
+		</field>
+		<!-- Translation (plural 4) -->
+		<field name="tText4" type="X">
+		</field>
+		<!-- Translation (plural 5) -->
+		<field name="tText5" type="X">
+		</field>
+	</table>
+
+</schema>

@@ -4,20 +4,20 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "204150827181e13ad02968d4afa784ee",
+    "hash": "61a11f82a648b75679aec12ce7d2214f",
     "packages": [
         {
             "name": "gettext/gettext",
-            "version": "v2.2.0",
+            "version": "v3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/oscarotero/Gettext.git",
-                "reference": "d45fb9dcb7c063dc22790f5b3cc7d23b8f230a55"
+                "reference": "e6598d172881dd8eb6232d6321784a01fd6a47d7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/oscarotero/Gettext/zipball/d45fb9dcb7c063dc22790f5b3cc7d23b8f230a55",
-                "reference": "d45fb9dcb7c063dc22790f5b3cc7d23b8f230a55",
+                "url": "https://api.github.com/repos/oscarotero/Gettext/zipball/e6598d172881dd8eb6232d6321784a01fd6a47d7",
+                "reference": "e6598d172881dd8eb6232d6321784a01fd6a47d7",
                 "shasum": ""
             },
             "require": {
@@ -54,7 +54,57 @@
                 "po",
                 "translation"
             ],
-            "time": "2014-12-17 23:04:56"
+            "time": "2015-01-28 15:27:55"
+        },
+        {
+            "name": "mlocati/concrete5-translation-library",
+            "version": "1.0.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mlocati/concrete5-translation-library.git",
+                "reference": "dded8e9d1632b299ce3022f6549343f07e2b8966"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mlocati/concrete5-translation-library/zipball/dded8e9d1632b299ce3022f6549343f07e2b8966",
+                "reference": "dded8e9d1632b299ce3022f6549343f07e2b8966",
+                "shasum": ""
+            },
+            "require": {
+                "gettext/gettext": "3.1.*",
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "C5TL\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Michele Locati",
+                    "email": "mlocati@gmail.com",
+                    "homepage": "https://github.com/mlocati",
+                    "role": "developer"
+                }
+            ],
+            "description": "Library to handle concrete5 core and package translations",
+            "homepage": "https://github.com/mlocati/concrete5-translation-library",
+            "keywords": [
+                "concrete5",
+                "i18n",
+                "internationalization",
+                "l10n",
+                "localization",
+                "packages",
+                "translate",
+                "translation"
+            ],
+            "time": "2015-01-28 15:52:06"
         }
     ],
     "packages-dev": [],
