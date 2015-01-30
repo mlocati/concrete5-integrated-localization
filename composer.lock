@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "61a11f82a648b75679aec12ce7d2214f",
+    "hash": "6f30f209405df7c283a33b49d2fda270",
     "packages": [
         {
             "name": "gettext/gettext",
@@ -58,16 +58,16 @@
         },
         {
             "name": "mlocati/concrete5-translation-library",
-            "version": "1.0.4",
+            "version": "1.0.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mlocati/concrete5-translation-library.git",
-                "reference": "dded8e9d1632b299ce3022f6549343f07e2b8966"
+                "reference": "f9e122aee56fb1428b9a8279036fdc6b2cdc2cea"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mlocati/concrete5-translation-library/zipball/dded8e9d1632b299ce3022f6549343f07e2b8966",
-                "reference": "dded8e9d1632b299ce3022f6549343f07e2b8966",
+                "url": "https://api.github.com/repos/mlocati/concrete5-translation-library/zipball/f9e122aee56fb1428b9a8279036fdc6b2cdc2cea",
+                "reference": "f9e122aee56fb1428b9a8279036fdc6b2cdc2cea",
                 "shasum": ""
             },
             "require": {
@@ -104,7 +104,7 @@
                 "translate",
                 "translation"
             ],
-            "time": "2015-01-28 15:52:06"
+            "time": "2015-01-30 07:57:32"
         }
     ],
     "packages-dev": [],
