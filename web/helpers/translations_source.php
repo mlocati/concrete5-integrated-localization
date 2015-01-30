@@ -338,7 +338,10 @@ class TranslationsSourceHelper
                 'name' => $row['lName'],
                 'isSource' => empty($row['lIsSource']) ? false : true,
                 'pluralCount' => (int) $row['lPluralCount'],
-                'pluralRule' => (int) $row['lPluralRule'],
+                'pluralRule' => $row['lPluralRule'],
+                'approved' => empty($row['lApproved']) ? false : true,
+                'requestedBy' => isset($row['lRequestedBy']) ? ((int) $row['lRequestedBy']) : null,
+                'requestedOn' => isset($row['lRequestedOn']) ? $row['lRequestedOn'] : '',
             );
         }
         $rs->Close();
@@ -346,13 +349,29 @@ class TranslationsSourceHelper
         return $result;
     }
 
-    public function getAvailableLocales($excludeSourceLocale = true)
+    public function getAvailableLocales($excludeSourceLocale = true, $onlyApproved = true)
     {
-        return $this->getLocales($excludeSourceLocale ? 'lIsSource = 0' : '');
+        $w = array();
+        $q = array();
+        if ($excludeSourceLocale) {
+            $w[] = '(lIsSource = 0)';
+        }
+        if ($onlyApproved) {
+            $w[] = '(lApproved = 1)';
+        }
+
+        return $this->getLocales($w, $q);
     }
-    public function getLocaleByID($localeID)
+    public function getLocaleByID($localeID, $onlyIfApproved = true)
     {
-        $list = $this->getLocales('lID = ?', array($localeID));
+        $w = array();
+        $q = array();
+        $w[] = '(lID = ?)';
+        $q[] = $localeID;
+        if ($onlyIfApproved) {
+            $w[] = '(lApproved = 1)';
+        }
+        $list = $this->getLocales(implode(' AND ', $w), $q);
 
         return empty($list) ? null : $list[0];
     }

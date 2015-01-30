@@ -27,6 +27,17 @@
 		<field name="lPluralRule" type="C" size="255">
 			<NOTNULL />
 		</field>
+		<!-- Is this locale approved? -->
+		<field name="lApproved" type="I1">
+			<UNSIGNED />
+			<NOTNULL />
+			<DEFAULT value="0" />
+		</field>
+		<field name="lRequestedBy" type="I">
+			<UNSIGNED />
+		</field>
+		<field name="lRequestedOn" type="T">
+		</field>
 	</table>
 
 	<!-- List of translatable strings -->
