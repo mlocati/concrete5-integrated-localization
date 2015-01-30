@@ -19,32 +19,43 @@ class DashboardIntegratedLocalizationLocalesController extends Controller
         $this->set('locales', $locales);
         $this->set('editingLocale', $editingLocale);
     }
-    public function approved()
+    public function approved($localeName)
     {
-        $this->set('message', t('The locale has been approved'));
+        $th = Loader::helper('text');
+        /* @var $th TextHelper */
+        $this->set('message', t("The locale '%s' has been approved", $th->specialchars($localeName)));
         $this->view();
     }
-    public function unapproved()
+    public function deleted($localeName)
     {
-        $this->set('message', t('The locale request has been denied'));
+        $th = Loader::helper('text');
+        /* @var $th TextHelper */
+        $this->set('message', t("The request to adopt the locale '%s' has been denied", $th->specialchars($localeName)));
         $this->view();
     }
 
-    public function set_approved()
+    public function approve($localeID)
     {
         Loader::model('integrated_locale', 'integrated_localization');
-        $locale = IntegratedLocale::getByID($this->get('ilID'), true);
+        $locale = IntegratedLocale::getByID($localeID, true);
         if ($locale) {
-            $approve = null;
-            $a = $this->get('approve');
-            if ($a === 'yes') {
-                $locale->approve();
-                $this->redirect('/dashboard/integrated_localization/locales/approved');
-            } elseif ($a === 'no') {
-                $locale->delete();
-                $this->redirect('/dashboard/integrated_localization/locales/unapproved');
-            }
+            $locale->approve();
+            $this->redirect('/dashboard/integrated_localization/locales', 'approved', $locale->getName());
+        } else {
+            $this->set('error', t('Unable to find the locale with id %s', $localeID));
+            $this->view();
         }
-        $this->view();
+    }
+    public function delete($localeID)
+    {
+        Loader::model('integrated_locale', 'integrated_localization');
+        $locale = IntegratedLocale::getByID($localeID, true);
+        if ($locale) {
+            $locale->delete();
+            $this->redirect('/dashboard/integrated_localization/locales', 'deleted', $locale-getName());
+        } else {
+            $this->set('error', t('Unable to find the locale with id %s', $localeID));
+            $this->view();
+        }
     }
 }

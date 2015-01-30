@@ -96,8 +96,8 @@ if ($editingLocale) {
                         <td><?php echo $th->specialchars($locale->getRequestedOn());
                         ?></td>
                         <td style="white-space: nowrap">
-                            <?php echo $cih->button(t('Deny'), View::url('/dashboard/integrated_localization/locales/set_approved?approve=no&ilID='.rawurlencode($locale->getID())), '', 'small danger', array('onclick' => $th->specialchars('return confirm('.json_encode(t('Are you sure?')).')'))); ?>
-                            <?php echo $cih->button(t('Approve'), View::url('/dashboard/integrated_localization/locales/set_approved?approve=yes&ilID='.rawurlencode($locale->getID())), '', 'small success', array('onclick' => $th->specialchars('return confirm('.json_encode(t('Are you sure?')).')'))); ?>
+                            <?php echo $cih->button(t('Deny'), View::url('/dashboard/integrated_localization/locales', 'delete', $locale->getID()), '', 'small danger', array('onclick' => $th->specialchars('return confirm('.json_encode(t('Are you sure?')).')'))); ?>
+                            <?php echo $cih->button(t('Approve'), View::url('/dashboard/integrated_localization/locales', 'approve', $locale->getID()), '', 'small success', array('onclick' => $th->specialchars('return confirm('.json_encode(t('Are you sure?')).')'))); ?>
                         </td>
                         <?php
                     }
