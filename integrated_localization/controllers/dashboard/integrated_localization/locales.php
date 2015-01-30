@@ -68,5 +68,5 @@ class DashboardIntegratedLocalizationLocalesController extends Controller
             $this->set('error', t('Unable to find the locale with id %s', $th->specialchars($localeID)));
             $this->view();
         }
-     }
+    }
 }
