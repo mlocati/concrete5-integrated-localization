@@ -114,7 +114,7 @@ class TranslationsSourceHelper
         }
     }
 
-    public function processPackageZip($packageHandle, $packageVersion, $packageZip, $exportTranslations = true, $importTranslations = true, $importTranslationsAsApproved = false)
+    public function processPackageZip($packageZip, &$packageHandle = '', &$packageVersion = '', $exportTranslations = true, $importTranslations = true, $importTranslationsAsApproved = false)
     {
         if (!is_file($packageZip)) {
             throw new Exception(t("Package archive not found: %s", $packageZip));
@@ -122,7 +122,7 @@ class TranslationsSourceHelper
         $fh = Loader::helper('file');
         /* @var $fh FileHelper */
         for ($i = 0; ; $i++) {
-            $unzippedFolder = str_replace(DIRECTORY_SEPARATOR, '/', $fh->getTemporaryDirectory()).'/localization/package-'.strtolower(trim(preg_replace('/[^\w\.]+/', '-', $packageHandle), '-'));
+            $unzippedFolder = str_replace(DIRECTORY_SEPARATOR, '/', $fh->getTemporaryDirectory()).'/localization/package-'.trim(preg_replace('/[^\w\.]+/', '-', basename(strtolower($packageZip), '.zip')), '-');
             if ($i > 0) {
                 $unzippedFolder .= '-'.$i;
             }
@@ -151,7 +151,7 @@ class TranslationsSourceHelper
             }
             @$zip->close();
             unset($zip);
-            $packageFilesChanged = $this->processPackageDirectory($packageHandle, $packageVersion, $unzippedFolder, $exportTranslations, $importTranslations, $importTranslationsAsApproved);
+            $packageFilesChanged = $this->processPackageDirectory($unzippedFolder, $packageHandle, $packageVersion, $exportTranslations, $importTranslations, $importTranslationsAsApproved);
             if ($packageFilesChanged) {
                 $tempZipFilename = tempnam($fh->getTemporaryDirectory().'/localization', 'zip');
                 if (!$tempZipFilename) {
@@ -204,14 +204,30 @@ class TranslationsSourceHelper
         }
     }
 
-    public function processPackageDirectory($packageHandle, $packageVersion, $dir, $exportTranslations = true, $importTranslations = true, $importTranslationsAsApproved = false)
+    public function processPackageDirectory($dir, &$packageHandle = '', &$packageVersion = '', $exportTranslations = true, $importTranslations = true, $importTranslationsAsApproved = false)
     {
-        if (is_file("$dir/controller.php")) {
-            $packageRootDir = $dir;
-        } elseif (is_file("$dir/$packageHandle/controller.php")) {
-            $packageRootDir = "$dir/$packageHandle";
-        } else {
+        $pih = Loader::helper('package_inspector', 'integrated_localization');
+        /* @var $pih PackageInspectorHelper */
+        $packageRootDir = $pih->getControllerDirectory($dir);
+        if ($packageRootDir === '') {
             throw new Exception(t("Unable to find the package file '%s'", 'controller.php'));
+        }
+        if (!is_string($packageHandle)) {
+            $packageHandle = '';
+        }
+        if (is_int($packageVersion) || is_float($packageVersion)) {
+            $packageVersion = (string) $packageVersion;
+        } elseif (!is_string($packageVersion)) {
+            $packageVersion = '';
+        }
+        if (($packageHandle === '') || ($packageVersion === '')) {
+            $packageInfo = $pih->getPackageInfo("$packageRootDir/controller.php");
+            if ($packageHandle === '') {
+                $packageHandle = $packageInfo['handle'];
+            }
+            if ($packageVersion === '') {
+                $packageVersion = $packageInfo['version'];
+            }
         }
         $packageFilesChanged = false;
         $this->parseDirectory($packageRootDir, "packages/$packageHandle", $packageHandle, $packageVersion);
@@ -329,7 +345,7 @@ class TranslationsSourceHelper
 
         return $result;
     }
-    
+
     public function getAvailableLocales($excludeSourceLocale = true)
     {
         return $this->getLocales($excludeSourceLocale ? 'lIsSource = 0' : '');
