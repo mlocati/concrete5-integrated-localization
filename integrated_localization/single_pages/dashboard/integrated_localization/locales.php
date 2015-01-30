@@ -17,15 +17,62 @@ $cih = Loader::helper('concrete/interface');
 if ($editing) {
     /* @var $editing IntegratedLocale */
     echo $cdh->getDashboardPaneHeaderWrapper(t('Edit %s', $editing->getName()), false, 'span16', false);
+    $totalPluralTranslations = $editing->getTotalPluralTranslations();
     ?>
-    <div class="ccm-pane-body">
-        <?php echo $fh->select('language', $languages, $editing->getLanguage()); ?>
-        <?php echo $fh->select('country', array_merge(array('' => t('*** No Country')), $countries), $editing->getTerritory()); ?>
-    </div>
-    <div class="ccm-pane-footer">
-        <?php echo $cih->submit(t('Save'), false, 'right', 'primary'); ?>
-        <?php echo $cih->button(t('Cancel'), View::url('/dashboard/integrated_localization/locales'), 'right'); ?>
-    </div>
+    <script>
+    $(document).ready(function() {
+        var originalPluralCount = <?php echo json_encode($editing->getPluralCount()); ?>;
+        $('#pluralCount').prop({type: 'number', min: 1, max: 6});
+        $('#integratedlocalization-locale-details')
+            .removeAttr('onsubmit')
+            .on('submit', function() {
+                var pluralCount = parseInt($('#pluralCount').val(), 10);
+                if((!pluralCount) || (pluralCount < 1) || (pluralCount > 6)) {
+                    alert(<?php echo json_encode('Please enter the number of plurals, between 1 and 6'); ?>);
+                    $('#pluralCount').select().focus();
+                    return false;
+                }
+                $('#pluralCount').val(pluralCount.toString());
+                <?php if ($totalPluralTranslations > 0) { ?>
+                    if(pluralCount != originalPluralCount) {
+                        if(!confirm(<?php echo json_encode(t("WARNING!!!\nIf you change the number of plural rules, all the %d plural translations will be deleted!!!\n\nAre you sure you want to proceed anyway?", $totalPluralTranslations)); ?>)) {
+                            return false;
+                        }
+                    }
+                <?php } ?>
+                return true;
+            })
+        ;
+    });
+    </script>
+    <form method="POST" id="integratedlocalization-locale-details" name="integratedlocalization-locale-details" onsubmit="return false">
+        <div class="ccm-pane-body">
+            <div class="clearfix">
+                <label for="language"><?php echo t('Language'); ?></label>
+                <div class="input"><?php echo $fh->select('language', $languages, $editing->getLanguage(), array('required' => 'required')); ?></div>
+            </div>
+            <div class="clearfix">
+                <label for="country"><?php echo t('Country'); ?></label>
+                <div class="input"><?php echo $fh->select('country', array_merge(array('' => t('*** No Country')), $countries), $editing->getTerritory()); ?></div>
+            </div>
+            <div class="clearfix">
+                <label for="name"><?php echo t('Name'); ?></label>
+                <div class="input"><?php echo $fh->text('name', $editing->getName(), array('maxlength' => '100', 'required' => 'required')); ?></div>
+            </div>
+            <div class="clearfix">
+                <label for="pluralCount"><?php echo t('# of plurals'); ?></label>
+                <div class="input"><?php echo $fh->text('pluralCount', (string) $editing->getPluralCount(), array('required' => 'required', 'class' => 'span1')); ?></div>
+            </div>
+            <div class="clearfix">
+                <label for="pluralRule"><?php echo t('Plural rule'); ?></label>
+                <div class="input"><?php echo $fh->text('pluralRule', $editing->getPluralRule(), array('maxlength' => '255', 'required' => 'required', 'class' => 'span12')); ?></div>
+            </div>
+        </div>
+        <div class="ccm-pane-footer">
+            <?php echo $cih->submit(t('Save'), false, 'right', 'primary'); ?>
+            <?php echo $cih->button(t('Cancel'), View::url('/dashboard/integrated_localization/locales'), 'right'); ?>
+        </div>
+    </form>
     <?php
     echo $cdh->getDashboardPaneFooterWrapper();
 } else {

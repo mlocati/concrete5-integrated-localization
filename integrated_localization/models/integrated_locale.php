@@ -247,7 +247,7 @@ class IntegratedLocale
         return $group;
     }
     /**
-     * 
+     *
      */
     public function approve()
     {
@@ -264,7 +264,7 @@ class IntegratedLocale
         $db->Execute('UPDATE IntegratedLocales SET ilApproved = 1 WHERE ilID = ? LIMIT 1', array($this->getID()));
     }
     /**
-     * 
+     *
      */
     public function delete()
     {
@@ -287,11 +287,22 @@ class IntegratedLocale
     protected function splitID()
     {
         preg_match('/^([a-z]{2,3})(?:[_\-]([a-z]{4}))?(?:[_\-]([a-z]{2}|[0-9]{3}))?(?:$|[_\-])/i', $this->getID(), $matches);
-    
+
         return array(
             'language' => strtolower($matches[1]),
             'script' => isset($matches[2]) ? ucfirst(strtolower($matches[2])) : '',
             'territory' => isset($matches[3]) ? strtoupper($matches[3]) : '',
         );
+    }
+    /**
+     * @return int
+     */
+    public function getTotalPluralTranslations()
+    {
+        $db = Loader::db();
+        /* @var $db ADODB_mysql */
+        $n = $db->GetOne("SELECT COUNT(*) FROM IntegratedTranslations WHERE (itLocale = ?) AND (itText1 IS NOT NULL) AND (itText1 <> '')", array($this->getID()));
+
+        return empty($n) ? 0 : (int) $n;
     }
 }
