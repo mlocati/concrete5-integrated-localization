@@ -6,17 +6,21 @@ $cdh = Loader::helper('concrete/dashboard');
 $th = Loader::helper('text');
 /* @var $th TextHelper */
 
+$fh = Loader::helper('form');
+/* @var $fh FormHelper */
+
 $cih = Loader::helper('concrete/interface');
 /* @var $cih ConcreteInterfaceHelper */
 
 /* @var $locales IntegratedLocale[] */
 
-if ($editingLocale) {
-    /* @var $editingLocale IntegratedLocale */
-    echo $cdh->getDashboardPaneHeaderWrapper(t('Edit %s', $editingLocale->getName()), false, 'span16', false);
+if ($editing) {
+    /* @var $editing IntegratedLocale */
+    echo $cdh->getDashboardPaneHeaderWrapper(t('Edit %s', $editing->getName()), false, 'span16', false);
     ?>
     <div class="ccm-pane-body">
-
+        <?php echo $fh->select('language', $languages, $editing->getLanguage()); ?>
+        <?php echo $fh->select('country', array_merge(array('' => t('*** No Country')), $countries), $editing->getTerritory()); ?>
     </div>
     <div class="ccm-pane-footer">
         <?php echo $cih->submit(t('Save'), false, 'right', 'primary'); ?>
@@ -72,7 +76,7 @@ if ($editingLocale) {
                             ?> href="javascript:void(0)" disabled="disabled" onclick="<?php echo $th->specialchars('alert('.json_encode(t("This is the source locale and can't be modified")).')'); ?>"<?php
 
                         } else {
-                            ?> href="<?php echo $th->specialchars(View::url('/dashboard/integrated_localization/locales/?ilID='.rawurlencode($locale->getID()))); ?>"<?php
+                            ?> href="<?php echo $th->specialchars(View::url('/dashboard/integrated_localization/locales/', 'edit', $locale->getID())); ?>"<?php
                         }
                         ?>><?php
                         echo $th->specialchars($locale->getName());

@@ -58,6 +58,33 @@ class IntegratedLocale
     /**
      * @return string
      */
+    public function getLanguage()
+    {
+        $info = $this->splitID();
+
+        return $info['language'];
+    }
+    /**
+     * @return string
+     */
+    public function getScript()
+    {
+        $info = $this->splitID();
+
+        return $info['script'];
+    }
+    /**
+     * @return string
+     */
+    public function getTerritory()
+    {
+        $info = $this->splitID();
+
+        return $info['territory'];
+    }
+    /**
+     * @return string
+     */
     public function getName()
     {
         return $this->name;
@@ -253,5 +280,18 @@ class IntegratedLocale
         /* @var $db ADODB_mysql */
         $db->Execute('DELETE FROM IntegratedTranslations WHERE itLocale = ?', array($this->getID()));
         $db->Execute('DELETE FROM IntegratedLocales WHERE ilID = ? LIMIT 1', array($this->getID()));
+    }
+    /**
+     * @return array
+     */
+    protected function splitID()
+    {
+        preg_match('/^([a-z]{2,3})(?:[_\-]([a-z]{4}))?(?:[_\-]([a-z]{2}|[0-9]{3}))?(?:$|[_\-])/i', $this->getID(), $matches);
+    
+        return array(
+            'language' => strtolower($matches[1]),
+            'script' => isset($matches[2]) ? ucfirst(strtolower($matches[2])) : '',
+            'territory' => isset($matches[3]) ? strtoupper($matches[3]) : '',
+        );
     }
 }

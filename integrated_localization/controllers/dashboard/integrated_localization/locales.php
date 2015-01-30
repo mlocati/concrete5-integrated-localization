@@ -6,34 +6,8 @@ class DashboardIntegratedLocalizationLocalesController extends Controller
     {
         Loader::model('integrated_locale', 'integrated_localization');
         $locales = IntegratedLocale::getList(true, true);
-        $editingLocale = false;
-        $ilID = $this->get('ilID');
-        if (is_string($ilID)) {
-            foreach ($locales as $locale) {
-                if ($locale->getID() === $ilID) {
-                    $editingLocale = $locale;
-                    break;
-                }
-            }
-        }
         $this->set('locales', $locales);
-        $this->set('editingLocale', $editingLocale);
     }
-    public function approved($localeName)
-    {
-        $th = Loader::helper('text');
-        /* @var $th TextHelper */
-        $this->set('message', t("The locale '%s' has been approved", $th->specialchars($localeName)));
-        $this->view();
-    }
-    public function deleted($localeName)
-    {
-        $th = Loader::helper('text');
-        /* @var $th TextHelper */
-        $this->set('message', t("The request to adopt the locale '%s' has been denied", $th->specialchars($localeName)));
-        $this->view();
-    }
-
     public function approve($localeID)
     {
         Loader::model('integrated_locale', 'integrated_localization');
@@ -42,9 +16,18 @@ class DashboardIntegratedLocalizationLocalesController extends Controller
             $locale->approve();
             $this->redirect('/dashboard/integrated_localization/locales', 'approved', $locale->getName());
         } else {
-            $this->set('error', t('Unable to find the locale with id %s', $localeID));
+            $th = Loader::helper('text');
+            /* @var $th TextHelper */
+            $this->set('error', t('Unable to find the locale with id %s', $th->specialchars($localeID)));
             $this->view();
         }
+    }
+    public function approved($localeName)
+    {
+        $th = Loader::helper('text');
+        /* @var $th TextHelper */
+        $this->set('message', t("The locale '%s' has been approved", $th->specialchars($localeName)));
+        $this->view();
     }
     public function delete($localeID)
     {
@@ -54,8 +37,36 @@ class DashboardIntegratedLocalizationLocalesController extends Controller
             $locale->delete();
             $this->redirect('/dashboard/integrated_localization/locales', 'deleted', $locale-getName());
         } else {
-            $this->set('error', t('Unable to find the locale with id %s', $localeID));
+            $th = Loader::helper('text');
+            /* @var $th TextHelper */
+            $this->set('error', t('Unable to find the locale with id %s', $th->specialchars($localeID)));
             $this->view();
         }
     }
+    public function deleted($localeName)
+    {
+        $th = Loader::helper('text');
+        /* @var $th TextHelper */
+        $this->set('message', t("The request to adopt the locale '%s' has been denied", $th->specialchars($localeName)));
+        $this->view();
+    }
+    public function edit($localeID)
+    {
+        Loader::model('integrated_locale', 'integrated_localization');
+        $locale = IntegratedLocale::getByID($localeID, true);
+        if ($locale) {
+            $this->set('editing', $locale);
+            $languages = \Gettext\Utils\Locales::getLanguages(true, true);
+            natcasesort($languages);
+            $this->set('languages', $languages);
+            $countries = \Gettext\Utils\Locales::getTerritories(true, true);
+            natcasesort($countries);
+            $this->set('countries', $countries);
+        } else {
+            $th = Loader::helper('text');
+            /* @var $th TextHelper */
+            $this->set('error', t('Unable to find the locale with id %s', $th->specialchars($localeID)));
+            $this->view();
+        }
+     }
 }
