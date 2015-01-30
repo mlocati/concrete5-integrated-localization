@@ -13,6 +13,7 @@ class FileExtendedHelper
     public function deleteFromFileSystem($path)
     {
         if (is_dir($path)) {
+            $allChildrenDeleted = true;
             foreach (scandir($path) as $child) {
                 switch ($child) {
                     case '.':
@@ -20,17 +21,22 @@ class FileExtendedHelper
                         break;
                     default:
                         if ($this->deleteFromFileSystem($path.'/'.$child) === false) {
-                            return false;
+                            $allChildrenDeleted = false;
                         }
                         break;
                 }
             }
-
-            return @rmdir($path) ? true : false;
+            if ($allChildrenDeleted) {
+                $result = @rmdir($path) ? true : false;
+            } else {
+                $result = false;
+            }
         } elseif (is_file($path)) {
-            return @unlink($path) ? true : false;
+            $result = @unlink($path) ? true : false;
         } else {
-            return false;
+            $result = false;
         }
+
+        return $result;
     }
 }
