@@ -172,7 +172,28 @@ class IntegratedLocale
      */
     public function getAdministratorsGroupName()
     {
-        return sprintf('Locale administrators for $s', $this->getID());
+        return sprintf('Locale administrators for %s', $this->getID());
+    }
+    /**
+     * @return string
+     */
+    public function getTranslatorsGroupName()
+    {
+        return sprintf('Locale translators for %s', $this->getID());
+    }
+    /**
+     * @return string
+     */
+    public function getAdministratorsGroupDescription()
+    {
+        return sprintf('Administrators for the locale %s', $this->getName());
+    }
+    /**
+     * @return string
+     */
+    public function getTranslatorsGroupDescription()
+    {
+        return sprintf('Translators for the locale %s', $this->getName());
     }
     /**
      * return Group|null
@@ -180,15 +201,11 @@ class IntegratedLocale
     public function getAdministratorsGroup()
     {
         $group = Group::getByName($this->getAdministratorsGroupName());
-        if(isset($group) && ($group->isError() || (!$group->getGroupID()))) {
+        if (isset($group) && ($group->isError() || (!$group->getGroupID()))) {
             $group = null;
         }
-        
+
         return $group;
-    }
-    public function getTranslatorsGroupName()
-    {
-        return sprintf('Locale translators for $s', $this->getID());
     }
     /**
      * return Group|null
@@ -196,35 +213,40 @@ class IntegratedLocale
     public function getTranslatorsGroup()
     {
         $group = Group::getByName($this->getTranslatorsGroupName());
-        if(isset($group) && ($group->isError() || (!$group->getGroupID()))) {
+        if (isset($group) && ($group->isError() || (!$group->getGroupID()))) {
             $group = null;
         }
-    
+
         return $group;
     }
-
+    /**
+     * 
+     */
     public function approve()
     {
         $g = $this->getAdministratorsGroup();
-        if(!$g) {
-            Group::add($this->getAdministratorsGroupName(), sprintf('Administrators for the locale %s', $this->getName()));
+        if (!$g) {
+            Group::add($this->getAdministratorsGroupName(), $this->getAdministratorsGroupDescription());
         }
         $g = $this->getTranslatorsGroup();
-        if(!$g) {
-            Group::add($this->getTranslatorsGroupName(), sprintf('Translators for the locale %s', $this->getName()));
+        if (!$g) {
+            Group::add($this->getTranslatorsGroupName(), $this->getTranslatorsGroupDescription());
         }
         $db = Loader::db();
         /* @var $db ADODB_mysql */
         $db->Execute('UPDATE IntegratedLocales SET ilApproved = 1 WHERE ilID = ? LIMIT 1', array($this->getID()));
     }
+    /**
+     * 
+     */
     public function delete()
     {
         $g = $this->getAdministratorsGroup();
-        if($g) {
+        if ($g) {
             $g->delete();
         }
         $g = $this->getTranslatorsGroup();
-        if($g) {
+        if ($g) {
             $g->delete();
         }
         $db = Loader::db();
