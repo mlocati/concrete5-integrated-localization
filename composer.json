@@ -18,6 +18,6 @@
 	"config": {
 		"preferred-install": "dist",
 		"optimize-autoloader": true,
-		"vendor-dir": "web/libraries/3rdparty"
+		"vendor-dir": "integrated_localization/libraries/3rdparty"
 	}
 }
