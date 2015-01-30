@@ -4,14 +4,13 @@ class DashboardIntegratedLocalizationLocalesController extends Controller
 {
     public function view()
     {
-        $tsh = Loader::helper('translations_source', 'integrated_localization');
-        /* @var $tsh TranslationsSourceHelper */
-        $locales = $tsh->getAvailableLocales(false);
+        Loader::model('integrated_locale', 'integrated_localization');
+        $locales = IntegratedLocale::getList(true, true);
         $editingLocale = false;
-        $lID = $this->get('lID');
-        if (is_string($lID)) {
+        $ilID = $this->get('ilID');
+        if (is_string($ilID)) {
             foreach ($locales as $locale) {
-                if ($locale['id'] === $lID) {
+                if ($locale->getID() === $ilID) {
                     $editingLocale = $locale;
                     break;
                 }
@@ -31,41 +30,21 @@ class DashboardIntegratedLocalizationLocalesController extends Controller
         $this->view();
     }
 
-    public function approve()
+    public function set_approved()
     {
-        $locale = null;
-        $approve = null;
-        $tsh = Loader::helper('translations_source', 'integrated_localization');
-        /* @var $tsh TranslationsSourceHelper */
-        $locales = $tsh->getAvailableLocales(false);
-        $lID = $this->get('lID');
-        if (is_string($lID)) {
-            foreach ($locales as $l) {
-                if ($l['id'] === $lID) {
-                    $locale = $l;
-                    break;
-                }
-            }
-        }
-
-        $a = $this->get('ok');
-        if ($a === '1') {
-            $approve = true;
-        } elseif ($a === '0') {
-            $approve = false;
-        }
-        if (isset($locale) && isset($approve)) {
-            $db = Loader::db();
-            /* @var $db ADODB_mysql */
-            if ($approve) {
-                $db->Execute('UPDATE Locales SET lApproved = 1 WHERE lID = ? LIMIT 1', array($locale['id']));
+        Loader::model('integrated_locale', 'integrated_localization');
+        $locale = IntegratedLocale::getByID($this->get('ilID'), true);
+        if ($locale) {
+            $approve = null;
+            $a = $this->get('approve');
+            if ($a === 'yes') {
+                $locale->approve();
                 $this->redirect('/dashboard/integrated_localization/locales/approved');
-            } else {
-                $db->Execute('DELETE FROM Locales WHERE lID = ? LIMIT 1', array($locale['id']));
+            } elseif ($a === 'no') {
+                $locale->delete();
                 $this->redirect('/dashboard/integrated_localization/locales/unapproved');
             }
-        } else {
-            $this->view();
         }
+        $this->view();
     }
 }

@@ -36,7 +36,7 @@ class TranslationsSourceHelper
         );
         $db->Execute('START TRANSACTION');
         try {
-            $db->Execute('DELETE FROM TranslatablePlaces WHERE (tpPackage = ?) AND (tpVersion = ?)', array($packageHandle, $packageVersion));
+            $db->Execute('DELETE FROM IntegratedTranslatablePlaces WHERE (itpPackage = ?) AND (itpVersion = ?)', array($packageHandle, $packageVersion));
             $placesQuery = null;
             $placesQueryParams = null;
             $placesQueryCount = 0;
@@ -44,35 +44,35 @@ class TranslationsSourceHelper
                 $result['total']++;
                 /* @var $translation \Gettext\Translation */
                 $hash = md5($translation->getId());
-                $row = $db->GetRow('SELECT tID, tPlural FROM Translatables WHERE tHash = ? LIMIT 1', array($hash));
+                $row = $db->GetRow('SELECT itID, itPlural FROM IntegratedTranslatables WHERE itHash = ? LIMIT 1', array($hash));
                 if ($row) {
-                    $tID = (int) $row['tID'];
-                    if ($translation->hasPlural() && (((string) $row['tPlural']) === '')) {
-                        $db->Execute('UPDATE Translatables SET tPlural = ? WHERE tID = ? LIMIT 1', array($translation->getPlural(), $tID));
+                    $itID = (int) $row['itID'];
+                    if ($translation->hasPlural() && (((string) $row['itPlural']) === '')) {
+                        $db->Execute('UPDATE IntegratedTranslatables SET itPlural = ? WHERE itID = ? LIMIT 1', array($translation->getPlural(), $itID));
                         $result['updated']++;
                     }
                 } else {
-                    $sql = 'INSERT INTO Translatables SET tHash = ?, tText = ?';
+                    $sql = 'INSERT INTO IntegratedTranslatables SET itHash = ?, itText = ?';
                     $q = array($hash, $translation->getOriginal());
-                    if ($translation->getContext() !== '') {
-                        $sql .= ', tContext = ?';
+                    if ($translation->hasContext() !== '') {
+                        $sql .= ', itContext = ?';
                         $q[] = $translation->getContext();
                     }
                     if ($translation->hasPlural()) {
-                        $sql .= ', tPlural = ?';
+                        $sql .= ', itPlural = ?';
                         $q[] = $translation->getPlural();
                     }
                     $db->Execute($sql, $q);
-                    $tID = (int) $db->Insert_ID();
+                    $itID = (int) $db->Insert_ID();
                     $result['added']++;
                 }
                 if ($placesQueryCount === 0) {
-                    $placesQuery = 'INSERT INTO TranslatablePlaces (tpTranslatable, tpPackage, tpVersion, tpLocations, tpComments) VALUES ';
+                    $placesQuery = 'INSERT INTO IntegratedTranslatablePlaces (itpTranslatable, itpPackage, itpVersion, itpLocations, itpComments) VALUES ';
                     $placesQueryParams = array();
                 } else {
                     $placesQuery .= ', ';
                 }
-                $placesQuery .= '('.$tID.', ?';
+                $placesQuery .= '('.$itID.', ?';
                 $placesQueryParams[] = $packageHandle;
                 $placesQuery .= ', ?';
                 $placesQueryParams[] = $packageVersion;
@@ -232,9 +232,10 @@ class TranslationsSourceHelper
         $packageFilesChanged = false;
         $this->parseDirectory($packageRootDir, "packages/$packageHandle", $packageHandle, $packageVersion);
         if ($importTranslations || $exportTranslations) {
+            Loader::model('integrated_locale', 'integrated_localization');
             $translationsDir = "$packageRootDir/languages";
-            foreach ($this->getAvailableLocales() as $localeInfo) {
-                $gettextDir = "$translationsDir/{$localeInfo['id']}/LC_MESSAGES";
+            foreach (IntegratedLocale::getList() as $locale) {
+                $gettextDir = "$translationsDir/".$locale->getID()."/LC_MESSAGES";
                 $poFile = "$gettextDir/messages.po";
                 $moFile = "$gettextDir/messages.mo";
                 $importedTranslations = null;
@@ -254,14 +255,14 @@ class TranslationsSourceHelper
                     }
                     if ($importedTranslations->count() > 0) {
                         if ($importTranslations) {
-                            $this->importTranslations($localeInfo['id'], $importedTranslations, $importTranslationsAsApproved);
+                            $this->importTranslations($locale->getID(), $importedTranslations, $importTranslationsAsApproved);
                         }
                     } else {
                         $importedTranslations = null;
                     }
                 }
                 if ($exportTranslations) {
-                    $translationsToExport = $this->loadPackageTranslations($localeInfo['id'], $packageHandle, $packageVersion);
+                    $translationsToExport = $this->loadPackageTranslations($locale->getID(), $packageHandle, $packageVersion);
                     if ($importedTranslations) {
                         $translationsToExport->mergeWith($importedTranslations);
                     }
@@ -320,83 +321,36 @@ class TranslationsSourceHelper
         }
     }
 
-    private function getLocales($where = '', $q = array())
+    /**
+     * @param IntegratedLocale|string $locale
+     * @param \Gettext\Translations $translations
+     * @param bool $markAsApproved
+     */
+    public function importTranslations($locale, \Gettext\Translations $translations, $markAsApproved)
     {
-        $result = array();
-        $db = Loader::db();
-        /* @var $db ADODB_mysql */
-        $sql = 'SELECT * FROM Locales';
-        if (is_string($where) && ($where !== '')) {
-            $sql .= ' WHERE '.$where;
+        if(!is_object($locale)) {
+            Loader::model('integrated_locale', 'integrated_localization');
+            $l = IntegratedLocale::getByID($locale);
+            if (!$l) {
+                throw new Exception(t('Invalid locale identifier: %s', $locale));
+            }
+            $locale = $l;
         }
-        $sql .= ' ORDER BY lName';
-        $rs = $db->Query($sql, $q);
-        /* @var $rs ADORecordSet_mysql */
-        while ($row = $rs->FetchRow()) {
-            $result[] = array(
-                'id' => $row['lID'],
-                'name' => $row['lName'],
-                'isSource' => empty($row['lIsSource']) ? false : true,
-                'pluralCount' => (int) $row['lPluralCount'],
-                'pluralRule' => $row['lPluralRule'],
-                'approved' => empty($row['lApproved']) ? false : true,
-                'requestedBy' => isset($row['lRequestedBy']) ? ((int) $row['lRequestedBy']) : null,
-                'requestedOn' => isset($row['lRequestedOn']) ? $row['lRequestedOn'] : '',
-            );
-        }
-        $rs->Close();
-
-        return $result;
-    }
-
-    public function getAvailableLocales($excludeSourceLocale = true, $onlyApproved = true)
-    {
-        $w = array();
-        $q = array();
-        if ($excludeSourceLocale) {
-            $w[] = '(lIsSource = 0)';
-        }
-        if ($onlyApproved) {
-            $w[] = '(lApproved = 1)';
-        }
-
-        return $this->getLocales($w, $q);
-    }
-    public function getLocaleByID($localeID, $onlyIfApproved = true)
-    {
-        $w = array();
-        $q = array();
-        $w[] = '(lID = ?)';
-        $q[] = $localeID;
-        if ($onlyIfApproved) {
-            $w[] = '(lApproved = 1)';
-        }
-        $list = $this->getLocales(implode(' AND ', $w), $q);
-
-        return empty($list) ? null : $list[0];
-    }
-
-    public function importTranslations($localeID, \Gettext\Translations $translations, $markAsApproved)
-    {
-        $localeInfo = $this->getLocaleByID($localeID);
-        if (!isset($localeInfo)) {
-            throw new Exception(t('Invalid locale identifier: %s', $localeID));
-        }
+        $pluralCount = $locale->getPluralCount();
         $translations = clone $translations;
-        $translations->setLanguage($localeInfo['id']);
-        $translations->setPluralForms($localeInfo['pluralCount'], $localeInfo['pluralRule']);
+        $translations->setLanguage($locale->getID());
+        $translations->setPluralForms($pluralCount, $locale->getPluralRule());
         $markAsApproved = $markAsApproved ? 1 : 0;
         $db = Loader::db();
         /* @var $db ADODB_mysql */
         $adds = array();
-        $maxPluralCount = 1;
         foreach ($translations as $translation) {
             /* @var $translation \Gettext\Translation */
             if ($translation->hasTranslation()) {
                 $translated = true;
                 $plural = $translation->hasPlural();
                 if ($plural) {
-                    for ($i = 0; $i < $localeInfo['pluralCount']; $i++) {
+                    for ($i = 0; $i < $pluralCount; $i++) {
                         if ($translation->getPluralTranslation($i) === '') {
                             $translated = false;
                             break;
@@ -417,60 +371,57 @@ class TranslationsSourceHelper
                     $row = $db->GetRow(
                         '
                             SELECT
-                                tID,
-                                tPlural,
-                                tApproved,
-                                tText0
+                                itID,
+                                itPlural,
+                                itApproved,
+                                itText0
                             FROM
-                                    Translatables
+                                    IntegratedTranslatables
                                 LEFT JOIN
-                                    Translations
+                                    IntegratedTranslations
                                 ON
-                                    (? = Translations.tLocale)
+                                    (? = IntegratedTranslations.itLocale)
                                     AND
-                                    (Translatables.tID = Translations.tTranslatable)
+                                    (IntegratedTranslatables.itID = IntegratedTranslations.itTranslatable)
                             WHERE
-                               (tHash = ?)
+                               (itHash = ?)
                             LIMIT 1
                         ',
-                        array($localeInfo['id'], $hash)
+                        array($locale->getID(), $hash)
                     );
                     if ($row) {
-                        $translatableID = (int) $row['tID'];
-                        $savedPlural = (isset($row['tPlural']) && ($row['tPlural'] !== '')) ? true : false;
+                        $translatableID = (int) $row['itID'];
+                        $savedPlural = (isset($row['itPlural']) && ($row['itPlural'] !== '')) ? true : false;
                         if ($savedPlural === $plural) {
-                            if (is_null($row['tText0'])) {
+                            if (is_null($row['itText0'])) {
                                 $addThis = array(
-                                    'tLocale' => $localeInfo['id'],
-                                    'tTranslatable' => $translatableID,
-                                    'tApproved' => $markAsApprovedThis,
-                                    'tText0' => $translation->getTranslation(),
+                                    'itLocale' => $locale->getID(),
+                                    'itTranslatable' => $translatableID,
+                                    'itApproved' => $markAsApprovedThis,
+                                    'itText0' => $translation->getTranslation(),
                                 );
                                 if ($plural) {
-                                    for ($i = 0; $i < $localeInfo['pluralCount']; $i++) {
-                                        $addThis['tText'.($i + 1)] = $translation->getPluralTranslation($i);
-                                    }
-                                    if ($maxPluralCount < $localeInfo['pluralCount']) {
-                                        $maxPluralCount = $localeInfo['pluralCount'];
+                                    for ($i = 0; $i < $pluralCount; $i++) {
+                                        $addThis['itText'.($i + 1)] = $translation->getPluralTranslation($i);
                                     }
                                 }
                                 $adds[] = $addThis;
                             } else {
-                                $savedApproved = empty($row['tApproved']) ? 0 : 1;
+                                $savedApproved = empty($row['itApproved']) ? 0 : 1;
                                 if ($markAsApprovedThis || ($savedApproved === 0)) {
-                                    $sql = 'UPDATE Translations SET';
+                                    $sql = 'UPDATE IntegratedTranslations SET';
                                     $q = array();
-                                    $sql .= ' tApproved = '.$markAsApprovedThis;
-                                    $sql .= ', tText0 = ?';
+                                    $sql .= ' itApproved = '.$markAsApprovedThis;
+                                    $sql .= ', itText0 = ?';
                                     $q[] = $translation->getTranslation();
                                     if ($plural) {
-                                        for ($i = 0; $i < $localeInfo['pluralCount']; $i++) {
-                                            $sql .= ', tText'.($i + 1).' = ?';
+                                        for ($i = 0; $i < $pluralCount; $i++) {
+                                            $sql .= ', itText'.($i + 1).' = ?';
                                             $q[] = $translation->getPluralTranslation($i);
                                         }
                                     }
-                                    $sql .= ' WHERE (tLocale = ?) AND (tTranslatable = ?) LIMIT 1';
-                                    $q[] = $localeInfo['id'];
+                                    $sql .= ' WHERE (itLocale = ?) AND (itTranslatable = ?) LIMIT 1';
+                                    $q[] = $locale->getID();
                                     $q[] = $translatableID;
                                     $db->Execute($sql, $q);
                                 }
@@ -482,9 +433,9 @@ class TranslationsSourceHelper
         }
         $numAdd = count($adds);
         if ($numAdd > 0) {
-            $sqlStart = 'INSERT INTO Translations (tLocale, tTranslatable, tApproved';
-            for ($i = 0; $i < $maxPluralCount; $i++) {
-                $sqlStart .= ', tText'.$i;
+            $sqlStart = 'INSERT INTO IntegratedTranslations (itLocale, itTranslatable, itApproved';
+            for ($i = 0; $i < $pluralCount; $i++) {
+                $sqlStart .= ', itText'.$i;
             }
             $sqlStart .= ') VALUES ';
             $sql = '';
@@ -498,13 +449,13 @@ class TranslationsSourceHelper
                     $sql .= ', ';
                 }
                 $sql .= '(?, ?, ?';
-                $q[] = $adds[$a]['tLocale'];
-                $q[] = $adds[$a]['tTranslatable'];
-                $q[] = $adds[$a]['tApproved'];
-                for ($i = 0; $i < $maxPluralCount; $i++) {
-                    if (isset($adds[$a]['tText'.$i])) {
+                $q[] = $adds[$a]['itLocale'];
+                $q[] = $adds[$a]['itTranslatable'];
+                $q[] = $adds[$a]['itApproved'];
+                for ($i = 0; $i < $pluralCount; $i++) {
+                    if (isset($adds[$a]['itText'.$i])) {
                         $sql .= ', ?';
-                        $q[] = $adds[$a]['tText'.$i];
+                        $q[] = $adds[$a]['itText'.$i];
                     } else {
                         $sql .= ', NULL';
                     }
@@ -519,101 +470,106 @@ class TranslationsSourceHelper
     }
 
     /**
-     * @param string $localeID
+     * @param IntegratedLocale|string $locale
      * @param string $packageHandle
      * @param string $packageVersion
      * @param bool $onlyTranslated
      * @return \Gettext\Translations
      */
-    public function loadPackageTranslations($localeID, $packageHandle, $packageVersion, $onlyTranslated = false, $unapprovedAsFuzzy = false)
+    public function loadPackageTranslations($locale, $packageHandle, $packageVersion, $onlyTranslated = false, $unapprovedAsFuzzy = false)
     {
-        $localeInfo = $this->getLocaleByID($localeID);
-        if (!isset($localeInfo)) {
-            throw new Exception(t('Invalid locale identifier: %s', $localeID));
+        if(!is_object($locale)) {
+            Loader::model('integrated_locale', 'integrated_localization');
+            $l = IntegratedLocale::getByID($locale);
+            if (!$l) {
+                throw new Exception(t('Invalid locale identifier: %s', $locale));
+            }
+            $locale = $l;
         }
+        $pluralCount = $locale->getPluralCount();
         $translations = new \Gettext\Translations();
         $translations->setHeader('Project-Id-Version', "$packageHandle v$packageVersion");
-        $translations->setLanguage($localeInfo['id']);
-        $translations->setPluralForms($localeInfo['pluralCount'], $localeInfo['pluralRule']);
+        $translations->setLanguage($locale->getID());
+        $translations->setPluralForms($pluralCount, $locale->getPluralRule());
         $db = Loader::db();
         /* @var $db ADODB_mysql */
         if ($onlyTranslated) {
             $from = '
-                    TranslatablePlaces
+                    IntegratedTranslatablePlaces
                 INNER JOIN
-                    Translations
+                    IntegratedTranslations
                 ON
-                    (TranslatablePlaces.tpTranslatable = Translations.tTranslatable)
+                    (IntegratedTranslatablePlaces.itpTranslatable = IntegratedTranslations.itTranslatable)
                 INNER JOIN
-                    Translatables
+                    IntegratedTranslatables
                 ON
-                    (Translatables.tID = TranslatablePlaces.tpTranslatable)
+                    (IntegratedTranslatables.itID = IntegratedTranslatablePlaces.itpTranslatable)
             ';
             $where = '
-                (TranslatablePlaces.tpPackage = ?)
+                (IntegratedTranslatablePlaces.itpPackage = ?)
                 AND
-                (TranslatablePlaces.tpVersion = ?)
+                (IntegratedTranslatablePlaces.itpVersion = ?)
                 AND
-                (Translations.tLocale = ?)
+                (IntegratedTranslations.itLocale = ?)
             ';
             $q = array(
                 $packageHandle,
                 $packageVersion,
-                $localeInfo['id'],
+                $locale->getID(),
             );
         } else {
             $from = '
-                    TranslatablePlaces
+                    IntegratedTranslatablePlaces
                 INNER JOIN
-                    Translatables
+                    IntegratedTranslatables
                 ON
-                    (Translatables.tID = TranslatablePlaces.tpTranslatable)
+                    (IntegratedTranslatables.itID = IntegratedTranslatablePlaces.itpTranslatable)
                 LEFT JOIN
-                    Translations
+                    IntegratedTranslations
                 ON
-                    (? = Translations.tLocale)
+                    (? = IntegratedTranslations.itLocale)
                     AND
-                    (TranslatablePlaces.tpTranslatable = Translations.tTranslatable)
+                    (IntegratedTranslatablePlaces.itpTranslatable = IntegratedTranslations.itTranslatable)
             ';
             $where = '
-                (TranslatablePlaces.tpPackage = ?)
+                (IntegratedTranslatablePlaces.itpPackage = ?)
                 AND
-                (TranslatablePlaces.tpVersion = ?)
+                (IntegratedTranslatablePlaces.itpVersion = ?)
             ';
             $q = array(
-                $localeInfo['id'],
+                $locale->getID(),
                 $packageHandle,
                 $packageVersion,
             );
         }
         $select = "
-             TranslatablePlaces.tpLocations,
-             TranslatablePlaces.tpComments,
-             Translatables.tContext,
-             Translatables.tText,
-             Translatables.tPlural,
-             Translations.tApproved
+             IntegratedTranslatablePlaces.itpLocations,
+             IntegratedTranslatablePlaces.itpComments,
+             IntegratedTranslatables.itContext,
+             IntegratedTranslatables.itText,
+             IntegratedTranslatables.itPlural,
+             IntegratedTranslations.itApproved
         ";
-        for ($i = 0; $i < $localeInfo['pluralCount']; $i++) {
-            $select .= ', Translations.tText'.$i;
+        for ($i = 0; $i < $pluralCount; $i++) {
+            $select .= ', IntegratedTranslations.itText'.$i;
         }
         $rs = $db->Query("SELECT $select FROM $from WHERE $where", $q);
         /* @var $rs ADORecordSet_mysql */
         while ($row = $rs->FetchRow()) {
-            $transation = $translations->insert($row['tContext'], $row['tText'], $row['tPlural']);
-            if (isset($row['tText0'])) {
-                $transation->setTranslation($row['tText0']);
+            $transation = $translations->insert($row['itContext'], $row['itText'], $row['itPlural']);
+            if (isset($row['itText0'])) {
+                $transation->setTranslation($row['itText0']);
                 if ($transation->hasPlural()) {
-                    for ($i = 1; $i < $localeInfo['pluralCount']; $i++) {
-                        $transation->setPluralTranslation($row['tText'.$i], $i - 1);
+                    for ($i = 1; $i < $pluralCount; $i++) {
+                        $transation->setPluralTranslation($row['itText'.$i], $i - 1);
                     }
                 }
-                if ($unapprovedAsFuzzy && empty($row['tApproved'])) {
+                if ($unapprovedAsFuzzy && empty($row['itApproved'])) {
                     $transation->addFlag('fuzzy');
                 }
             }
-            if (isset($row['tpLocations']) && ($row['tpLocations'] !== '')) {
-                foreach (explode("\x04", $row['tpLocations']) as $location) {
+            if (isset($row['itpLocations']) && ($row['itpLocations'] !== '')) {
+                foreach (explode("\x04", $row['iitpLocations']) as $location) {
                     if ($location !== '') {
                         $line = null;
                         if (preg_match('/^(.+):(\d+)$/', $location, $m)) {
@@ -624,8 +580,8 @@ class TranslationsSourceHelper
                     }
                 }
             }
-            if (isset($row['tpComments']) && ($row['tpComments'] !== '')) {
-                foreach (explode("\x04", $row['tpComments']) as $comment) {
+            if (isset($row['itpComments']) && ($row['itpComments'] !== '')) {
+                foreach (explode("\x04", $row['itpComments']) as $comment) {
                     if ($comment !== '') {
                         $transation->addExtractedComment($comment);
                     }

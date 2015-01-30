@@ -9,17 +9,18 @@ $th = Loader::helper('text');
 $cih = Loader::helper('concrete/interface');
 /* @var $cih ConcreteInterfaceHelper */
 
+/* @var $locales IntegratedLocale[] */
+
 if ($editingLocale) {
-    echo $cdh->getDashboardPaneHeaderWrapper(t('Edit %s', $editingLocale['name']), false, 'span16', false);
+    /* @var $editingLocale IntegratedLocale */
+    echo $cdh->getDashboardPaneHeaderWrapper(t('Edit %s', $editingLocale->getName()), false, 'span16', false);
     ?>
     <div class="ccm-pane-body">
 
     </div>
     <div class="ccm-pane-footer">
-        <?php echo $cih->submit(t('Save'), false, 'right', 'primary');
-    ?>
-        <?php echo $cih->button(t('Cancel'), View::url('/dashboard/integrated_localization/locales'), 'right');
-    ?>
+        <?php echo $cih->submit(t('Save'), false, 'right', 'primary'); ?>
+        <?php echo $cih->button(t('Cancel'), View::url('/dashboard/integrated_localization/locales'), 'right'); ?>
     </div>
     <?php
     echo $cdh->getDashboardPaneFooterWrapper();
@@ -33,7 +34,8 @@ if ($editingLocale) {
             ?></h2><?php
             $found = false;
             foreach ($locales as $locale) {
-                if ($locale['approved'] !== $approved) {
+                /* @var $locale IntegratedLocale */
+                if ($locale->getApproved() !== $approved) {
                     continue;
                 }
                 if (!$found) {
@@ -63,61 +65,50 @@ if ($editingLocale) {
                     <?php
                     $found = true;
                 }
-                ?><tr<?php echo $locale['isSource'] ? ' style="background-color: #fafcba"' : '';
+                ?><tr<?php echo $locale->getIsSource() ? ' style="background-color: #fafcba"' : '';
                 ?>>
                     <td><a <?php
-                        if ($locale['isSource']) {
-                            ?> href="javascript:void(0)" disabled="disabled" onclick="<?php echo $th->specialchars('alert('.json_encode(t("This is the source language and can't be modified")).')');
-                            ?>"<?php
+                        if ($locale->getIsSource()) {
+                            ?> href="javascript:void(0)" disabled="disabled" onclick="<?php echo $th->specialchars('alert('.json_encode(t("This is the source locale and can't be modified")).')'); ?>"<?php
 
                         } else {
-                            ?> href="<?php echo $th->specialchars(View::url('/dashboard/integrated_localization/locales/?lID='.rawurlencode($locale['id'])));
-                            ?>"<?php
-
+                            ?> href="<?php echo $th->specialchars(View::url('/dashboard/integrated_localization/locales/?ilID='.rawurlencode($locale->getID()))); ?>"<?php
                         }
-                ?>><?php
-                        echo $th->specialchars($locale['name']);
-                ?></a></td>
-                    <td><?php echo $th->specialchars($locale['id']);
-                ?></td>
+                        ?>><?php
+                        echo $th->specialchars($locale->getName());
+                    ?></a></td>
+                    <td><?php echo $th->specialchars($locale->getName()); ?></td>
                     <?php
                     if (!$approved) {
                         ?>
                         <td><?php
-                            $requestedBy = $locale['requestedBy'] ? User::getByUserID($locale['requestedBy']) : null;
-                        if (is_object($requestedBy) && $requestedBy->getUserID()) {
-                            ?><a href="<?php echo $th->specialchars(View::url('/index.php/dashboard/users/search?uID='.$locale['requestedBy']));
-                            ?>"><?php echo $th->specialchars($requestedBy->getUserName());
-                            ?></a><?php
-
-                        } elseif ($locale['requestedBy']) {
-                            echo t('Deleted user (id: %d)', $locale['requestedBy']);
-                        } else {
-                            echo t('Nobody');
-                        }
+                            $requestedBy = $locale->getRequestedBy() ? User::getByUserID($locale->getRequestedBy()) : null;
+                            if (is_object($requestedBy) && $requestedBy->getUserID()) {
+                                ?><a href="<?php echo $th->specialchars(View::url('/index.php/dashboard/users/search?uID='.$locale->getRequestedBy()));
+                                ?>"><?php echo $th->specialchars($requestedBy->getUserName());
+                                ?></a><?php
+                            } elseif ($locale->getRequestedBy()) {
+                                echo t('Deleted user (id: %d)', $locale->getRequestedBy());
+                            } else {
+                                echo t('Nobody');
+                            }
                         ?></td>
-                        <td><?php echo $th->specialchars($locale['requestedOn']);
+                        <td><?php echo $th->specialchars($locale->getRequestedOn());
                         ?></td>
                         <td style="white-space: nowrap">
-                            <?php echo $cih->button(t('Deny'), View::url('/dashboard/integrated_localization/locales/approve?ok=0&lID='.rawurlencode($locale['id'])), '', 'small danger', array('onclick' => $th->specialchars('return confirm('.json_encode(t('Are you sure?')).')')));
-                        ?>
-                            <?php echo $cih->button(t('Approve'), View::url('/dashboard/integrated_localization/locales/approve?ok=1&lID='.rawurlencode($locale['id'])), '', 'small success', array('onclick' => $th->specialchars('return confirm('.json_encode(t('Are you sure?')).')')));
-                        ?>
+                            <?php echo $cih->button(t('Deny'), View::url('/dashboard/integrated_localization/locales/set_approved?approve=no&ilID='.rawurlencode($locale->getID())), '', 'small danger', array('onclick' => $th->specialchars('return confirm('.json_encode(t('Are you sure?')).')'))); ?>
+                            <?php echo $cih->button(t('Approve'), View::url('/dashboard/integrated_localization/locales/set_approved?approve=yes&ilID='.rawurlencode($locale->getID())), '', 'small success', array('onclick' => $th->specialchars('return confirm('.json_encode(t('Are you sure?')).')'))); ?>
                         </td>
                         <?php
-
                     }
                 ?>
                 </tr><?php
-
             }
             if ($found) {
                 ?></tbody></table><?php
 
             } else {
-                ?><div class="alert-message"><?php echo t('No locales found.');
-                ?></div><?php
-
+                ?><div class="alert-message"><?php echo t('No locales found.'); ?></div><?php
             }
         }
     ?>

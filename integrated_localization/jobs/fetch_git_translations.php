@@ -39,7 +39,7 @@ class FetchGitTranslations extends Job
             $stats['branches']++;
             foreach ($repository->getTaggedVersions() as $tag => $version) {
                 // Load new versions
-                if (!$db->GetOne("SELECT tpTranslatable FROM TranslatablePlaces WHERE (tpPackage = '-') AND (tpVersion = ?)", array($version))) {
+                if (!$db->GetOne("SELECT itpTranslatable FROM IntegratedTranslatablePlaces WHERE (itpPackage = '-') AND (itpVersion = ?)", array($version))) {
                     $repository->checkout("tags/$tag");
                     $stats = self::parseCoreDirectory($stats, $tsh, $repository->getDirectory(), $version);
                     $stats['branches']++;
