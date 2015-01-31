@@ -6,9 +6,8 @@
 class TranslationsSourceHelper
 {
     /**
-     * Extract translatable strings from core/packages
-     * @param string $directory The root directory to parse
-     * @param string $relPath How the root directory will be seen by translators
+     * Import translatable strings from core/packages into the database
+     * @param \Gettext\Translations $translations The translatable strings to import
      * @param string $packageHandle The package handle ('-' for the core)
      * @param string $packageVersion The package version ('dev-...' for the core development versions)
      * @throws Exception
@@ -17,23 +16,10 @@ class TranslationsSourceHelper
      * - int updated: numnber of new entries updated
      * - int added: number of new entries added
      */
-    public function parseDirectory($directory, $relPath, $packageHandle, $packageVersion)
+    public function saveTranslatables(\Gettext\Translations $translations, $packageHandle, $packageVersion)
     {
-        $translations = new \Gettext\Translations();
-        \C5TL\Parser::clearCache();
-        foreach (\C5TL\Parser::getAllParsers() as $parser) {
-            if ($parser->canParseDirectory()) {
-                $parser->parseDirectory($directory, $relPath, $translations);
-            }
-        }
-        \C5TL\Parser::clearCache();
         $db = Loader::db();
         /* @var $db ADODB_mysql */
-        $result = array(
-            'total' => 0,
-            'updated' => 0,
-            'added' => 0,
-        );
         $db->Execute('START TRANSACTION');
         try {
             $db->Execute('DELETE FROM IntegratedTranslatablePlaces WHERE (itpPackage = ?) AND (itpVersion = ?)', array($packageHandle, $packageVersion));
@@ -113,222 +99,14 @@ class TranslationsSourceHelper
             throw $x;
         }
     }
-
-    public function processPackageZip($packageZip, &$packageHandle = '', &$packageVersion = '', $exportTranslations = true, $importTranslations = true, $importTranslationsAsApproved = false)
-    {
-        if (!is_file($packageZip)) {
-            throw new Exception(t("Package archive not found: %s", $packageZip));
-        }
-        $fh = Loader::helper('file');
-        /* @var $fh FileHelper */
-        for ($i = 0; ; $i++) {
-            $unzippedFolder = str_replace(DIRECTORY_SEPARATOR, '/', $fh->getTemporaryDirectory()).'/localization/package-'.trim(preg_replace('/[^\w\.]+/', '-', basename(strtolower($packageZip), '.zip')), '-');
-            if ($i > 0) {
-                $unzippedFolder .= '-'.$i;
-            }
-            if (file_exists($unzippedFolder)) {
-                continue;
-            }
-            @mkdir($unzippedFolder, DIRECTORY_PERMISSIONS_MODE, true);
-            if (!is_dir($unzippedFolder)) {
-                throw new Exception(t('Unable to create the directory %s', $unzippedFolder));
-            }
-            break;
-        }
-        try {
-            if (!class_exists('ZipArchive')) {
-                throw new Exception(t('Missing PHP extension: %s', 'ZIP'));
-            }
-            $zip = new ZipArchive();
-            $rc = @$zip->open($packageZip);
-            self::checkZipOpenResult($rc);
-            if (@$zip->extractTo($unzippedFolder) !== true) {
-                $error = $zip->getStatusString();
-                if ((!is_string($error)) || ($error === '')) {
-                    $error = t('Unknown error');
-                }
-                throw new Exception(t('Error extracting files from zip: %s', $error));
-            }
-            @$zip->close();
-            unset($zip);
-            $packageFilesChanged = $this->processPackageDirectory($unzippedFolder, $packageHandle, $packageVersion, $exportTranslations, $importTranslations, $importTranslationsAsApproved);
-            if ($packageFilesChanged) {
-                $tempZipFilename = tempnam($fh->getTemporaryDirectory().'/localization', 'zip');
-                if (!$tempZipFilename) {
-                    throw new Exception(t('Unable to create a temporary file'));
-                }
-                $zip = new ZipArchive();
-                $rc = $zip->open($tempZipFilename, ZIPARCHIVE::CREATE | ZipArchive::OVERWRITE);
-                self::checkZipOpenResult($rc);
-                $startPath = strlen($unzippedFolder) + 1;
-                $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($unzippedFolder, FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::SELF_FIRST);
-                foreach ($iterator as $splFileInfo) {
-                    /* @var $splFileInfo SplFileInfo */
-                    $fileAbs = str_replace(DIRECTORY_SEPARATOR, '/', $splFileInfo->getRealPath());
-                    if ($fileAbs !== $unzippedFolder) {
-                        $fileRel = substr($fileAbs, $startPath);
-                        if (is_dir($fileAbs)) {
-                            $rc = $zip->addEmptyDir($fileRel);
-                        } elseif (is_file($fileAbs)) {
-                            $rc = $zip->addFile($fileAbs, $fileRel);
-                        }
-                        if ($rc !== true) {
-                            $error = $zip->getStatusString();
-                            if ((!is_string($error)) || ($error === '')) {
-                                $error = t('Unknown error');
-                            }
-                            throw new Exception(t('Error adding files to zip: %s', $error));
-                        }
-                    }
-                }
-                @$zip->close();
-                unset($zip);
-                if (@rename($tempZipFilename, $packageZip) !== true) {
-                    throw new Exception(t('Error moving zip file to its final location'));
-                }
-                unset($tempZipFilename);
-            }
-            Loader::helper('file_extended', 'integrated_localization')->deleteFromFileSystem($unzippedFolder);
-        } catch (Exception $x) {
-            if (isset($zip)) {
-                try {
-                    @$zip->close();
-                } catch (Exception $foo) {
-                }
-            }
-            if (isset($tempZipFilename) && $tempZipFilename) {
-                @unlink($tempZipFilename);
-            }
-            Loader::helper('file_extended', 'integrated_localization')->deleteFromFileSystem($unzippedFolder);
-            throw $x;
-        }
-    }
-
-    public function processPackageDirectory($dir, &$packageHandle = '', &$packageVersion = '', $exportTranslations = true, $importTranslations = true, $importTranslationsAsApproved = false)
-    {
-        $pih = Loader::helper('package_inspector', 'integrated_localization');
-        /* @var $pih PackageInspectorHelper */
-        $packageRootDir = $pih->getControllerDirectory($dir);
-        if ($packageRootDir === '') {
-            throw new Exception(t("Unable to find the package file '%s'", 'controller.php'));
-        }
-        if (!is_string($packageHandle)) {
-            $packageHandle = '';
-        }
-        if (is_int($packageVersion) || is_float($packageVersion)) {
-            $packageVersion = (string) $packageVersion;
-        } elseif (!is_string($packageVersion)) {
-            $packageVersion = '';
-        }
-        if (($packageHandle === '') || ($packageVersion === '')) {
-            $packageInfo = $pih->getPackageInfo("$packageRootDir/controller.php");
-            if ($packageHandle === '') {
-                $packageHandle = $packageInfo['handle'];
-            }
-            if ($packageVersion === '') {
-                $packageVersion = $packageInfo['version'];
-            }
-        }
-        $packageFilesChanged = false;
-        $this->parseDirectory($packageRootDir, "packages/$packageHandle", $packageHandle, $packageVersion);
-        if ($importTranslations || $exportTranslations) {
-            Loader::model('integrated_locale', 'integrated_localization');
-            $translationsDir = "$packageRootDir/languages";
-            foreach (IntegratedLocale::getList() as $locale) {
-                $gettextDir = "$translationsDir/".$locale->getID()."/LC_MESSAGES";
-                $poFile = "$gettextDir/messages.po";
-                $moFile = "$gettextDir/messages.mo";
-                $importedTranslations = null;
-                if (is_dir($gettextDir)) {
-                    $importedTranslations = new \Gettext\Translations();
-                    if (is_file($poFile)) {
-                        try {
-                            \Gettext\Extractors\Po::fromFile($poFile, $importedTranslations);
-                        } catch (Exception $foo) {
-                        }
-                    }
-                    if (is_file($moFile)) {
-                        try {
-                            \Gettext\Extractors\Mo::fromFile($moFile, $importedTranslations);
-                        } catch (Exception $foo) {
-                        }
-                    }
-                    if ($importedTranslations->count() > 0) {
-                        if ($importTranslations) {
-                            $this->importTranslations($locale->getID(), $importedTranslations, $importTranslationsAsApproved);
-                        }
-                    } else {
-                        $importedTranslations = null;
-                    }
-                }
-                if ($exportTranslations) {
-                    $translationsToExport = $this->loadPackageTranslations($locale->getID(), $packageHandle, $packageVersion);
-                    if ($importedTranslations) {
-                        $translationsToExport->mergeWith($importedTranslations);
-                    }
-                    if ($translationsToExport->count() > 0) {
-                        $someTranslated = false;
-                        foreach ($translationsToExport as $translation) {
-                            if ($translation->hasTranslation()) {
-                                $someTranslated = true;
-                                break;
-                            }
-                        }
-                        if ($someTranslated) {
-                            if (!is_dir($gettextDir)) {
-                                @mkdir($gettextDir, DIRECTORY_PERMISSIONS_MODE, true);
-                                if (!is_dir($gettextDir)) {
-                                    throw new Exception(t('Unable to create the directory %s', $gettextDir));
-                                }
-                            }
-                            $translationsToExport->toPoFile($poFile);
-                            $translationsToExport->toMoFile($moFile);
-                            $packageFilesChanged = true;
-                        }
-                    }
-                }
-            }
-        }
-
-        return $packageFilesChanged;
-    }
-
-    private static function checkZipOpenResult($rc)
-    {
-        if ($rc !== true) {
-            switch ($rc) {
-                case ZipArchive::ER_EXISTS:
-                    throw new Exception(t('Error opening zip: %s', t("File already exists.")));
-                case ZipArchive::ER_INCONS:
-                    throw new Exception(t('Error opening zip: %s', t("Zip archive inconsistent.")));
-                case ZipArchive::ER_INVAL:
-                    throw new Exception(t('Error opening zip: %s', t("Invalid argument.")));
-                case ZipArchive::ER_MEMORY:
-                    throw new Exception(t('Error opening zip: %s', t("Malloc failure.")));
-                case ZipArchive::ER_NOENT:
-                    throw new Exception(t('Error opening zip: %s', t("No such file.")));
-                case ZipArchive::ER_NOZIP:
-                    throw new Exception(t('Error opening zip: %s', t("Not a zip archive.")));
-                case ZipArchive::ER_OPEN:
-                    throw new Exception(t('Error opening zip: %s', t("Can't open file.")));
-                case ZipArchive::ER_READ:
-                    throw new Exception(t('Error opening zip: %s', t("Read error.")));
-                case ZipArchive::ER_SEEK:
-                    throw new Exception(t('Error opening zip: %s', t("Seek error.")));
-                default:
-                    throw new Exception(t('Error opening zip: %s', t("Unknown error (%s).", $rc)));
-            }
-        }
-    }
-
     /**
      * @param IntegratedLocale|string $locale
      * @param \Gettext\Translations $translations
      * @param bool $markAsApproved
      */
-    public function importTranslations($locale, \Gettext\Translations $translations, $markAsApproved)
+    public function saveTranslations($locale, \Gettext\Translations $translations, $markAsApproved)
     {
-        if(!is_object($locale)) {
+        if (!is_object($locale)) {
             Loader::model('integrated_locale', 'integrated_localization');
             $l = IntegratedLocale::getByID($locale);
             if (!$l) {
@@ -468,7 +246,6 @@ class TranslationsSourceHelper
             }
         }
     }
-
     /**
      * @param IntegratedLocale|string $locale
      * @param string $packageHandle
@@ -476,9 +253,9 @@ class TranslationsSourceHelper
      * @param bool $onlyTranslated
      * @return \Gettext\Translations
      */
-    public function loadPackageTranslations($locale, $packageHandle, $packageVersion, $onlyTranslated = false, $unapprovedAsFuzzy = false)
+    public function loadTranslationsByPackage($locale, $packageHandle, $packageVersion, $onlyTranslated = false, $unapprovedAsFuzzy = false)
     {
-        if(!is_object($locale)) {
+        if (!is_object($locale)) {
             Loader::model('integrated_locale', 'integrated_localization');
             $l = IntegratedLocale::getByID($locale);
             if (!$l) {
@@ -591,5 +368,88 @@ class TranslationsSourceHelper
         $rs->Close();
 
         return $translations;
+    }
+    /**
+     * @param IntegratedLocale|string $locale
+     * @param \Gettext\Translations $translations
+     * @param bool $unapprovedAsFuzzy
+     */
+    public function fillInTranslations($locale, $translations, $unapprovedAsFuzzy = false)
+    {
+        if (!is_object($locale)) {
+            Loader::model('integrated_locale', 'integrated_localization');
+            $l = IntegratedLocale::getByID($locale);
+            if (!$l) {
+                throw new Exception(t('Invalid locale identifier: %s', $locale));
+            }
+            $locale = $l;
+        }
+        $db = Loader::db();
+        /* @var $db ADODB_mysql */
+        $pluralCount = $locale->getPluralCount();
+        $translations->setLanguage($locale->getID());
+        $translations->setPluralForms($pluralCount, $locale->getPluralRule());
+        $total = count($translations);
+        $current = 0;
+        $searchGroup = array();
+        $searchGroupCount = 0;
+        foreach ($translations as $translation) {
+            if ($translation->hasTranslation() === false) {
+                $searchGroup[md5($translation->getId())] = $translation;
+                $searchGroupCount++;
+            }
+            $current++;
+            if (($current === $total) || ($searchGroupCount >= 25)) {
+                if ($searchGroupCount > 0) {
+                    $q = array_keys($searchGroup);
+                    $q[] = $locale->getID();
+                    $rs = $db->Query(
+                        '
+                            SELECT
+                                IntegratedTranslatables.itHash,
+                                IntegratedTranslations.*
+                            FROM
+                                    IntegratedTranslatables
+                                INNER JOIN
+                                    IntegratedTranslations
+                                ON
+                                    IntegratedTranslatables.itID = IntegratedTranslations.itTranslatable
+                            WHERE
+                                ('.implode(' OR ', array_fill(0, $searchGroupCount, '(IntegratedTranslatables.itHash = ?)')).')
+                                AND
+                                (IntegratedTranslations.itLocale = ?)
+                        ',
+                        $q
+                    );
+                    /* @var $rs ADORecordSet_mysql */
+                    while ($row = $rs->FetchRow()) {
+                        $translation = $searchGroup[$row['itHash']];
+                        if ($translation->hasPlural()) {
+                            $useCount = $pluralCount;
+                            for ($i = 1; $i < $pluralCount; $i++) {
+                                if ((!isset($row['itText'.$i])) || ($row['itText'.$i] === '')) {
+                                    $useCount = 0;
+                                    break;
+                                }
+                            }
+                        } else {
+                            $useCount = 1;
+                        }
+                        if ($useCount > 0) {
+                            if ($unapprovedAsFuzzy && empty($row['itApproved'])) {
+                                $translation->addFlag('fuzzy');
+                            }
+                            $translation->setTranslation($row['itText0']);
+                            for ($i = 1; $i < $useCount; $i++) {
+                                $translation->setPluralTranslation($row['itText'.$i], $i - 1);
+                            }
+                        }
+                    }
+                    $rs->Close();
+                    $searchGroup = array();
+                    $searchGroupCount = 0;
+                }
+            }
+        }
     }
 }

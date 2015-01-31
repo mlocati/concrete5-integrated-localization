@@ -66,8 +66,8 @@ class FetchGitTranslations extends Job
      * @param string $directory
      * @param string $version
      * @throws Exception
-     * @return array Same result of TranslationsSourceHelper::parseDirectory
-     * @see TranslationsSourceHelper::parseDirectory
+     * @return array Same result of TranslationsSourceHelper::importTranslatables
+     * @see TranslationsSourceHelper::importTranslatables
      */
     private static function parseCoreDirectory($stats, $tsh, $directory, $version)
     {
@@ -80,7 +80,15 @@ class FetchGitTranslations extends Job
                 throw new Exception(t('Unable to find the core web root in the directory %s', $directory));
             }
         }
-        $statsThis = $tsh->parseDirectory($directory, '', '-', $version);
+        $translations = new \Gettext\Translations();
+        \C5TL\Parser::clearCache();
+        foreach (\C5TL\Parser::getAllParsers() as $parser) {
+            if ($parser->canParseDirectory()) {
+                $parser->parseDirectory($directory, '', $translations);
+            }
+        }
+        \C5TL\Parser::clearCache();
+        $statsThis = $tsh->importTranslatables($translations, '-', $version);
         if (is_array($stats)) {
             $result = $stats;
             array_walk(
