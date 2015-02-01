@@ -9,7 +9,8 @@ Available components
 ### Jobs
 
 - `Fetch git translations`
-  Fetches the two GitHub repositories and extracts translatable strings for all the tagged versions as well as for the development branches
+  Fetches the two GitHub repositories and extracts translatable strings for all the tagged versions as well as for the development branches.
+  **Warning** the first execution of this job may require a few minutes. Subsequent executions will be much faster (it should complete in seconds).
 
 ### Helpers
 
