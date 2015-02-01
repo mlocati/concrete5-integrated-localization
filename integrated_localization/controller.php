@@ -7,7 +7,7 @@ class IntegratedLocalizationPackage extends Package
 
     protected $appVersionRequired = '5.5.2';
 
-    protected $pkgVersion = '0.0.4';
+    protected $pkgVersion = '0.0.6';
 
     public function getPackageName()
     {
@@ -37,6 +37,7 @@ class IntegratedLocalizationPackage extends Package
         Loader::model('job');
         Loader::model('page');
         Loader::model('single_page');
+        Loader::model('block_type');
         $db = Loader::db();
         if ($fromVersion === '') {
             /* @var $db ADODB_mysql */
@@ -113,6 +114,10 @@ class IntegratedLocalizationPackage extends Package
                     $sp->update(array('cName' => $info['name'], 'cDescription' => $info['description']));
                 }
             }
+        }
+        $bt = BlockType::getByHandle('package_languages_builder');
+        if (!is_object($bt)) {
+            BlockType::installBlockTypeFromPackage('package_languages_builder', $pkg);
         }
     }
 
