@@ -37,34 +37,34 @@ class IntegratedPackageLocalizer
      */
     public function __construct($path, $packageHandle = '', $packageVersion = '')
     {
-        $realPath = @realpath($path);
-        if ($realPath === false) {
-            throw new Exception(t('Unable to find the file/directory %s', $path));
-        }
-        $path = str_replace(DIRECTORY_SEPARATOR, '/', $realPath);
-        if (is_dir($path)) {
-            $this->baseDirectory = $path;
-        } else {
-            $fh = Loader::helper('file');
-            /* @var $fh FileHelper */
-            $dir = '';
-            for ($i = 0; ($dir !== '') && file_exists($dir); $i++) {
-                $dir = str_replace(DIRECTORY_SEPARATOR, '/', $fh->getTemporaryDirectory()).'/localization/package-'.trim(preg_replace('/[^\w\.]+/', '-', basename(strtolower($path), '.zip')), '-');
-                if ($i > 0) {
-                    $dir .= '-'.$i;
+        try {
+            $realPath = @realpath($path);
+            if ($realPath === false) {
+                throw new Exception(t('Unable to find the file/directory %s', $path));
+            }
+            $path = str_replace(DIRECTORY_SEPARATOR, '/', $realPath);
+            if (is_dir($path)) {
+                $this->baseDirectory = $path;
+            } else {
+                $fh = Loader::helper('file');
+                /* @var $fh FileHelper */
+                $dir = '';
+                for ($i = 0; ($dir === '') || file_exists($dir); $i++) {
+                    $dir = str_replace(DIRECTORY_SEPARATOR, '/', $fh->getTemporaryDirectory()).'/localization/package-'.trim(preg_replace('/[^\w\.]+/', '-', basename(strtolower($path), '.zip')), '-');
+                    if ($i > 0) {
+                        $dir .= '-'.$i;
+                    }
                 }
-            }
-            @mkdir($dir, DIRECTORY_PERMISSIONS_MODE, true);
-            if (!is_dir($dir)) {
-                throw new Exception(t('Unable to create the directory %s', $dir));
-            }
-            $this->baseDirectory = $dir;
-            $this->baseDirectoryIsTemporary = true;
-            if (!class_exists('ZipArchive')) {
-                throw new Exception(t('Missing PHP extension: %s', 'ZIP'));
-            }
-            $zip = new ZipArchive();
-            try {
+                @mkdir($dir, DIRECTORY_PERMISSIONS_MODE, true);
+                if (!is_dir($dir)) {
+                    throw new Exception(t('Unable to create the directory %s', $dir));
+                }
+                $this->baseDirectory = $dir;
+                $this->baseDirectoryIsTemporary = true;
+                if (!class_exists('ZipArchive')) {
+                    throw new Exception(t('Missing PHP extension: %s', 'ZIP'));
+                }
+                $zip = new ZipArchive();
                 self::checkZipOpenResult(@$zip->open($realPath));
                 if (@$zip->extractTo($this->baseDirectory) !== true) {
                     $error = $zip->getStatusString();
@@ -73,60 +73,66 @@ class IntegratedPackageLocalizer
                     }
                     throw new Exception(t('Error extracting files from zip: %s', $error));
                 }
-            } catch (Exception $x) {
-                try {
-                    $zip->close();
-                } catch (Exception $foo) {
-                }
-                throw $x;
+                $zip->close();
+                unset($zip);
+                $this->originalZipPath = $realPath;
             }
-            $this->originalZipPath = $realPath;
-            @$zip->close();
-            unset($zip);
-        }
-        if (@is_file($this->baseDirectory.'/controller.php')) {
-            $this->controllerDirectory = $this->baseDirectory;
-        } else {
-            $contents = @scandir($this->baseDirectory);
-            if ($contents === false) {
-                throw new Exception(t('Unable to retrieve the contents of the directory %s', $this->baseDirectory));
-            }
-            $contents = array_values(array_filter($contents, function ($item) {
-                return $item[0] !== '.';
-            }));
-            if ((count($contents) === 1) && is_file($this->baseDirectory.'/'.$contents[0].'/controller.php')) {
-                $this->controllerDirectory = $this->baseDirectory.'/'.$contents[0];
+            if (@is_file($this->baseDirectory.'/controller.php')) {
+                $this->controllerDirectory = $this->baseDirectory;
             } else {
-                throw new Exception(t("Unable to find the package file '%s'", 'controller.php'));
+                $contents = @scandir($this->baseDirectory);
+                if ($contents === false) {
+                    throw new Exception(t('Unable to retrieve the contents of the directory %s', $this->baseDirectory));
+                }
+                $contents = array_values(array_filter($contents, function ($item) {
+                    return $item[0] !== '.';
+                }));
+                if ((count($contents) === 1) && is_file($this->baseDirectory.'/'.$contents[0].'/controller.php')) {
+                    $this->controllerDirectory = $this->baseDirectory.'/'.$contents[0];
+                } else {
+                    throw new Exception(t("Unable to find the package file '%s'", 'controller.php'));
+                }
             }
-        }
-        if (!is_string($packageHandle)) {
-            $packageHandle = '';
-        }
-        if (is_int($packageVersion) || is_float($packageVersion)) {
-            $packageVersion = (string) $packageVersion;
-        } elseif (!is_string($packageVersion)) {
-            $packageVersion = '';
-        }
-        if (($packageHandle === '') || ($packageVersion === '')) {
-            $packageInfo = self::extractPackageInfo($this->controllerDirectory.'/controller.php');
-            if ($packageHandle === '') {
-                $packageHandle = $packageInfo['handle'];
+            if (!is_string($packageHandle)) {
+                $packageHandle = '';
             }
-            if ($packageVersion === '') {
-                $packageVersion = $packageInfo['version'];
+            if (is_int($packageVersion) || is_float($packageVersion)) {
+                $packageVersion = (string) $packageVersion;
+            } elseif (!is_string($packageVersion)) {
+                $packageVersion = '';
             }
+            if (($packageHandle === '') || ($packageVersion === '')) {
+                $packageInfo = self::extractPackageInfo($this->controllerDirectory.'/controller.php');
+                if ($packageHandle === '') {
+                    $packageHandle = $packageInfo['handle'];
+                }
+                if ($packageVersion === '') {
+                    $packageVersion = $packageInfo['version'];
+                }
+            }
+            $this->packageHandle = $packageHandle;
+            $this->packageVersion = $packageVersion;
+        } catch (Exception $x) {
+            if (isset($zip)) {
+                @$zip->close();
+                unset($zip);
+            }
+            $this->cleanup();
         }
-        $this->packageHandle = $packageHandle;
-        $this->packageVersion = $packageVersion;
+    }
+    /**
+     */
+    private function cleanup()
+    {
+        if ($this->baseDirectoryIsTemporary && is_dir($this->baseDirectory)) {
+            Loader::helper('file_extended', 'integrated_localization')->deleteFromFileSystem($this->baseDirectory);
+        }
     }
     /**
      */
     public function __destruct()
     {
-        if ($this->baseDirectoryIsTemporary) {
-            Loader::helper('file_extended', 'integrated_localization')->deleteFromFileSystem($this->baseDirectory);
-        }
+        $this->cleanup();
     }
     /**
      * @return string
@@ -251,7 +257,7 @@ class IntegratedPackageLocalizer
             header('Content-length: '.$length);
             header('Pragma: no-cache');
             header('Expires: 0');
-            @readfile("$archive_file_name");
+            @readfile($tempZipFilename);
             @unlink($tempZipFilename);
             unset($tempZipFilename);
             die();
