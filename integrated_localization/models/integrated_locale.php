@@ -195,32 +195,100 @@ class IntegratedLocale
         return $result;
     }
     /**
+     * @param string $id
+     * @param string $name
+     * @return string
+     */
+    private static function getAdministratorsGroupNameFor($id, $name)
+    {
+        return sprintf('Locale administrators for %s', $id);
+    }
+    /**
      * @return string
      */
     public function getAdministratorsGroupName()
     {
-        return sprintf('Locale administrators for %s', $this->getID());
+        return self::getAdministratorsGroupNameFor($this->getID(), $this->getName());
+    }
+    /**
+     * @param string $id
+     * @param string $name
+     * @return string
+     */
+    private static function getTranslatorsGroupNameFor($id, $name)
+    {
+        return sprintf('Locale translators for %s', $id);
     }
     /**
      * @return string
      */
     public function getTranslatorsGroupName()
     {
-        return sprintf('Locale translators for %s', $this->getID());
+        return self::getTranslatorsGroupNameFor($this->getID(), $this->getName());
+    }
+    /**
+     * @param string $id
+     * @param string $name
+     * @return string
+     */
+    private static function getAspirantTranslatorsGroupNameFor($id, $name)
+    {
+        return sprintf('Aspirant locale translators for %s', $id);
+    }
+    /**
+     * @return string
+     */
+    public function getAspirantTranslatorsGroupName()
+    {
+        return self::getAspirantTranslatorsGroupNameFor($this->getID(), $this->getName());
+    }
+    /**
+     * @param string $id
+     * @param string $name
+     * @return string
+     */
+    private static function getAdministratorsGroupDescriptionFor($id, $name)
+    {
+        return sprintf('Administrators for the locale %s', $name);
     }
     /**
      * @return string
      */
     public function getAdministratorsGroupDescription()
     {
-        return sprintf('Administrators for the locale %s', $this->getName());
+        return self::getAdministratorsGroupDescriptionFor($this->getID(), $this->getName());
+    }
+    /**
+     * @param string $id
+     * @param string $name
+     * @return string
+     */
+    private static function getTranslatorsGroupDescriptionFor($id, $name)
+    {
+        return sprintf('Translators for the locale %s', $name);
     }
     /**
      * @return string
      */
     public function getTranslatorsGroupDescription()
     {
-        return sprintf('Translators for the locale %s', $this->getName());
+        return self::getTranslatorsGroupDescriptionFor($this->getID(), $this->getName());
+    }
+    /**
+     * @param string $id
+     * @param string $name
+     * @return string
+     */
+    private static function getAspirantTranslatorsGroupDescriptionFor($id, $name)
+    {
+        return sprintf('Aspirant translators for the locale %s', $name);
+    }
+    /**
+     * @return string
+     */
+    public function getAspirantTranslatorsGroupDescription()
+    {
+        return self::getAspirantTranslatorsGroupDescriptionFor($this->getID(), $this->getName());
     }
     /**
      * return Group|null
@@ -247,39 +315,79 @@ class IntegratedLocale
         return $group;
     }
     /**
+     * return Group|null
+     */
+    public function getAspirantTranslatorsGroup()
+    {
+        $group = Group::getByName($this->getAspirantTranslatorsGroupName());
+        if (isset($group) && ($group->isError() || (!$group->getGroupID()))) {
+            $group = null;
+        }
+
+        return $group;
+    }
+    /**
      *
      */
     public function approve()
     {
-        $g = $this->getAdministratorsGroup();
-        if (!$g) {
-            Group::add($this->getAdministratorsGroupName(), $this->getAdministratorsGroupDescription());
-        }
-        $g = $this->getTranslatorsGroup();
-        if (!$g) {
-            Group::add($this->getTranslatorsGroupName(), $this->getTranslatorsGroupDescription());
-        }
         $db = Loader::db();
         /* @var $db ADODB_mysql */
-        $db->Execute('UPDATE IntegratedLocales SET ilApproved = 1 WHERE ilID = ? LIMIT 1', array($this->getID()));
+        $db->Execute('START TRANSACTION');
+        try {
+            $g = $this->getAdministratorsGroup();
+            if (!$g) {
+                Group::add($this->getAdministratorsGroupName(), $this->getAdministratorsGroupDescription());
+            }
+            $g = $this->getTranslatorsGroup();
+            if (!$g) {
+                Group::add($this->getTranslatorsGroupName(), $this->getTranslatorsGroupDescription());
+            }
+            $g = $this->getAspirantTranslatorsGroup();
+            if (!$g) {
+                Group::add($this->getAspirantTranslatorsGroupName(), $this->getAspirantTranslatorsGroupDescription());
+            }
+            $db->Execute('UPDATE IntegratedLocales SET ilApproved = 1 WHERE ilID = ? LIMIT 1', array($this->getID()));
+            $db->Execute('COMMIT');
+        } catch (Exception $x) {
+            try {
+                $db->Execute('ROLLBACK');
+            } catch (Exception $foo) {
+            }
+            throw $x;
+        }
     }
     /**
      *
      */
     public function delete()
     {
-        $g = $this->getAdministratorsGroup();
-        if ($g) {
-            $g->delete();
-        }
-        $g = $this->getTranslatorsGroup();
-        if ($g) {
-            $g->delete();
-        }
         $db = Loader::db();
         /* @var $db ADODB_mysql */
-        $db->Execute('DELETE FROM IntegratedTranslations WHERE itLocale = ?', array($this->getID()));
-        $db->Execute('DELETE FROM IntegratedLocales WHERE ilID = ? LIMIT 1', array($this->getID()));
+        $db->Execute('START TRANSACTION');
+        try {
+            $g = $this->getAdministratorsGroup();
+            if ($g) {
+                $g->delete();
+            }
+            $g = $this->getTranslatorsGroup();
+            if ($g) {
+                $g->delete();
+            }
+            $g = $this->getAspirantTranslatorsGroup();
+            if ($g) {
+                $g->delete();
+            }
+            $db->Execute('DELETE FROM IntegratedTranslations WHERE itLocale = ?', array($this->getID()));
+            $db->Execute('DELETE FROM IntegratedLocales WHERE ilID = ? LIMIT 1', array($this->getID()));
+            $db->Execute('COMMIT');
+        } catch (Exception $x) {
+            try {
+                $db->Execute('ROLLBACK');
+            } catch (Exception $foo) {
+            }
+            throw $x;
+        }
     }
     /**
      * @return array
@@ -304,5 +412,106 @@ class IntegratedLocale
         $n = $db->GetOne("SELECT COUNT(*) FROM IntegratedTranslations WHERE (itLocale = ?) AND (itText1 IS NOT NULL) AND (itText1 <> '')", array($this->getID()));
 
         return empty($n) ? 0 : (int) $n;
+    }
+    /**
+     * @param array $newInfo
+     */
+    public function update($newInfo)
+    {
+        if (!is_array($newInfo)) {
+            $newInfo = array();
+        }
+        if (isset($newInfo['id'])) {
+            $id = $newInfo['id'];
+            if ((!is_string($id)) || ($id !== trim($id)) || ($id === '')) {
+                throw new Exception(t('Invalid locale identifier'));
+            }
+        } else {
+            $id = $this->getID();
+        }
+        if (isset($newInfo['name'])) {
+            $name = $newInfo['name'];
+            if ((!is_string($name)) || ($name !== trim($name)) || ($name === '')) {
+                throw new Exception(t('Invalid locale name'));
+            }
+        } else {
+            $name = $this->getName();
+        }
+        if (isset($newInfo['pluralCount'])) {
+            $pluralCount = $newInfo['pluralCount'];
+            if (!is_int($pluralCount)) {
+                if (is_string($pluralCount) && is_numeric($pluralCount)) {
+                    $pluralCount = @intval($pluralCount);
+                }
+            }
+            if ((!is_int($pluralCount)) || ($pluralCount < 1) || ($pluralCount > 6)) {
+                throw new Exception(t('Invalid plural count'));
+            }
+        } else {
+            $pluralCount = $this->getPluralCount();
+        }
+        if (isset($newInfo['pluralRule'])) {
+            $pluralRule = $newInfo['pluralRule'];
+            if ((!is_string($pluralRule)) || ($pluralRule !== trim($pluralRule)) || ($pluralRule === '')) {
+                throw new Exception(t('Invalid plural rule'));
+            }
+        } else {
+            $pluralRule = $this->getPluralRule();
+        }
+        $db = Loader::db();
+        /* @var $db ADODB_mysql */
+        $db->Execute('START TRANSACTION');
+        try {
+            if (($id !== $this->getID()) || ($name !== $this->getName())) {
+                $g = $this->getAdministratorsGroup();
+                if ($g) {
+                    $g->update(self::getAdministratorsGroupNameFor($id, $name), self::getAdministratorsGroupDescriptionFor($id, $name));
+                }
+                $g = $this->getTranslatorsGroup();
+                if ($g) {
+                    $g->update(self::getTranslatorsGroupNameFor($id, $name), self::getTranslatorsGroupDescriptionFor($id, $name));
+                }
+                $g = $this->getAspirantTranslatorsGroup();
+                if ($g) {
+                    $g->update(self::getAspirantTranslatorsGroupNameFor($id, $name), self::getAspirantTranslatorsGroupDescriptionFor($id, $name));
+                }
+            }
+            if ($pluralCount !== $this->getPluralCount()) {
+                $db->Execute("DELETE FROM IntegratedTranslations WHERE (itLocale = ?) AND (itText1 IS NOT NULL) AND (itText1 <> '')", array($this->getID()));
+            }
+            if ($id !== $this->getID()) {
+                $db->Execute("UPDATE IntegratedTranslations SET itLocale = ? WHERE itLocale = ?", array($id, $this->getID()));
+            }
+            $db->Execute(
+                '
+                    UPDATE IntegratedLocales SET
+                        ilID = ?,
+                        ilName = ?,
+                        ilPluralCount = ?,
+                        ilPluralRule = ?
+                    WHERE
+                        ilID = ?
+                    LIMIT 1
+                ',
+                array(
+                    $id,
+                    $name,
+                    $pluralCount,
+                    $pluralRule,
+                    $this->getID(),
+                )
+            );
+            $db->Execute('COMMIT');
+        } catch (Exception $x) {
+            try {
+                $db->Execute('ROLLBACK');
+            } catch (Exception $foo) {
+            }
+            throw $x;
+        }
+        $this->id = $id;
+        $this->name = $name;
+        $this->pluralCount = $pluralCount;
+        $this->pluralRule = $pluralRule;
     }
 }

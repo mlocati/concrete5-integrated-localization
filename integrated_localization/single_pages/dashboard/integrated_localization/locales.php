@@ -1,5 +1,7 @@
 <?php defined('C5_EXECUTE') or die('Access Denied.');
 
+/* @var $this View */
+
 $cdh = Loader::helper('concrete/dashboard');
 /* @var $cdh ConcreteDashboardHelper */
 
@@ -43,9 +45,23 @@ if ($editing) {
                 return true;
             })
         ;
+        function updateAutoName() {
+            $('#name').closest('.clearfix')[$('#auto_name').is(':checked') ? 'hide' : 'show']('fast');
+        }
+        $('#auto_name').on('change', function() {
+            updateAutoName();
+        });
+        updateAutoName();
+        function updateAutoPlural() {
+            $('#pluralCount,#pluralRule').closest('.clearfix')[$('#auto_plural').is(':checked') ? 'hide' : 'show']('fast');
+        }
+        $('#auto_plural').on('change', function() {
+            updateAutoPlural();
+        });
+        updateAutoPlural();
     });
     </script>
-    <form method="POST" id="integratedlocalization-locale-details" name="integratedlocalization-locale-details" onsubmit="return false">
+    <form method="POST" action="<?php echo $this->action('save', $editing->getID());?>" id="integratedlocalization-locale-details" name="integratedlocalization-locale-details" onsubmit="return false">
         <div class="ccm-pane-body">
             <div class="clearfix">
                 <label for="language"><?php echo t('Language'); ?></label>
@@ -56,8 +72,16 @@ if ($editing) {
                 <div class="input"><?php echo $fh->select('country', array_merge(array('' => t('*** No Country')), $countries), $editing->getTerritory()); ?></div>
             </div>
             <div class="clearfix">
+                <label for="auto_name"><?php echo t('Auto-generate name'); ?></label>
+                <div class="input"><?php echo $fh->checkbox('auto_name', '1', false); ?></div>
+            </div>
+            <div class="clearfix">
                 <label for="name"><?php echo t('Name'); ?></label>
                 <div class="input"><?php echo $fh->text('name', $editing->getName(), array('maxlength' => '100', 'required' => 'required')); ?></div>
+            </div>
+            <div class="clearfix">
+                <label for="auto_plural"><?php echo t('Auto-generate plural rules'); ?></label>
+                <div class="input"><?php echo $fh->checkbox('auto_plural', '1', false); ?></div>
             </div>
             <div class="clearfix">
                 <label for="pluralCount"><?php echo t('# of plurals'); ?></label>
