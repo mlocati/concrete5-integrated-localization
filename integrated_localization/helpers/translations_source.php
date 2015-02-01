@@ -436,7 +436,7 @@ class TranslationsSourceHelper
                             $useCount = 1;
                         }
                         if ($useCount > 0) {
-                            if($unapprovedAsFuzzy && empty($row['itApproved'])) {
+                            if ($unapprovedAsFuzzy && empty($row['itApproved'])) {
                                 $translation->addFlag('fuzzy');
                             }
                             $translation->setTranslation($row['itText0']);
