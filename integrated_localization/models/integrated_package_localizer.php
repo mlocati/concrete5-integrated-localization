@@ -215,16 +215,6 @@ class IntegratedPackageLocalizer
         return $translations;
     }
     /**
-     * @return array
-     * @see TranslationsSourceHelper::importTranslatables()
-     */
-    public function importTranslatables()
-    {
-        $tsh = Loader::helper('translations_source', 'integrated_localization');
-        /* @var $tsh TranslationsSourceHelper */
-        return $tsh->importTranslatables($this->getTranslatables(), $this->getPackageHandle(), $this->getPackageVersion());
-    }
-    /**
      * @throws Exception
      */
     public function repack()
@@ -297,7 +287,7 @@ class IntegratedPackageLocalizer
      * @param bool $writePO
      * @throws Exception
      */
-    public function writeGettextFiles($locale, \Gettext\Translations $translations, $writeMO = true, $writePO = true)
+    public function writeTranslationsFile($locale, \Gettext\Translations $translations, $writeMO = true, $writePO = true)
     {
         if (!is_object($locale)) {
             Loader::model('integrated_locale', 'integrated_localization');

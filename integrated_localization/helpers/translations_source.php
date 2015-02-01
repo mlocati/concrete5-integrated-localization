@@ -64,7 +64,7 @@ class TranslationsSourceHelper
                 $placesQueryParams[] = $packageVersion;
                 $refs = array();
                 foreach ($translation->getReferences() as $tr) {
-                    $refs[] = implode(':', $tr);
+                    $refs[] = isset($tr[1]) ? implode(':', $tr) : $tr[0];
                 }
                 if (empty($refs)) {
                     $placesQuery .= ', NULL';
@@ -436,7 +436,7 @@ class TranslationsSourceHelper
                             $useCount = 1;
                         }
                         if ($useCount > 0) {
-                            if ($unapprovedAsFuzzy && empty($row['itApproved'])) {
+                            if($unapprovedAsFuzzy && empty($row['itApproved'])) {
                                 $translation->addFlag('fuzzy');
                             }
                             $translation->setTranslation($row['itText0']);

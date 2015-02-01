@@ -66,8 +66,8 @@ class FetchGitTranslations extends Job
      * @param string $directory
      * @param string $version
      * @throws Exception
-     * @return array Same result of TranslationsSourceHelper::importTranslatables
-     * @see TranslationsSourceHelper::importTranslatables
+     * @return array Same result of TranslationsSourceHelper::saveTranslatables
+     * @see TranslationsSourceHelper::saveTranslatables
      */
     private static function parseCoreDirectory($stats, $tsh, $directory, $version)
     {
@@ -88,7 +88,7 @@ class FetchGitTranslations extends Job
             }
         }
         \C5TL\Parser::clearCache();
-        $statsThis = $tsh->importTranslatables($translations, '-', $version);
+        $statsThis = $tsh->saveTranslatables($translations, '-', $version);
         if (is_array($stats)) {
             $result = $stats;
             array_walk(
