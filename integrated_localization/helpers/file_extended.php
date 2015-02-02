@@ -6,6 +6,59 @@
 class FileExtendedHelper
 {
     /**
+     * @param bool $createSubfolder
+     * @throws Exception
+     * @return string
+     */
+    public function getTempSandboxDirectory($createSubfolder)
+    {
+        $fh = Loader::helper('file');
+        /* @var $fh FileHelper */
+        $dir = $fh->getTemporaryDirectory();
+        if ((!is_string($dir)) || ($dir === '')) {
+            throw new Exception(t('Unable to retrieve the temporary directory.'));
+        }
+        $dir = str_replace(DIRECTORY_SEPARATOR, '/', $dir).'/integrated_localization';
+        if (!is_dir($dir)) {
+            @mkdir($dir);
+            if (!is_dir($dir)) {
+                throw new Exception(t('Unable to create a temporary directory.'));
+            }
+        }
+        $file = $dir.'/index.html';
+        if (!file_exists($file)) {
+            if (@file_put_contents($file, '') === false) {
+                throw new Exception(t('Error initializing a temporary directory.'));
+            }
+        }
+        $file = $dir.'/.htaccess';
+        if (!file_exists($file)) {
+            if (@file_put_contents(
+                $file,
+                <<<EOT
+Order deny,allow
+Deny from all
+php_flag engine off
+EOT
+                ) === false) {
+                throw new Exception(t('Error initializing a temporary directory.'));
+            }
+        }
+        if ($createSubfolder) {
+            $dir2 = '';
+            while (($dir2 === '') || file_exists($dir2)) {
+                $dir2 = $dir.'/'.date('YmdHis').'-'.md5(microtime().mt_rand());
+            }
+            @mkdir($dir2, DIRECTORY_PERMISSIONS_MODE, true);
+            if (!is_dir($dir2)) {
+                throw new Exception(t('Unable to create the directory %s', $dir2));
+            }
+            $dir = $dir2;
+        }
+
+        return $dir;
+    }
+    /**
      * Removes a file or a directory (even if not empty)
      * @param string $path
      * @return boolean
