@@ -105,8 +105,7 @@ if ($editing) {
     <div class="ccm-pane-body ccm-pane-body-footer">
         <?php
         foreach (array(false, true) as $approved) {
-            ?><h2><?php echo $approved ? t('Approved locales') : t('Locales awaiting approval');
-            ?></h2><?php
+            ?><h2><?php echo $approved ? t('Approved locales') : t('Locales awaiting approval'); ?></h2><?php
             $found = false;
             foreach ($locales as $locale) {
                 /* @var $locale IntegratedLocale */
