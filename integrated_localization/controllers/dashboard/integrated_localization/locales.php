@@ -2,6 +2,18 @@
 
 class DashboardIntegratedLocalizationLocalesController extends Controller
 {
+    public function on_start()
+    {
+        $th = Loader::helper('translators', 'integrated_localization');
+        /* @var $th TranslatorsHelper */
+        if($th->getCurrentUserAccess() !== 'admin') {
+            $v = View::getInstance();
+            /* @var $v View */
+            $v->render('/page_forbidden');
+            die();
+        }
+    }
+
     public function view()
     {
         Loader::model('integrated_locale', 'integrated_localization');
