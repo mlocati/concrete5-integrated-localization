@@ -103,27 +103,33 @@ class IntegratedLocalizationPackage extends Package
                 Job::installByPackage('fetch_git_translations', $pkg);
             }
         }
+        $th = Loader::helper('translators', 'integrated_localization');
+        /* @var $th TranslatorsHelper */
+        $administrators = $th->getAdministratorsGroup();
+        if (!$administrators) {
+            $administrators = Group::add($th->getAdministratorsGroupName(), $th->getAdministratorsGroupDescription());
+        }
         foreach (array(
-            '/dashboard/integrated_localization' => array('name' => t('Integrated Localization'), 'description' => ''),
-            '/dashboard/integrated_localization/locales' => array('name' => t('Locales'), 'description' => ''),
+            //'/integrated_localization' => array('name' => t('Integrated Localization'), 'description' => '', 'standardPage' => true),
+            '/integrated_localization/locales' => array('name' => t('Locales'), 'description' => ''),
+            '/integrated_localization/translators' => array('name' => t('Translators'), 'description' => ''),
         ) as $path => $info) {
             $sp = Page::getByPath($path);
             /* @var $sp Page */
             if ((!is_object($sp)) || $sp->isError() || (!$sp->getCollectionID())) {
-                $sp = SinglePage::add($path, $pkg);
-                if (is_object($sp)) {
-                    $sp->update(array('cName' => $info['name'], 'cDescription' => $info['description']));
+                if (isset($info['standardPage']) && $info['standardPage']) {
+                    //Collection::add();
+                } else {
+                    $sp = SinglePage::add($path, $pkg);
+                    if (is_object($sp)) {
+                        $sp->update(array('cName' => $info['name'], 'cDescription' => $info['description']));
+                    }
                 }
             }
         }
         $bt = BlockType::getByHandle('package_languages_builder');
         if (!is_object($bt)) {
             BlockType::installBlockTypeFromPackage('package_languages_builder', $pkg);
-        }
-        $th = Loader::helper('translators', 'integrated_localization');
-        /* @var $th TranslatorsHelper */
-        if (!$th->getAdministratorsGroup()) {
-            Group::add($th->getAdministratorsGroupName(), $th->getAdministratorsGroupDescription());
         }
     }
 

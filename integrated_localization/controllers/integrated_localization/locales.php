@@ -1,12 +1,12 @@
 <?php defined('C5_EXECUTE') or die('Access Denied.');
 
-class DashboardIntegratedLocalizationLocalesController extends Controller
+class IntegratedLocalizationLocalesController extends Controller
 {
     public function on_start()
     {
         $th = Loader::helper('translators', 'integrated_localization');
         /* @var $th TranslatorsHelper */
-        if($th->getCurrentUserAccess() !== 'admin') {
+        if ($th->getCurrentUserAccess() < TranslatorAccess::GLOBAL_ADMINISTRATOR) {
             $v = View::getInstance();
             /* @var $v View */
             $v->render('/page_forbidden');
@@ -26,7 +26,7 @@ class DashboardIntegratedLocalizationLocalesController extends Controller
         $locale = IntegratedLocale::getByID($localeID, true);
         if ($locale) {
             $locale->approve();
-            $this->redirect('/dashboard/integrated_localization/locales', 'approved', $locale->getName());
+            $this->redirect('/integrated_localization/locales', 'approved', $locale->getName());
         } else {
             $th = Loader::helper('text');
             /* @var $th TextHelper */
@@ -46,8 +46,9 @@ class DashboardIntegratedLocalizationLocalesController extends Controller
         Loader::model('integrated_locale', 'integrated_localization');
         $locale = IntegratedLocale::getByID($localeID, true);
         if ($locale) {
+            $name = $locale->getName();
             $locale->delete();
-            $this->redirect('/dashboard/integrated_localization/locales', 'deleted', $locale-getName());
+            $this->redirect('/integrated_localization/locales', 'deleted', $name);
         } else {
             $th = Loader::helper('text');
             /* @var $th TextHelper */
@@ -150,7 +151,7 @@ class DashboardIntegratedLocalizationLocalesController extends Controller
                     'pluralCount' => $pluralCount,
                     'pluralRule' => $pluralRule,
                 ));
-                $this->redirect('/dashboard/integrated_localization/locales', 'saved', $locale->getName());
+                $this->redirect('/integrated_localization/locales', 'saved', $locale->getName());
             } catch (Exception $x) {
                 $th = Loader::helper('text');
                 /* @var $th TextHelper */
