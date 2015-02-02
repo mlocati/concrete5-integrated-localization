@@ -153,9 +153,13 @@ if ($editing) {
                         <td><?php
                             $requestedBy = $locale->getRequestedBy() ? User::getByUserID($locale->getRequestedBy()) : null;
                             if (is_object($requestedBy) && $requestedBy->getUserID()) {
-                                ?><a href="<?php echo $th->specialchars(View::url('/index.php/dashboard/users/search?uID='.$locale->getRequestedBy()));
-                                ?>"><?php echo $th->specialchars($requestedBy->getUserName());
-                                ?></a><?php
+                                if (ENABLE_USER_PROFILES) {
+                                    ?><a href="<?php echo $th->specialchars(View::url('/profile', $locale->getRequestedBy())); ?>"><?php
+                                }
+                                echo $th->specialchars($requestedBy->getUserName());
+                                if (ENABLE_USER_PROFILES) {
+                                    ?></a><?php
+                                }
                             } elseif ($locale->getRequestedBy()) {
                                 echo t('Deleted user (id: %d)', $locale->getRequestedBy());
                             } else {
