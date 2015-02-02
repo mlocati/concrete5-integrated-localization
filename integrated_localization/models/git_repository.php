@@ -60,7 +60,9 @@ class GitRepository
                     break;
             }
         }
-        $this->directory = str_replace(DIRECTORY_SEPARATOR, '/', Loader::helper('file')->getTemporaryDirectory()).'/localization/'.strtolower(trim(preg_replace('/[^\w\.]+/', '-', $url), '-'));
+        $feh = Loader::helper('file_extended', 'integrated_localization');
+        /* @var $feh FileExtendedHelper */
+        $this->directory = $feh->getTempSandboxDirectory(false).'/'.strtolower(trim(preg_replace('/[^\w\.]+/', '-', $url), '-'));
     }
 
     public function update()

@@ -46,20 +46,9 @@ class IntegratedPackageLocalizer
             if (is_dir($path)) {
                 $this->baseDirectory = $path;
             } else {
-                $fh = Loader::helper('file');
-                /* @var $fh FileHelper */
-                $dir = '';
-                for ($i = 0; ($dir === '') || file_exists($dir); $i++) {
-                    $dir = str_replace(DIRECTORY_SEPARATOR, '/', $fh->getTemporaryDirectory()).'/localization/package-'.trim(preg_replace('/[^\w\.]+/', '-', basename(strtolower($path), '.zip')), '-');
-                    if ($i > 0) {
-                        $dir .= '-'.$i;
-                    }
-                }
-                @mkdir($dir, DIRECTORY_PERMISSIONS_MODE, true);
-                if (!is_dir($dir)) {
-                    throw new Exception(t('Unable to create the directory %s', $dir));
-                }
-                $this->baseDirectory = $dir;
+                $feh = Loader::helper('file_extended', 'integrated_localization');
+                /* @var $feh FileExtendedHelper */
+                $this->baseDirectory = $feh->getTempSandboxDirectory(true);
                 $this->baseDirectoryIsTemporary = true;
                 if (!class_exists('ZipArchive')) {
                     throw new Exception(t('Missing PHP extension: %s', 'ZIP'));
@@ -499,9 +488,9 @@ class IntegratedPackageLocalizer
         $serverDirectory = str_replace(DIRECTORY_SEPARATOR, '/', $tmp);
         $zipBaseDirectory = is_string($zipBaseDirectory) ? trim(str_replace(DIRECTORY_SEPARATOR, '/', trim($zipBaseDirectory)), '/') : '';
         try {
-            $fh = Loader::helper('file');
-            /* @var $fh FileHelper */
-            $tmp = @tempnam($fh->getTemporaryDirectory().'/localization', 'zip');
+            $feh = Loader::helper('file_extended', 'integrated_localization');
+            /* @var $feh FileExtendedHelper */
+            $tmp = @tempnam($feh->getTempSandboxDirectory(false), 'zip');
             if (!$tmp) {
                 throw new Exception(t('Unable to create a temporary file'));
             }
