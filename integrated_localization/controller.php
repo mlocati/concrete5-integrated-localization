@@ -42,7 +42,7 @@ class IntegratedLocalizationPackage extends Package
         if ($fromVersion === '') {
             /* @var $db ADODB_mysql */
             $db->Execute("
-                INSERT INTO IntegratedLocales
+                INSERT IGNORE INTO IntegratedLocales
                     (ilID    , ilName                            , ilIsSource, ilPluralCount, ilPluralRule                                                                                 , ilApproved, ilRequestedBy, ilRequestedOn)
                     VALUES
                     ('en_US' , 'English (United States)'         , 1         , 2            , '(n != 1)'                                                                                   , 1         , NULL         , NULL         ),
