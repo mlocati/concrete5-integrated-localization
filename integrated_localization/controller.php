@@ -38,6 +38,7 @@ class IntegratedLocalizationPackage extends Package
         Loader::model('page');
         Loader::model('single_page');
         Loader::model('block_type');
+        Loader::model('group');
         $db = Loader::db();
         if ($fromVersion === '') {
             /* @var $db ADODB_mysql */
@@ -118,6 +119,11 @@ class IntegratedLocalizationPackage extends Package
         $bt = BlockType::getByHandle('package_languages_builder');
         if (!is_object($bt)) {
             BlockType::installBlockTypeFromPackage('package_languages_builder', $pkg);
+        }
+        $th = Loader::helper('translators', 'integrated_localization');
+        /* @var $th TranslatorsHelper */
+        if (!$th->getAdministratorsGroup()) {
+            Group::add($th->getAdministratorsGroupName(), $th->getAdministratorsGroupDescription());
         }
     }
 
