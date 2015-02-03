@@ -1,6 +1,6 @@
 <?php defined('C5_EXECUTE') or die('Access Denied.');
 
-class IntegratedLocalizationTranslatorsController extends Controller
+class IntegratedLocalizationGroupsController extends Controller
 {
     public function on_start()
     {

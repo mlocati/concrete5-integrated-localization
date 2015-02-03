@@ -112,7 +112,7 @@ class IntegratedLocalizationPackage extends Package
         foreach (array(
             //'/integrated_localization' => array('name' => t('Integrated Localization'), 'description' => '', 'standardPage' => true),
             '/integrated_localization/locales' => array('name' => t('Locales'), 'description' => ''),
-            '/integrated_localization/translators' => array('name' => t('Translators'), 'description' => ''),
+            '/integrated_localization/groups' => array('name' => t('Translators\' Groups'), 'description' => ''),
         ) as $path => $info) {
             $sp = Page::getByPath($path);
             /* @var $sp Page */

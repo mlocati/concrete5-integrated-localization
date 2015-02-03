@@ -135,8 +135,8 @@ if (isset($addingNewLocale) && $addingNewLocale) {
 } else {
     /* @var $locales IntegratedLocale[] */
     ?>
-    <h2><?php echo t('Translators'); ?></h2>
-    <p><?php echo t('Please select a language'); ?></p>
+    <h2><?php echo t('Translators\' groups'); ?></h2>
+    <p><?php echo t('Please select a translators\' group'); ?></p>
     <table class="table table-striped">
         <thead>
             <tr>
