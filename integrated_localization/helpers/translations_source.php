@@ -13,13 +13,23 @@ class TranslationsSourceHelper
      * @throws Exception
      * @return array Keys are:
      * - int total: number of total entries found
-     * - int updated: numnber of new entries updated
+     * - int updated: number of new entries updated
      * - int added: number of new entries added
+     * - bool somethingChanged: will be set to true if something changed
      */
     public function saveTranslatables(\Gettext\Translations $translations, $packageHandle, $packageVersion)
     {
         $db = Loader::db();
         /* @var $db ADODB_mysql */
+        $preHash = $db->GetOne('SELECT MD5(GROUP_CONCAT(itpTranslatable)) FROM IntegratedTranslatablePlaces WHERE (itpPackage = ?) AND (itpVersion = ?) ORDER BY itpTranslatable', array($packageHandle, $packageVersion));
+        if(!isset($preHash)) {
+            $preHash = '';
+        }
+        $result = array(
+            'total' => 0,
+            'added' => 0,
+            'updated' => 0,
+        );
         $db->Execute('START TRANSACTION');
         try {
             $db->Execute('DELETE FROM IntegratedTranslatablePlaces WHERE (itpPackage = ?) AND (itpVersion = ?)', array($packageHandle, $packageVersion));
@@ -88,6 +98,11 @@ class TranslationsSourceHelper
             if ($placesQueryCount !== 0) {
                 $db->Execute($placesQuery, $placesQueryParams);
             }
+            $postHash = $db->GetOne('SELECT MD5(GROUP_CONCAT(itpTranslatable)) FROM IntegratedTranslatablePlaces WHERE (itpPackage = ?) AND (itpVersion = ?) ORDER BY itpTranslatable', array($packageHandle, $packageVersion));
+            if(!isset($postHash)) {
+                $postHash = '';
+            }
+            $result['somethingChanged'] = ($preHash === $postHash) ? false : true;
             $db->Execute('COMMIT');
 
             return $result;
