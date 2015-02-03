@@ -8,9 +8,6 @@ $th = Loader::helper('text');
 $fh = Loader::helper('form');
 /* @var $fh FormHelper */
 
-$cih = Loader::helper('concrete/interface');
-/* @var $cih ConcreteInterfaceHelper */
-
 /* @var $locales IntegratedLocale[] */
 
 if ($editing) {
