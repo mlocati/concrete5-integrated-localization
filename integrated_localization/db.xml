@@ -143,6 +143,10 @@
 		<!-- Translation (plural 5) -->
 		<field name="itText5" type="X">
 		</field>
+		<!-- For fast joins with IntegratedTranslatables table -->
+		<index name="itTranslatable">
+			<col>itTranslatable</col>
+		</index>
 	</table>
 
 </schema>
