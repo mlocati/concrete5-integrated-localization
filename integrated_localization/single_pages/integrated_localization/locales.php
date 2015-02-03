@@ -15,7 +15,7 @@ $cih = Loader::helper('concrete/interface');
 
 if ($editing) {
     /* @var $editing IntegratedLocale */
-    $pageTitle = t('Edit %s', $editing->getName());
+    ?><h2><?php echo $th->specialchars(t('Edit %s', $editing->getName())); ?></h2><?php
     $totalPluralTranslations = $editing->getTotalPluralTranslations();
     ?>
     <script>
@@ -112,7 +112,7 @@ if ($editing) {
     </form>
     <?php
 } else {
-    $pageTitle = t('Locales');
+    ?><h2><?php echo t('Locales'); ?></h2><?php
     foreach (array(false, true) as $approved) {
         ?><h2><?php echo $approved ? t('Approved locales') : t('Locales awaiting approval'); ?></h2><?php
         $found = false;

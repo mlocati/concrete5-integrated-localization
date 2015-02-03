@@ -9,12 +9,36 @@ $th = Loader::helper('text');
 $db = Loader::db();
 /* @var $db ADODB_mysql */
 
-$cih = Loader::helper('concrete/interface');
-/* @var $cih ConcreteInterfaceHelper */
+$fh = Loader::helper('form');
+/* @var $fh FormHelper */
 
-if(isset($viewingLocale) && is_object($viewingLocale)) {
+if (isset($addingNewLocale) && $addingNewLocale) {
+    ?>
+    <h2><?php echo $th->specialchars(t('Suggest the creation of a new translation group')); ?></h2>
+    <form method="POST" action="<?php echo $this->action('add_new_locale'); ?>" class="form-horizontal">
+        <div class="control-group">
+            <label class="control-label" for="language"><?php echo t('Language'); ?></label>
+            <div class="controls">
+                <div class="input"><?php echo $fh->select('language', array_merge(array('' => t('*** Please select')), $languages), false, array('required' => 'required')); ?></div>
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="territory"><?php echo t('Country'); ?></label>
+            <div class="controls">
+                <div class="input"><?php echo $fh->select('territory', array_merge(array('' => t('*** Please select')), $territories, array('-' => t('*** No Country-specific'))), false, array('required' => 'required')); ?></div>
+            </div>
+        </div>
+        <div class="control-group">
+            <div class="controls">
+                <a href="<?php echo $this->getViewPath(); ?>" class="btn"><?php echo t('Cancel'); ?></a>
+                <input type="submit" class="btn btn-primary" />
+            </div>
+        </div>
+    </form>
+    <?php
+} elseif(isset($viewingLocale) && is_object($viewingLocale)) {
     /* @var $viewingLocale IntegratedLocale */
-    $pageTitle = t('Translators for %s', $viewingLocale->getName());
+    ?><h2><?php echo $th->specialchars(t('Translators for %s', $viewingLocale->getName())); ?></h2><?php
     foreach (array(
         array('title' => t('Global administrators'), 'group' => $globalAdministratorsGroup, 'members' => $globalAdministrators, 'accessLevel' => TranslatorAccess::GLOBAL_ADMINISTRATOR),
         array('title' => t('Administrators for %s', $viewingLocale->getName()), 'group' => $groupAdministratorsGroup, 'members' => $groupAdministrators, 'accessLevel' => TranslatorAccess::LOCALE_ADMINISTRATOR),
@@ -71,19 +95,20 @@ if(isset($viewingLocale) && is_object($viewingLocale)) {
                                 switch($current['accessLevel']) {
                                     case TranslatorAccess::LOCALE_ASPIRANT:
                                         ?>
-                                        <a class="btn btn-mini btn-success" onclick="<?php echo $th->specialchars('return confirm('.json_encode(t('Are you sure?')).')'); ?>" href="<?php echo $this->action('accept_aspirant', $viewingLocale->getID(), $member->getUserID()); ?>"><?php echo t('Accept'); ?></a>
+                                        <a class="btn btn-mini btn-success" onclick="<?php echo $th->specialchars('return confirm('.json_encode(t('Are you sure?')).')'); ?>" href="<?php echo $this->action('update_user_group', $viewingLocale->getID(), $member->getUserID(), TranslatorAccess::LOCALE_ASPIRANT, TranslatorAccess::LOCALE_TRANSLATOR); ?>"><?php echo t('Accept as translator'); ?></a>
+                                        <a class="btn btn-mini btn-warning" onclick="<?php echo $th->specialchars('return confirm('.json_encode(t('Are you sure?')).')'); ?>" href="<?php echo $this->action('update_user_group', $viewingLocale->getID(), $member->getUserID(), TranslatorAccess::LOCALE_ASPIRANT, TranslatorAccess::LOCALE_ADMINISTRATOR); ?>"><?php echo t('Accept as administrator'); ?></a>
                                         <a class="btn btn-mini btn-danger" onclick="<?php echo $th->specialchars('return confirm('.json_encode(t('Are you sure?')).')'); ?>" href="<?php echo $this->action('kickuser', $viewingLocale->getID(), $member->getUserID()); ?>"><?php echo t('Deny'); ?></a>
                                         <?php
                                         break;
                                     case TranslatorAccess::LOCALE_TRANSLATOR:
                                         ?>
-                                        <a class="btn btn-mini btn-success" onclick="<?php echo $th->specialchars('return confirm('.json_encode(t('Are you sure?')).')'); ?>" href="<?php echo $this->action('promote_to_administrator', $viewingLocale->getID(), $member->getUserID()); ?>"><?php echo t('Promote to administrators'); ?></a>
+                                        <a class="btn btn-mini btn-success" onclick="<?php echo $th->specialchars('return confirm('.json_encode(t('Are you sure?')).')'); ?>" href="<?php echo $this->action('update_user_group', $viewingLocale->getID(), $member->getUserID(), TranslatorAccess::LOCALE_TRANSLATOR, TranslatorAccess::LOCALE_ADMINISTRATOR); ?>"><?php echo t('Promote to administrators'); ?></a>
                                         <a class="btn btn-mini btn-danger" onclick="<?php echo $th->specialchars('return confirm('.json_encode(t('Are you sure?')).')'); ?>" href="<?php echo $this->action('kickuser', $viewingLocale->getID(), $member->getUserID()); ?>"><?php echo t('Remove from translators'); ?></a>
                                         <?php
                                         break;
                                     case TranslatorAccess::LOCALE_ADMINISTRATOR:
                                         ?>
-                                        <a class="btn btn-mini btn-warning" onclick="<?php echo $th->specialchars('return confirm('.json_encode(t('Are you sure?')).')'); ?>" href="<?php echo $this->action('downgrade_to_translators', $viewingLocale->getID(), $member->getUserID()); ?>"><?php echo t('Downgrate to translators'); ?></a>
+                                        <a class="btn btn-mini btn-warning" onclick="<?php echo $th->specialchars('return confirm('.json_encode(t('Are you sure?')).')'); ?>" href="<?php echo $this->action('update_user_group', $viewingLocale->getID(), $member->getUserID(), TranslatorAccess::LOCALE_ADMINISTRATOR, TranslatorAccess::LOCALE_TRANSLATOR); ?>"><?php echo t('Downgrate to translators'); ?></a>
                                         <a class="btn btn-mini btn-danger" onclick="<?php echo $th->specialchars('return confirm('.json_encode(t('Are you sure?')).')'); ?>" href="<?php echo $this->action('kickuser', $viewingLocale->getID(), $member->getUserID()); ?>"><?php echo t('Remove from translators'); ?></a>
                                         <?php
                                         break;
@@ -99,15 +124,19 @@ if(isset($viewingLocale) && is_object($viewingLocale)) {
     }
     ?><div><?php
         ?><a class="pull-left btn" href="<?php echo $this->action(''); ?>"><span><?php echo t('Back to language list'); ?></span></a></p><?php
-        if (isset($me) && ($myAccess === TranslatorAccess::NONE)) {
-            ?><a class="pull-right btn btn-primary" href="<?php echo $this->action('enter_group', $viewingLocale->getID()); ?>"><span><?php echo t('Join this translators group!'); ?></span></a></p><?php
+        if (isset($me)) {
+            if ($myAccess === TranslatorAccess::NONE) {
+                ?><a class="pull-right btn btn-primary" href="<?php echo $this->action('enter_group', $viewingLocale->getID()); ?>"><span><?php echo t('Join this translators group!'); ?></span></a></p><?php
+            }
+        } else {
+            ?><a class="pull-right btn" href="<?php echo View::url('/login?rcID='.$c->getCollectionID()); ?>"><span><?php echo t('Login to join this translators group'); ?></span></a></p><?php
         }
     ?></div><?php
 } else {
     /* @var $locales IntegratedLocale[] */
-    $pageTitle = t('Translators');
     ?>
-    <h2><?php echo t('Please select a language'); ?></h2>
+    <h2><?php echo t('Translators'); ?></h2>
+    <p><?php echo t('Please select a language'); ?></p>
     <table class="table table-striped">
         <thead>
             <tr>
@@ -136,6 +165,9 @@ if(isset($viewingLocale) && is_object($viewingLocale)) {
                             echo t('Source language');
                         } elseif (!$locale->getApproved()) {
                             echo t('Awaiting approval');
+                            if(isset($myID) && ($locale->getRequestedBy() == $myID)) {
+                                ?> <a class="btn btn-mini btn-danger" href="<?php echo $th->specialchars($this->action('cancel_group_request', $locale->getID())); ?>" onclick="<?php echo $th->specialchars('return confirm('.json_encode(t('Are you sure you want to cancel your request?')).')'); ?>"><span><?php echo t('Cancel request'); ?></span></a><?php
+                            }
                         } else {
                             echo t('Active');
                         }
@@ -146,4 +178,14 @@ if(isset($viewingLocale) && is_object($viewingLocale)) {
         </tbody>
     </table>
     <?php
+    if(User::isLoggedIn()) {
+        ?>
+        <div>
+            <a class="btn btn-" href="<?php echo $th->specialchars($this->action('new_locale')); ?>"><span><?php echo t('Ask the creation of a new language'); ?></span></a>
+        </div>
+        <?php
+    }
+    else {
+        ?><p><?php echo t('In order to request a new language you have to <a href="%s">login</a>.', View::url('/login?rcID='.$c->getCollectionID())); ?></p><?php
+    }
 }

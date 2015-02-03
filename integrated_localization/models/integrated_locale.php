@@ -514,4 +514,55 @@ class IntegratedLocale
         $this->pluralCount = $pluralCount;
         $this->pluralRule = $pluralRule;
     }
+    /**
+     * @param string $id
+     * @param string $name
+     * @param int $plurals
+     * @param string $pluralRule
+     * @param bool $approved
+     * @throws Exception
+     * @return IntegratedLocale
+     */
+    public static function add($id, $name, $plurals, $pluralRule, $approved = false)
+    {
+        $w = 'INSERT INTO IntegratedLocales SET ';
+        $q = array();
+        $w .= ' ilID = ?';
+        $q[] = $id;
+        $w .= ', ilName = ?';
+        $q[] = $name;
+        $w .= ', ilPluralCount = ?';
+        $q[] = $plurals;
+        $w .= ', ilPluralRule = ?';
+        $q[] = $pluralRule;
+        $w .= ', ilApproved = ?';
+        $q[] = $approved ? 1 : 0;
+        if (User::isLoggedIn()) {
+            $user = new User();
+            if ($user->getUserID()) {
+                $w .= ', ilRequestedBy = ?';
+                $q[] = $user->getUserID();
+            }
+        }
+        $w .= ', ilRequestedOn = NOW()';
+        $db = Loader::db();
+        /* @var $db ADODB_mysql */
+        $db->Execute('START TRANSACTION');
+        try {
+            $db->Execute($w, $q);
+            $result = static::getByID($id, true);
+            if (!isset($result)) {
+                throw new Exception(t('Internal error'));
+            }
+            $db->Execute('COMMIT');
+        } catch (Exception $x) {
+            try {
+                $db->Execute('ROLLBACK');
+            } catch (Exception $foo) {
+            }
+            throw $x;
+        }
+
+        return $result;
+    }
 }
