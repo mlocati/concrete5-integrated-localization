@@ -14,13 +14,13 @@ class IntegratedLocalizationTranslateController extends Controller
     {
         $this->redirect('/integrated_localization/translate/core_development');
     }
-    public function core_development($selectedLocale = '*auto*')
+    public function core_development($selectedLocale = '*auto*', $selectedVersion = '')
     {
         $this->addTabs(__FUNCTION__);
         $this->set('locales', $this->getLocales($selectedLocale));
         $this->loadCoreVersions(true);
     }
-    public function core_releases($selectedLocale = '*auto*')
+    public function core_releases($selectedLocale = '*auto*', $selectedVersion = '')
     {
         $this->addTabs(__FUNCTION__);
         $this->set('locales', $this->getLocales($selectedLocale));
