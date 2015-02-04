@@ -41,4 +41,7 @@ Users that want start translating a specific locale will be inserted in this gro
 to manage locales (only for site administrators and for global locale administrators)
 
 `/integrated_localization/groups`
-to manage locales (only for site administrators and for global locale administrators)
+to view, join and manage translation groups
+
+`/integrated_localization/translate`
+to view core and package translations, and to upload new translations
