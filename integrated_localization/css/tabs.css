@@ -1,0 +1,51 @@
+.integrated_localization-tabs {
+	border-bottom: 1px solid #ddd;
+	margin-left: 0;
+	margin-bottom: 20px;
+	list-style: none;
+}
+
+.integrated_localization-tabs:before,
+	.integrated_localization-tabs:after {
+	display: table;
+	content: "";
+	line-height: 0;
+}
+.integrated_localization-tabs:after {
+	clear: both;
+}
+
+.integrated_localization-tabs > li {
+	float: left;
+	margin-bottom: -1px;
+}
+
+.integrated_localization-tabs > li > a {
+	display: block;
+	padding-right: 12px;
+	padding-left: 12px;
+	margin-right: 2px;
+	line-height: 14px;
+	padding-top: 8px;
+	padding-bottom: 8px;
+	line-height: 20px;;
+	border: 1px solid transparent;
+	-webkit-border-radius: 4px 4px 0 0;
+	-moz-border-radius: 4px 4px 0 0;
+	border-radius: 4px 4px 0 0;
+}
+
+.integrated_localization-tabs > li > a:hover,
+	.integrated_localization-tabs > li > a:focus {
+	border-color: #eee #eee #ddd;
+}
+
+.integrated_localization-tabs > .active > a,
+	.integrated_localization-tabs > .active > a:hover,
+	.integrated_localization-tabs > .active > a:focus {
+	color: #555;
+	background-color: #fff;
+	border: 1px solid #ddd;
+	border-bottom-color: transparent;
+	cursor: default;
+}

@@ -1,0 +1,47 @@
+div.integrated_localization-progress {
+	background-color: #777;
+	border-radius: 2px;
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25) inset;
+	height: 20px;
+	position: relative;
+	display: block;
+}
+div.integrated_localization-progress span {
+	border-radius: 2px;
+	font-size: 0;
+	display: block;
+	text-indent: -9999px;
+}
+div.integrated_localization-progress-0 span {
+	background-color: #fe2a02;
+}
+div.integrated_localization-progress-1 span {
+	background-color: #ff5202;
+}
+div.integrated_localization-progress-2 span {
+	background-color: #fe7b02;
+}
+div.integrated_localization-progress-3 span {
+	background-color: #fea302;
+}
+div.integrated_localization-progress-4 span {
+	background-color: #ffcd02;
+}
+div.integrated_localization-progress-5 span {
+	background-color: #fdf403;
+}
+div.integrated_localization-progress-6 span {
+	background-color: #e1ff03;
+}
+div.integrated_localization-progress-7 span {
+	background-color: #8ffe02;
+}
+div.integrated_localization-progress-8 span {
+	background-color: #67fe02;
+}
+div.integrated_localization-progress-9 span {
+	background-color: #3eff02;
+}
+div.integrated_localization-progress-10 span {
+	background-color: #16fe04;
+}
