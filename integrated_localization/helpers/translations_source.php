@@ -22,7 +22,7 @@ class TranslationsSourceHelper
         $db = Loader::db();
         /* @var $db ADODB_mysql */
         $preHash = $db->GetOne('SELECT MD5(GROUP_CONCAT(itpTranslatable)) FROM IntegratedTranslatablePlaces WHERE (itpPackage = ?) AND (itpVersion = ?) ORDER BY itpTranslatable', array($packageHandle, $packageVersion));
-        if(!isset($preHash)) {
+        if (!isset($preHash)) {
             $preHash = '';
         }
         $result = array(
@@ -99,7 +99,7 @@ class TranslationsSourceHelper
                 $db->Execute($placesQuery, $placesQueryParams);
             }
             $postHash = $db->GetOne('SELECT MD5(GROUP_CONCAT(itpTranslatable)) FROM IntegratedTranslatablePlaces WHERE (itpPackage = ?) AND (itpVersion = ?) ORDER BY itpTranslatable', array($packageHandle, $packageVersion));
-            if(!isset($postHash)) {
+            if (!isset($postHash)) {
                 $postHash = '';
             }
             $result['somethingChanged'] = ($preHash === $postHash) ? false : true;
