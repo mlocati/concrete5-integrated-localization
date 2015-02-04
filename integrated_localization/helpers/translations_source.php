@@ -103,6 +103,8 @@ class TranslationsSourceHelper
                 $postHash = '';
             }
             $result['somethingChanged'] = ($preHash === $postHash) ? false : true;
+            Cache::delete('integrated_localization-po', $packageHandle.'@'.$packageVersion);
+            Cache::delete('integrated_localization-mo', $packageHandle.'@'.$packageVersion);
             $db->Execute('COMMIT');
 
             return $result;
