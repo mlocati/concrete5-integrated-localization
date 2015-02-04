@@ -9,29 +9,28 @@ $th = Loader::helper('text');
 <div>
     <?php echo t('Selected language:'); ?> 
     <select onchange="<?php echo $th->specialchars('window.location.href = '.json_encode($this->action($tab, 'LOCALE_PLACEHOLDER')).'.replace("LOCALE_PLACEHOLDER", this.value);'); ?>"><?php
-        if(!isset($locales['selected'])) {
+        if (!isset($locales['selected'])) {
             ?><option value="" selected="selected"><?php echo t('*** Please select'); ?></option><?php
         }
         if ((count($locales['mine']) > 0) && (count($locales['notMine']) > 0)) {
             ?>
             <optgroup label="<?php echo t('My languages'); ?>">
                 <?php
-                foreach($locales['mine'] as $l) {
+                foreach ($locales['mine'] as $l) {
                     ?><option value="<?php echo $th->specialchars(rawurlencode($l->getID())); ?>"<?php echo ($locales['selected'] === $l) ? ' selected="selected"' : ''; ?>><?php echo $th->specialchars($l->getName()); ?></option><?php
                 }
                 ?>
             </optgroup>
             <optgroup label="<?php echo t('Other languages'); ?>">
                 <?php
-                foreach($locales['notMine'] as $l) {
+                foreach ($locales['notMine'] as $l) {
                     ?><option value="<?php echo $th->specialchars(rawurlencode($l->getID())); ?>"<?php echo ($locales['selected'] === $l) ? ' selected="selected"' : ''; ?>><?php echo $th->specialchars($l->getName()); ?></option><?php
                 }
                 ?>
             </optgroup>
             <?php
-        }
-        else {
-            foreach($locales['all'] as $l) {
+        } else {
+            foreach ($locales['all'] as $l) {
                 ?><option value="<?php echo $th->specialchars(rawurlencode($l->getID())); ?>"<?php echo ($locales['selected'] === $l) ? ' selected="selected"' : ''; ?>><?php echo $th->specialchars($l->getName()); ?></option><?php
             }
         }
@@ -39,7 +38,7 @@ $th = Loader::helper('text');
 </div>
 
 <?php
-if(!isset($locales['selected'])) {
+if (!isset($locales['selected'])) {
     ?><div class="alert"><?php echo t('Please select a language'); ?></div><?php
     return;
 }
@@ -53,32 +52,196 @@ if(!isset($locales['selected'])) {
 switch($tab) {
     case 'core_development':
     case 'core_releases':
-        
-        ?>
-        <table class="table table-striped table-condensed table-bordered table-hover">
-            <thead><tr>
-                <th><?php echo t('Version'); ?></th>
-                <th><?php echo t('Details'); ?></th>
-                <th><?php echo t('Progress'); ?></th>
-            </tr></thead>
-            <tbody><?php
-                foreach ($versions as $version => $name) {
-                    $stats = $this->controller->getVersionStats('-', $version, $locales['selected']);
-                    ?>
-                    <tr>
-                        <th><a href="<?php echo $this->action($tab, $locales['selected']->getID(), preg_replace('/^dev-/', '', $version)); ?>"><?php echo $th->specialchars($name); ?></a></th>
-                        <td><?php echo t('%s out of %s', $stats['translated'], $stats['total']); ?></td>
-                        <td style="width: 120px"><div class="integrated_localization-progress integrated_localization-progress-<?php echo floor($stats['progress'] / 10); ?>" title="<?php echo t('%s %%', $stats['progress']); ?>">
-                            <span style="width: <?php echo $stats['progress']; ?>%" ><?php echo t('%s %%', $stats['progress']); ?></span>
-                        </div></td>
-                    </tr>
-                    <?php
-                }
-                ?>       
-            </tbody>
-        </table>
-        <?php
+        if (isset($selectedVersion)) {
+            $selectedPackage = '-';
+            $selectedPackageNameWithVersion = $versions[$selectedVersion];
+        } else {
+            ?>
+            <table class="table table-striped table-condensed table-bordered table-hover">
+                <thead><tr>
+                    <th><?php echo t('Version'); ?></th>
+                    <th><?php echo t('Details'); ?></th>
+                    <th><?php echo t('Progress'); ?></th>
+                </tr></thead>
+                <tbody><?php
+                    foreach ($versions as $version => $name) {
+                        $stats = $this->controller->getVersionStats('-', $version, $locales['selected']);
+                        ?>
+                        <tr>
+                            <th><a href="<?php echo $this->action($tab, $locales['selected']->getID(), preg_replace('/^dev-/', '', $version)); ?>"><?php echo $th->specialchars($name); ?></a></th>
+                            <td><?php echo t('%1$s out of %2$s', $stats['translated'], $stats['total']); ?></td>
+                            <td style="width: 120px"><div class="integrated_localization-progress integrated_localization-progress-<?php echo floor($stats['progress'] / 10); ?>" title="<?php echo t('%s %%', $stats['progress']); ?>">
+                                <span style="width: <?php echo $stats['progress']; ?>%"><?php echo t('%s %%', $stats['progress']); ?></span>
+                            </div></td>
+                        </tr>
+                        <?php
+                    }
+                    ?>       
+                </tbody>
+            </table>
+            <?php
+        }
         break;
     case 'packages':
+        if (isset($selectedPackage) && isset($selectedVersion)) {
+            $selectedPackageNameWithVersion = ucwords(str_replace('_', ' ', $selectedPackage)).' v'.$selectedVersion;
+        } else {
+            ?>
+            <script>$(document).ready(function() {
+var LOCALSTORAGE_KEY = 'integratedLocalization.translate.package.search',
+    SELECTED_TEMPLATE = <?php echo json_encode($this->action($tab, $locales['selected']->getID(), '[[PACKAGE]]', '[[VERSION]]')); ?>,
+    $form = $('#integrated_localization-package-search'),
+    $search = $form.find('input.search-query')
+    $submit = $form.find('input[type="submit"]');
+var status = (function() {
+    var isBusy = true;
+    return {
+        busy: function(set) {
+            if ((typeof(set) === 'undefined') || (set === null)) {
+                return isBusy;
+            }
+            isBusy = !!set;
+            if (isBusy) {
+                $search.attr('readonly', 'readonly');
+                $submit.attr('disabled', 'disabled');
+            } else {
+                $search.removeAttr('readonly');
+                $submit.removeAttr('disabled');
+            }
+        }
+    }
+})();
+$search.on('change keydown click', function() {
+    $form.find('span').css('visibility', 'hidden');
+});
+function search() {
+	 if (status.busy()) {
+        return;
+    }
+    if (window.localStorage) {
+        window.localStorage.removeItem(LOCALSTORAGE_KEY);
+    }
+    var q = $.trim($search.val());
+    if (!/[0-9a-z]{4,}/i.test(q)) {
+        $form.find('span').css('visibility', 'visible');
+        $search.focus();
+        return;
+    }
+    status.busy(true);
+    $('.integrated_localization-package-results').hide('fast');
+    $.ajax({
+        async: true,
+        cache: true,
+        data: {q: q},
+        dataType: 'json',
+        type: 'GET',
+        url: <?php echo json_encode($this->action('search_package', $locales['selected']->getID())); ?>
+    })
+    .done(function(data) {
+        if (data === false) {
+            $('#integrated_localization-package-results-no').show('fast');
+            return;
+        } else {
+            if (window.localStorage) {
+                window.localStorage.setItem(LOCALSTORAGE_KEY, q);
+            }
+            var $tb = $('#integrated_localization-package-results-yes tbody').empty();
+            $.each(data, function(pHandle, pData) {
+                var $td0 = null, $showOthers = null;
+                $.each(pData.versions, function(index, vData) {
+                    var $tr = $('<tr' + ((index === 0) ? '' : ' style="display: none"') + ' />'), $c;
+                    $tr
+                        .append($c = $('<th />')
+                            .append($('<a />')
+                                .attr('href', SELECTED_TEMPLATE.replace(/\[\[PACKAGE\]\]/g, pHandle).replace(/\[\[VERSION\]\]/g, vData.v))
+                                .text(pData.name + ' v' + vData.v)
+                            )
+                        )
+                        .append($('<td />').text(
+                            <?php echo json_encode(t('%1$s out of %2$s')); ?>
+                            .replace(/%1\$s/, vData.stats.translated.toString())
+                            .replace(/%2\$s/, vData.stats.total.toString())
+                         ))
+                         .append($('<td style="width: 120px" />')
+                             .append($('<div' +
+                                 ' class="integrated_localization-progress integrated_localization-progress-' + Math.floor(vData.stats.progress / 10) + '"' +
+                                 ' title="' + vData.stats.progress + ' %" />'
+                                 )
+                                 .append($('<span style="width: ' + vData.stats.progress + '%" />')
+                                     .text(vData.stats.progress + ' %')
+                                 )
+                             )
+                         );
+                    $tb.append($tr);
+                    if ($td0 === null) {
+                        $td0 = $c;
+                    } else {
+                        if ($showOthers === null) {
+                            $td0.append($showOthers = $('<a href="javascript:void(0)" style="font-weight: normal" class="pull-right" />')
+                               .text(<?php echo json_encode(t('show older versions')); ?>)
+                               .data('rows', [])
+                               .data('rowsShown', false)
+                               .on('click', function() {
+                                   var $me = $(this), show = !$me.data('rowsShown');
+                                   $me.data('rowsShown', show);
+                                   $.each($me.data('rows'), function() {
+                                       this[show ? 'show' : 'hide']('fast');
+                                   });
+                                   $me.text(show ? <?php echo json_encode(t('hide older versions')); ?> : <?php echo json_encode(t('show older versions')); ?>)
+                               })
+                            );
+                        }
+                        $showOthers.data('rows').push($tr);
+                    }
+                });
+            });
+            $('#integrated_localization-package-results-yes').show('fast');
+        }
+    })
+    .fail(function(xhr, status, error) {
+        if (xhr.status === 400) {
+            alert(xhr.responseText);
+        } else {
+            alert(status);
+        }
+    })
+    .always(function() {
+        status.busy(false);
+    });
+}
+$form.removeAttr('onsubmit').on('submit', function() { search(); return false; });
+status.busy(false);
+if (window.localStorage) {
+    var initialSearch = window.localStorage.getItem(LOCALSTORAGE_KEY);
+    if ((typeof(initialSearch) === 'string') && (initialSearch !== '')) {
+        $search.val(initialSearch);
+        search();
+    }
+}
+            });</script>
+            <form class="form-search" onsubmit="return false" id="integrated_localization-package-search">
+                <input type="search" class="input-medium search-query" readonly="readonly" />
+                <input type="submit" class="btn btn-primary" disabled="disabled" value="<?php echo t('Search'); ?>" />
+                <span style="visibility: hidden"><?php echo t('Please be more specific...'); ?></span>
+            </form>
+            <div class="integrated_localization-package-results alert" style="display: none" id="integrated_localization-package-results-no">
+                <?php echo t('No package found.'); ?>
+            </div>
+            <div class="integrated_localization-package-results" style="display: none" id="integrated_localization-package-results-yes">
+                <table class="table table-hover table-condensed table-bordered">
+                    <thead><tr>
+                        <th><?php echo t('Package'); ?></th>
+                        <th><?php echo t('Details'); ?></th>
+                        <th><?php echo t('Progress'); ?></th>
+                    </tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <?php
+        }
         break;
+}
+
+if (isset($selectedPackage) && isset($selectedVersion)) {
+    ?><h3><?php echo $th->specialchars($selectedPackageNameWithVersion); ?></h3><?php
 }

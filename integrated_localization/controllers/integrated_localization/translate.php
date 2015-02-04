@@ -17,19 +17,36 @@ class IntegratedLocalizationTranslateController extends Controller
     public function core_development($selectedLocale = '*auto*', $selectedVersion = '')
     {
         $this->addTabs(__FUNCTION__);
-        $this->set('locales', $this->getLocales($selectedLocale));
+        $locales = $this->getLocales($selectedLocale);
+        $this->set('locales', $locales);
         $this->loadCoreVersions(true);
+        if (($selectedLocale !== '*auto*') && isset($locales['selected']) && is_string($selectedVersion) && ($selectedVersion !== '')) {
+            $selectedVersion = 'dev-'.$selectedVersion;
+            $this->checkPackageVersion('-', $selectedVersion);
+            $this->set('selectedVersion', $selectedVersion);
+        }
     }
     public function core_releases($selectedLocale = '*auto*', $selectedVersion = '')
     {
         $this->addTabs(__FUNCTION__);
-        $this->set('locales', $this->getLocales($selectedLocale));
+        $locales = $this->getLocales($selectedLocale);
+        $this->set('locales', $locales);
         $this->loadCoreVersions(false);
+        if (($selectedLocale !== '*auto*') && isset($locales['selected']) && is_string($selectedVersion) && ($selectedVersion !== '')) {
+            $this->checkPackageVersion('-', $selectedVersion);
+            $this->set('selectedVersion', $selectedVersion);
+        }
     }
-    public function packages($selectedLocale = '*auto*')
+    public function packages($selectedLocale = '*auto*', $selectedPackage = '', $selectedVersion = '')
     {
         $this->addTabs(__FUNCTION__);
-        $this->set('locales', $this->getLocales($selectedLocale));
+        $locales = $this->getLocales($selectedLocale);
+        $this->set('locales', $locales);
+        if (($selectedLocale !== '*auto*') && isset($locales['selected']) && is_string($selectedPackage) && ($selectedPackage !== '') && is_string($selectedVersion) && ($selectedVersion !== '')) {
+            $this->checkPackageVersion($selectedPackage, $selectedVersion);
+            $this->set('selectedPackage', $selectedPackage);
+            $this->set('selectedVersion', $selectedVersion);
+        }
     }
     private function loadCoreVersions($dev)
     {
@@ -154,5 +171,76 @@ class IntegratedLocalizationTranslateController extends Controller
         }
 
         return $result;
+    }
+    private function checkPackageVersion($package, $version)
+    {
+        $db = Loader::db();
+        /* @var $db ADODB_mysql */
+        if (!$db->GetOne(
+            '
+                SELECT itpTranslatable
+                FROM IntegratedTranslatablePlaces
+                WHERE (itpPackage = ?) AND (itpVersion = ?)
+            ',
+            array($package, $version)
+        )) {
+            throw new Exception(t('The package "%1$s" does not have a version "%2$s"', $package, $version));
+        }
+    }
+    public function search_package($localeID)
+    {
+        try {
+            Loader::model('integrated_locale', 'integrated_localization');
+            $locale = IntegratedLocale::getByID($localeID);
+            if (!isset($locale)) {
+                throw new Exception(t('Invalid locale identifier: %s', $localeID));
+            }
+            $q = $this->get('q');
+            $q = is_string($q) ? trim(preg_replace('/\s+/', ' ', $q)) : '';
+            if (!preg_match('/[0-9a-z]{4,}/i', $q)) {
+                throw new Exception(t('Please be more specific...'));
+            }
+            $qReal = strtolower(str_replace(' ', '_', $q));
+            $result = array();
+            if (preg_match('/^[a-z0-9_]+$/', $qReal)) {
+                $db = Loader::db();
+                /* @var $db ADODB_mysql */
+                $rs = $db->Query(
+                    'SELECT DISTINCT itpPackage, itpVersion FROM IntegratedTranslatablePlaces WHERE IntegratedTranslatablePlaces.itpPackage LIKE ? ORDER BY itpPackage',
+                    array('%'.$qReal.'%')
+                );
+                /* @var $rs ADORecordSet_mysql */
+                while ($row = $rs->FetchRow()) {
+                    if (!isset($result[$row['itpPackage']])) {
+                        $result[$row['itpPackage']] = array(
+                            'name' => ucwords(str_replace('_', ' ', $row['itpPackage'])),
+                            'versions' => array(),
+                        );
+                    }
+                    $result[$row['itpPackage']]['versions'][] = $row['itpVersion'];
+                }
+                $rs->Close();
+                if (!empty($result)) {
+                    foreach (array_keys($result) as $package) {
+                        $versions = $result[$package]['versions'];
+                        usort($versions, 'version_compare');
+                        $versions = array_reverse($versions);
+                        $result[$package]['versions'] = array();
+                        foreach ($versions as $version) {
+                            $result[$package]['versions'][] = array(
+                                'v' => $version,
+                                'stats' => $this->getVersionStats($package, $version, $locale),
+                            );
+                        }
+                    }
+                }
+            }
+            header('Content-Type: text/plain; charset='.APP_CHARSET);
+            echo empty($result) ? 'false' : json_encode($result);
+        } catch (Exception $x) {
+            header('400 Bad Request', true, 400);
+            echo $x->getMessage();
+        }
+        die();
     }
 }
