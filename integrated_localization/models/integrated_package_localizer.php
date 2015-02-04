@@ -1,39 +1,51 @@
 <?php
 
+/**
+ * Manage packages translations for packages
+ */
 class IntegratedPackageLocalizer
 {
     /**
+     * The root directory containing the package files
      * @var string
      */
     private $baseDirectory = '';
     /**
+     * This will be true if $baseDirectory is a temporary directory that should be removed on instance destruction
      * @var bool
      */
     private $baseDirectoryIsTemporary = false;
     /**
+     * This is the real package root directory (the one containing the controller.php file)
      * @var string
      */
     private $controllerDirectory = '';
     /**
+     * If the originating path was a zip file, this will contain the full path to that zip folder
      * @var string
      */
     private $originalZipPath = '';
     /**
+     * The package handle
      * @var string
      */
     private $packageHandle = '';
     /**
+     * The package version
      * @var string
      */
     private $packageVersion = '';
     /**
+     * The translatable strings read from the package directory
      * @var \Gettext\Translations|null
      */
     private $translatables = null;
     /**
-     * @param string $path
-     * @param string $pkgHandle
-     * @param string $pkgVersion
+     * Initialize a new instance
+     * @param string $path A path to the package .zip archive, or to the directory of the package (or to a directory that contains only the directory package)
+     * @param string $pkgHandle The package handle. If not specified we'll determine it from the package controller.php file
+     * @param string $pkgVersion The package version. If not specified we'll determine it from the package controller.php file
+     * @throw Exception
      */
     public function __construct($path, $packageHandle = '', $packageVersion = '')
     {
@@ -110,6 +122,7 @@ class IntegratedPackageLocalizer
         }
     }
     /**
+     * Clean up the instance temporary stuff
      */
     private function cleanup()
     {
@@ -118,12 +131,14 @@ class IntegratedPackageLocalizer
         }
     }
     /**
+     * Automatically called on instance release
      */
     public function __destruct()
     {
         $this->cleanup();
     }
     /**
+     * Return the package handle (extracted from the package controller.php if not given when the instane was initializated)
      * @return string
      */
     public function getPackageHandle()
@@ -131,6 +146,7 @@ class IntegratedPackageLocalizer
         return $this->packageHandle;
     }
     /**
+     * Return the package version (extracted from the package controller.php if not given when the instane was initializated)
      * @return string
      */
     public function getPackageVersion()
@@ -138,6 +154,7 @@ class IntegratedPackageLocalizer
         return $this->packageVersion;
     }
     /**
+     * Extract the translatable strings from the package files
      * @return \Gettext\Translations
      */
     public function getTranslatables()
@@ -157,10 +174,11 @@ class IntegratedPackageLocalizer
         return $this->translatables;
     }
     /**
-     * @param IntegratedLocale|string $locale
-     * @param bool $readFromDB
-     * @param bool $readFromPackageFiles
-     * @param bool $useTranslatables
+     * Read the translated strings already in the package and/or in the database
+     * @param IntegratedLocale|string $locale The locale for which you want the translations
+     * @param bool $readFromDB Do you want to read translations from the database?
+     * @param bool $readFromPackageFiles Do you want to read translations from the package .mo/.po files?
+     * @param bool $useTranslatables Leave to true to use as strings dictionary the strings read from the package files too, false to use only the package .mo/.po files
      * @throws Exception
      * @return \Gettext\Translations
      */
@@ -210,6 +228,7 @@ class IntegratedPackageLocalizer
         return $translations;
     }
     /**
+     * If this instance was created from a .zip archive, update the archive with the new files of the currently extracted temporary directory
      * @throws Exception
      */
     public function repack()
@@ -232,6 +251,8 @@ class IntegratedPackageLocalizer
         }
     }
     /**
+     * Create a .zip archive with the content of the current languages directory and ends the execution of the script
+     * @throws Exception
      */
     public function downloadLanguagesFolder()
     {
@@ -259,6 +280,7 @@ class IntegratedPackageLocalizer
         }
     }
     /**
+     * Write the gettext .pot dictionary with the translatable strings extracted from the package files
      * @throws Exception
      */
     public function writePotFile()
@@ -276,10 +298,11 @@ class IntegratedPackageLocalizer
         }
     }
     /**
-     * @param IntegratedLocale|string $locale
-     * @param \Gettext\Translations $translations
-     * @param bool $writeMO
-     * @param bool $writePO
+     * Write the gettext .po/.mo files for a specific locale
+     * @param IntegratedLocale|string $locale The language of the translations
+     * @param \Gettext\Translations $translations The translations to weite
+     * @param bool $writeMO Set to false to don't write the binary .mo file
+     * @param bool $writePO Set to false to don't write the textual .po file
      * @throws Exception
      */
     public function writeTranslationsFile($locale, \Gettext\Translations $translations, $writeMO = true, $writePO = true)
@@ -315,6 +338,7 @@ class IntegratedPackageLocalizer
         }
     }
     /**
+     * Check the result of a ZipArchive->open method call
      * @param true|int $rc
      * @throws Exception
      */
@@ -426,9 +450,10 @@ class IntegratedPackageLocalizer
         );
     }
     /**
-     * @param string $name
-     * @param array $tokens
-     * @return null|string|number
+     * Helper method used by IntegratedPackageLocalizer::extractPackageInfo
+     * @param string $name The name of the variable
+     * @param array $tokens The php tokens
+     * @return null|string|number The value of the variable (null if not found)
      */
     private static function extractPackageInfo_lookForVar($name, $tokens)
     {
@@ -472,9 +497,10 @@ class IntegratedPackageLocalizer
         return;
     }
     /**
-     * @param string $serverDirectory
-     * @param string $zipBaseDirectory
-     * @return string
+     * Create a temporary zip archive
+     * @param string $serverDirectory The directory to compress
+     * @param string $zipBaseDirectory THe name of the compressed directory as stored in the zip file
+     * @return string Returns the path of the newly created .zip file (you should delete it after you use it)
      */
     private static function createZip($serverDirectory, $zipBaseDirectory = '')
     {
