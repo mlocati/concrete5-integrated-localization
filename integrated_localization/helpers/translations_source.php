@@ -8,7 +8,7 @@ class TranslationsSourceHelper
     /**
      * Import translatable strings from core/packages into the database
      * @param \Gettext\Translations $translations The translatable strings to import
-     * @param string $packageHandle The package handle ('-' for the core)
+     * @param string $packageHandle The package handle ('_' for the core)
      * @param string $packageVersion The package version ('dev-...' for the core development versions)
      * @throws Exception
      * @return array Keys are:
@@ -104,6 +104,7 @@ class TranslationsSourceHelper
             }
             $result['somethingChanged'] = ($preHash === $postHash) ? false : true;
             Cache::delete('integrated_localization-po', $packageHandle.'@'.$packageVersion);
+            Cache::delete('integrated_localization-po-dev', $packageHandle.'@'.$packageVersion);
             Cache::delete('integrated_localization-mo', $packageHandle.'@'.$packageVersion);
             $db->Execute('COMMIT');
 

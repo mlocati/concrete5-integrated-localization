@@ -53,7 +53,7 @@ switch($tab) {
     case 'core_development':
     case 'core_releases':
         if (isset($selectedVersion)) {
-            $selectedPackage = '-';
+            $selectedPackage = '_';
             $selectedPackageNameWithVersion = $versions[$selectedVersion];
         } else {
             ?>
@@ -65,7 +65,7 @@ switch($tab) {
                 </tr></thead>
                 <tbody><?php
                     foreach ($versions as $version => $name) {
-                        $stats = $this->controller->getVersionStats('-', $version, $locales['selected']);
+                        $stats = $this->controller->getVersionStats('_', $version, $locales['selected']);
                         ?>
                         <tr>
                             <th><a href="<?php echo $this->action($tab, $locales['selected']->getID(), preg_replace('/^dev-/', '', $version)); ?>"><?php echo $th->specialchars($name); ?></a></th>
@@ -115,7 +115,7 @@ $search.on('change keydown click', function() {
     $form.find('span').css('visibility', 'hidden');
 });
 function search() {
-	 if (status.busy()) {
+    if (status.busy()) {
         return;
     }
     if (window.localStorage) {
@@ -243,5 +243,89 @@ if (window.localStorage) {
 }
 
 if (isset($selectedPackage) && isset($selectedVersion)) {
-    ?><h3><?php echo $th->specialchars($selectedPackageNameWithVersion); ?></h3><?php
+    $stats = $this->controller->getVersionStats($selectedPackage, $selectedVersion, $locales['selected'], true);
+    ?>
+    <h3><?php echo $th->specialchars($selectedPackageNameWithVersion); ?></h3>
+    <fieldset>
+        <legend><?php echo t('Statistics'); ?></legend>
+        <table class="table table-bordered" style="width: auto">
+            <tr>
+                <th><?php echo t('Total number of strings'); ?></th>
+                <td colspan="2"><?php echo $stats['total']; ?></td>
+            </tr>
+            <tr>
+                <th><?php echo t('Translated strings'); ?></th>
+                <td><?php echo $stats['translated']; ?></td>
+                <td><?php echo t('%.2f %%', ($stats['translated'] * 100) / $stats['total']); ?></td>
+            </tr>
+            <tr>
+                <th><?php echo t('Approved strings'); ?></th>
+                <td><?php echo $stats['approved']; ?></td>
+                <td><?php echo t('%.2f %%', ($stats['approved'] * 100) / $stats['total']); ?></td>
+            </tr>
+        </table>
+    </fieldset>
+    <fieldset>
+        <legend><?php echo t('Download Translations'); ?></legend>
+        <a href="<?php echo $this->action('download', $selectedPackage, $selectedVersion, $locales['selected']->getID(), 'po-dev') ?>"><?php echo t('Get .po file (with unapproved strings marked as fuzzy)'); ?></a><br />
+        <a href="<?php echo $this->action('download', $selectedPackage, $selectedVersion, $locales['selected']->getID(), 'po') ?>"><?php echo t('Get .po file');; ?></a><br />
+        <a href="<?php echo $this->action('download', $selectedPackage, $selectedVersion, $locales['selected']->getID(), 'mo') ?>"><?php echo t('Get compiled .mo file'); ?></a>
+    </fieldset>
+    <fieldset>
+    <fieldset>
+        <legend><?php echo t('Upload Translations'); ?></legend>
+        <?php
+        if(User::isLoggedIn()) {
+            $isCoordinator = false;
+            $trh = Loader::helper('translators', 'integrated_localization');
+            /* @var $trh TranslatorsHelper */
+            switch ($trh->getCurrentUserAccess($locales['selected'])) {
+                case TranslatorAccess::SITE_ADMINISTRATOR:
+            	 case TranslatorAccess::LOCALE_ADMINISTRATOR:
+                case TranslatorAccess::GLOBAL_ADMINISTRATOR:
+                    $isCoordinator = true;
+                    /* Fall-through */
+            	   case TranslatorAccess::LOCALE_TRANSLATOR:
+                	?>
+                	<form class="form-horizontal" method="POST" enctype="multipart/form-data" onsubmit="if(this.already)return false;this.already=true">
+                	   <div class="control-group">
+                	       <label class="control-label" for="ilUploadTranslations"><?php echo t('Upload .po file'); ?></label>
+                	       <div class="controls">
+                	           <input type="file" id="ilUploadTranslations" name="new-translations" required="required" />
+                	       </div>
+                	   </div>
+                	   <?php
+                	   if($isCoordinator) {
+                	       ?>
+                	       <div class="control-group">
+                	           <label class="control-label"><?php echo t('Options'); ?></label>
+                	           <div class="controls">
+                	               <label class="checkbox">
+                	                   <input type="checkbox" name="as-approved" value="Sure!"> <?php echo t('Mark non-fuzzy translations as approved'); ?>
+                	               </label>
+                	           </div>
+                	       </div>
+                	       <?php
+                      }
+                      ?>
+                      <div class="control-group">
+                        <div class="controls">
+                            <button type="submit" class="btn btn-default"><?php echo t('Upload'); ?></button>
+                        </div>
+                	</form>
+                	<?php
+                	break;
+                case TranslatorAccess::LOCALE_ASPIRANT:
+                    ?><div class="alert"><?php echo t('You have to wait that your application request will be approved in order to submit translations'); ?></div><?php
+                    break;
+                default:
+                	?><p><?php echo t('Do you want to help us translating? <a href="%1$s">Click here</a> to join the %2$s translation group!', View::url('/integrated_localization/groups', 'group', $locales['selected']->getID()), $th->specialchars($locales['selected']->getName())); ?></p><?php
+                	break;
+            }
+        } else {
+            ?><p><?php echo t('Do you want to help us translating? <a href="%3$s">Login</a> and <a href="%1$s">click here</a> to join the %2$s translation group!', View::url('/integrated_localization/groups', 'group', $locales['selected']->getID()), $th->specialchars($locales['selected']->getName()), View::url('/login?rcID='.$c->getCollectionID())); ?></p><?php
+        }
+        ?>
+    </fieldset>
+    <?php
 }
