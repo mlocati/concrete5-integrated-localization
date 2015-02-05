@@ -211,7 +211,7 @@ class IntegratedPackageLocalizer
                     );
                 }
                 $moFile = "$gettextDir/messages.mo";
-                if (is_file($poFile)) {
+                if (is_file($moFile)) {
                     $translations->mergeWith(
                         \Gettext\Extractors\Mo::fromFile($moFile),
                         MERGE_ADD | MERGE_COMMENTS | MERGE_PLURAL
