@@ -5,10 +5,24 @@
 $th = Loader::helper('text');
 /* @var $th TextHelper */
 
+$languagePlaceholderURL = $this->action($tab, 'LOCALE_PLACEHOLDER');
+if (isset($locales['selected']) && isset($selectedVersion)) {
+    switch ($tab) {
+        case 'core_development':
+        case 'core_releases':
+            $languagePlaceholderURL = $this->action($tab, 'LOCALE_PLACEHOLDER', preg_replace('/^dev-/', '', $selectedVersion));
+            break;
+        case 'packages':
+            if (isset($selectedPackage)) {
+                $languagePlaceholderURL = $this->action($tab, 'LOCALE_PLACEHOLDER', $selectedPackage, $selectedVersion);
+            }
+            break;
+    }
+}
 ?>
 <div>
     <?php echo t('Selected language:'); ?> 
-    <select onchange="<?php echo $th->specialchars('window.location.href = '.json_encode($this->action($tab, 'LOCALE_PLACEHOLDER')).'.replace("LOCALE_PLACEHOLDER", this.value);'); ?>"><?php
+    <select onchange="<?php echo $th->specialchars('window.location.href = '.json_encode($languagePlaceholderURL).'.replace("LOCALE_PLACEHOLDER", this.value);'); ?>"><?php
         if (!isset($locales['selected'])) {
             ?><option value="" selected="selected"><?php echo t('*** Please select'); ?></option><?php
         }
@@ -39,7 +53,6 @@ $th = Loader::helper('text');
 
 <?php
 if (!isset($locales['selected'])) {
-    ?><div class="alert"><?php echo t('Please select a language'); ?></div><?php
     return;
 }
 ?>
