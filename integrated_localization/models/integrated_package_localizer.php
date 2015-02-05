@@ -207,14 +207,14 @@ class IntegratedPackageLocalizer
                 if (is_file($poFile)) {
                     $translations->mergeWith(
                         \Gettext\Extractors\Po::fromFile($poFile),
-                        MERGE_ADD | MERGE_COMMENTS | MERGE_PLURAL
+                        \Gettext\Translations::MERGE_ADD | \Gettext\Translations::MERGE_COMMENTS | \Gettext\Translations::MERGE_PLURAL
                     );
                 }
                 $moFile = "$gettextDir/messages.mo";
                 if (is_file($moFile)) {
                     $translations->mergeWith(
                         \Gettext\Extractors\Mo::fromFile($moFile),
-                        MERGE_ADD | MERGE_COMMENTS | MERGE_PLURAL
+                        \Gettext\Translations::MERGE_ADD | \Gettext\Translations::MERGE_COMMENTS | \Gettext\Translations::MERGE_PLURAL
                     );
                 }
             }
