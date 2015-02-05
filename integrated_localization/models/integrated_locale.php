@@ -168,7 +168,7 @@ class IntegratedLocale
             $w[] = '(ilIsSource = 0)';
         }
 
-        return self::find($w, $q);
+        return self::find(implode(' AND ', $w), $q);
     }
     /**
      * @param string $where
