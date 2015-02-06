@@ -280,53 +280,62 @@ class IntegratedLocalizationTranslateController extends Controller
             if (is_string($format)) {
                 $format = strtolower($format);
             }
+            $only = '';
+            $unapprovedAsFuzzy = false;
             switch (is_string($format) ? $format : '') {
-                case 'po-dev':
-                    $onlyTranslated = false;
-                    $unapprovedAsFuzzy = true;
-                    break;
                 case 'po':
-                    $onlyTranslated = false;
-                    $unapprovedAsFuzzy = false;
+                    $filenameSuffix = '.po';
+                    if ($this->get('fuzzy') !== null) {
+                        $unapprovedAsFuzzy = true;
+                        $filenameSuffix = '-fuzzy'.$filenameSuffix;
+                    }
+                    if ($this->get('untranslated') !== null) {
+                        $only = 'untranslated';
+                    } elseif ($this->get('translated') !== null) {
+                        $only = 'translated';
+                    }
+                    if ($only !== '') {
+                        $filenameSuffix = '-'.$only.$filenameSuffix;
+                    }
+                    break;
                 case 'mo':
-                    $onlyTranslated = true;
-                    $unapprovedAsFuzzy = false;
+                    $filenameSuffix = '.mo';
                     break;
                 default:
                     throw new Exception(t('Invalid format identifier: %s', $format));
             }
             $tsh = Loader::helper('translations_source', 'integrated_localization');
             /* @var $tsh TranslationsSourceHelper */
-            $translations = $tsh->loadTranslationsByPackage($locale, $package, $version, $onlyTranslated, $unapprovedAsFuzzy);
+            $translations = $tsh->loadTranslationsByPackage($locale, $package, $version, $only, $unapprovedAsFuzzy);
             $translations->setLanguage($locale->getID());
             $translations->setPluralForms($locale->getPluralCount(), $locale->getPluralRule());
-            $outPackage = ($package === '_') ? 'concrete5core' : $package;
+            $filename = (($package === '_') ? 'concrete5core' : $package).'@'.$version.'-'.$localeID.$filenameSuffix;
             switch ($format) {
                 case 'po-dev':
                     $result = $translations->toPoString();
                     header('Content-Type: application/octet-stream', true);
-                    header('Content-Disposition: attachment; filename="'.$outPackage.'@'.$version.'-'.$localeID.'-dev.po', true);
+                    header('Content-Disposition: attachment; filename="'.$filename, true);
                     header('Content-Length: '.strlen($result));
                     echo $result;
                     break;
                 case 'po':
                     $result = $translations->toPoString();
                     header('Content-Type: application/octet-stream', true);
-                    header('Content-Disposition: attachment; filename="'.$outPackage.'@'.$version.'-'.$localeID.'.po', true);
+                    header('Content-Disposition: attachment; filename="'.$filename, true);
                     header('Content-Length: '.strlen($result));
                     echo $result;
                     break;
                 case 'mo':
                     $result = $translations->toMoString();
                     header('Content-Type: application/octet-stream', true);
-                    header('Content-Disposition: attachment; filename="'.$outPackage.'@'.$version.'-'.$localeID.'.mo', true);
+                    header('Content-Disposition: attachment; filename="'.$filename, true);
                     header('Content-Length: '.strlen($result));
                     echo $result;
                     break;
             }
         } catch (Exception $x) {
-            header('400 Bad Request', true, 400);
-            header('Content-Type: text/plain; charset='.APP_CHARSET, true);
+            @header('400 Bad Request', true, 400);
+            @header('Content-Type: text/plain; charset='.APP_CHARSET, true);
             echo $x->getMessage();
         }
         die();

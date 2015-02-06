@@ -280,60 +280,110 @@ if (isset($selectedPackage) && isset($selectedVersion)) {
     </fieldset>
     <fieldset>
         <legend><?php echo t('Download Translations'); ?></legend>
-        <a href="<?php echo $this->action('download', $selectedPackage, $selectedVersion, $locales['selected']->getID(), 'po-dev') ?>"><?php echo t('Get .po file (with unapproved strings marked as fuzzy)'); ?></a><br />
-        <a href="<?php echo $this->action('download', $selectedPackage, $selectedVersion, $locales['selected']->getID(), 'po') ?>"><?php echo t('Get .po file');; ?></a><br />
-        <a href="<?php echo $this->action('download', $selectedPackage, $selectedVersion, $locales['selected']->getID(), 'mo') ?>"><?php echo t('Get compiled .mo file'); ?></a>
+        <?php
+        $hasUntranslated = ($stats['translated'] < $stats['total']) ? true : false;
+        $hasTranslated = ($stats['translated'] > 0) ? true : false;
+        $hasUnapproved = ($stats['approved'] < $stats['translated']) ? true : false;
+        ?>
+        <table class="table table-border" style="width: auto">
+            <tbody>
+                <tr>
+                    <th><?php echo t('Compiled format'); ?><br /><small><?php echo t('Useful for users'); ?></small></th>
+                    <td colspan="3"><a href="<?php echo $this->action('download', $selectedPackage, $selectedVersion, $locales['selected']->getID(), 'mo') ?>"><?php echo t('download'); ?></a></td>
+                </tr>
+                <tr>
+                    <th><?php echo t('Text format'); ?><br /><small><?php echo t('Useful for translators'); ?></small></th>
+                    <td><a href="<?php echo $this->action('download', $selectedPackage, $selectedVersion, $locales['selected']->getID(), 'po'); ?>"><?php echo t('all strings'); ?></a></td>
+                    <td><a<?php
+                        if ($hasUntranslated) {
+                            ?> href="<?php echo $this->action('download', $selectedPackage, $selectedVersion, $locales['selected']->getID(), 'po'); ?>?untranslated"<?php
+                        } else {
+                            ?> href="javascript:void(0)" disabled="disabled" style="color: gray; cursor: text; text-decoration: none"<?php
+                        }
+                        ?>><?php echo t('only untranslated strings'); ?></a><?php
+                    ?></td>
+                    <td><a<?php
+                        if ($hasTranslated) { 
+                            ?> href="<?php echo $this->action('download', $selectedPackage, $selectedVersion, $locales['selected']->getID(), 'po'); ?>?translated"<?php
+                        } else {
+                            ?> href="javascript:void(0)" disabled="disabled" style="color: gray; cursor: text; text-decoration: none"<?php
+                        }
+                        ?>><?php echo t('only translated strings'); ?></a>
+                    </td>
+                </tr>
+                <tr>
+                    <th><?php echo t('Text format with unapproved strings marked as fuzzy'); ?><br /><small><?php echo t('Useful for translator coordinators'); ?></small></th>
+                    <td><a<?php
+                        if ($hasUnapproved) {
+                            ?> href="<?php echo $this->action('download', $selectedPackage, $selectedVersion, $locales['selected']->getID(), 'po'); ?>?fuzzy"<?php
+                        } else {
+                            ?> href="javascript:void(0)" disabled="disabled" style="color: gray; cursor: text; text-decoration: none"<?php
+                        }
+                        ?>><?php echo t('all strings'); ?></a>
+                    </td>
+                    <td></td>
+                    <td><a<?php
+                        if ($hasUnapproved && $hasTranslated) {
+                            ?> href="<?php echo $this->action('download', $selectedPackage, $selectedVersion, $locales['selected']->getID(), 'po'); ?>?fuzzy&amp;translated"<?php
+                        } else {
+                            ?> href="javascript:void(0)" disabled="disabled" style="color: gray; cursor: text; text-decoration: none"<?php
+                        }
+                        ?>><?php echo t('only translated strings'); ?></a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </fieldset>
     <fieldset>
     <fieldset>
         <legend><?php echo t('Upload Translations'); ?></legend>
         <?php
-        if(User::isLoggedIn()) {
+        if (User::isLoggedIn()) {
             $isCoordinator = false;
             $trh = Loader::helper('translators', 'integrated_localization');
             /* @var $trh TranslatorsHelper */
             switch ($trh->getCurrentUserAccess($locales['selected'])) {
                 case TranslatorAccess::SITE_ADMINISTRATOR:
-            	 case TranslatorAccess::LOCALE_ADMINISTRATOR:
+                case TranslatorAccess::LOCALE_ADMINISTRATOR:
                 case TranslatorAccess::GLOBAL_ADMINISTRATOR:
                     $isCoordinator = true;
                     /* Fall-through */
-            	   case TranslatorAccess::LOCALE_TRANSLATOR:
-                	?>
-                	<form class="form-horizontal" method="POST" enctype="multipart/form-data" onsubmit="if(this.already)return false;this.already=true">
-                	   <div class="control-group">
-                	       <label class="control-label" for="ilUploadTranslations"><?php echo t('Upload .po file'); ?></label>
-                	       <div class="controls">
-                	           <input type="file" id="ilUploadTranslations" name="new-translations" required="required" />
-                	       </div>
-                	   </div>
-                	   <?php
-                	   if($isCoordinator) {
-                	       ?>
-                	       <div class="control-group">
-                	           <label class="control-label"><?php echo t('Options'); ?></label>
-                	           <div class="controls">
-                	               <label class="checkbox">
-                	                   <input type="checkbox" name="as-approved" value="Sure!"> <?php echo t('Mark non-fuzzy translations as approved'); ?>
-                	               </label>
-                	           </div>
-                	       </div>
-                	       <?php
-                      }
-                      ?>
-                      <div class="control-group">
-                        <div class="controls">
-                            <button type="submit" class="btn btn-default"><?php echo t('Upload'); ?></button>
+                case TranslatorAccess::LOCALE_TRANSLATOR:
+                    ?>
+                    <form class="form-horizontal" method="POST" enctype="multipart/form-data" onsubmit="if(this.already)return false;this.already=true">
+                        <div class="control-group">
+                            <label class="control-label" for="ilUploadTranslations"><?php echo t('Upload .po file'); ?></label>
+                            <div class="controls">
+                                <input type="file" id="ilUploadTranslations" name="new-translations" required="required" />
+                            </div>
                         </div>
-                	</form>
-                	<?php
-                	break;
-                case TranslatorAccess::LOCALE_ASPIRANT:
-                    ?><div class="alert"><?php echo t('You have to wait that your application request will be approved in order to submit translations'); ?></div><?php
+                        <?php
+                        if ($isCoordinator) {
+                            ?>
+                            <div class="control-group">
+                                <label class="control-label"><?php echo t('Options'); ?></label>
+                                <div class="controls">
+                                    <label class="checkbox">
+                                        <input type="checkbox" name="as-approved" value="Sure!"> <?php echo t('Mark non-fuzzy translations as approved'); ?>
+                                    </label>
+                                </div>
+                            </div>
+                            <?php
+                        }
+                        ?>
+                        <div class="control-group">
+                            <div class="controls">
+                                <button type="submit" class="btn btn-default"><?php echo t('Upload'); ?></button>
+                            </div>
+                        </div>
+                    </form>
+                    <?php
                     break;
+                case TranslatorAccess::LOCALE_ASPIRANT:
+                    ?><div class="alert"><?php echo t('You have to wait that your application request will be approved in order to submit translations'); ?></div><?phpbreak;
                 default:
-                	?><p><?php echo t('Do you want to help us translating? <a href="%1$s">Click here</a> to join the %2$s translation group!', View::url('/integrated_localization/groups', 'group', $locales['selected']->getID()), $th->specialchars($locales['selected']->getName())); ?></p><?php
-                	break;
+                    ?><p><?php echo t('Do you want to help us translating? <a href="%1$s">Click here</a> to join the %2$s translation group!', View::url('/integrated_localization/groups', 'group', $locales['selected']->getID()), $th->specialchars($locales['selected']->getName())); ?></p><?php
+                    break;
             }
         } else {
             ?><p><?php echo t('Do you want to help us translating? <a href="%3$s">Login</a> and <a href="%1$s">click here</a> to join the %2$s translation group!', View::url('/integrated_localization/groups', 'group', $locales['selected']->getID()), $th->specialchars($locales['selected']->getName()), View::url('/login?rcID='.$c->getCollectionID())); ?></p><?php

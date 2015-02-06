@@ -268,10 +268,10 @@ class TranslationsSourceHelper
      * @param IntegratedLocale|string $locale
      * @param string $packageHandle
      * @param string $packageVersion
-     * @param bool $onlyTranslated
+     * @param string $only 'translated' to load only translated strings, 'untranslated' to load only untranslated strings. Anything else: load all the strings
      * @return \Gettext\Translations
      */
-    public function loadTranslationsByPackage($locale, $packageHandle, $packageVersion, $onlyTranslated = false, $unapprovedAsFuzzy = false)
+    public function loadTranslationsByPackage($locale, $packageHandle, $packageVersion, $only = '', $unapprovedAsFuzzy = false)
     {
         if (!is_object($locale)) {
             Loader::model('integrated_locale', 'integrated_localization');
@@ -288,54 +288,84 @@ class TranslationsSourceHelper
         $translations->setPluralForms($pluralCount, $locale->getPluralRule());
         $db = Loader::db();
         /* @var $db ADODB_mysql */
-        if ($onlyTranslated) {
-            $from = '
-                    IntegratedTranslatablePlaces
-                INNER JOIN
-                    IntegratedTranslations
-                ON
-                    (IntegratedTranslatablePlaces.itpTranslatable = IntegratedTranslations.itTranslatable)
-                INNER JOIN
-                    IntegratedTranslatables
-                ON
-                    (IntegratedTranslatables.itID = IntegratedTranslatablePlaces.itpTranslatable)
-            ';
-            $where = '
-                (IntegratedTranslatablePlaces.itpPackage = ?)
-                AND
-                (IntegratedTranslatablePlaces.itpVersion = ?)
-                AND
-                (IntegratedTranslations.itLocale = ?)
-            ';
-            $q = array(
-                $packageHandle,
-                $packageVersion,
-                $locale->getID(),
-            );
-        } else {
-            $from = '
-                    IntegratedTranslatablePlaces
-                INNER JOIN
-                    IntegratedTranslatables
-                ON
-                    (IntegratedTranslatables.itID = IntegratedTranslatablePlaces.itpTranslatable)
-                LEFT JOIN
-                    IntegratedTranslations
-                ON
-                    (? = IntegratedTranslations.itLocale)
+        switch($only) {
+            case 'translated':
+                $from = '
+                        IntegratedTranslatablePlaces
+                    INNER JOIN
+                        IntegratedTranslations
+                    ON
+                        (IntegratedTranslatablePlaces.itpTranslatable = IntegratedTranslations.itTranslatable)
+                    INNER JOIN
+                        IntegratedTranslatables
+                    ON
+                        (IntegratedTranslatables.itID = IntegratedTranslatablePlaces.itpTranslatable)
+                ';
+                $where = '
+                    (IntegratedTranslatablePlaces.itpPackage = ?)
                     AND
-                    (IntegratedTranslatablePlaces.itpTranslatable = IntegratedTranslations.itTranslatable)
-            ';
-            $where = '
-                (IntegratedTranslatablePlaces.itpPackage = ?)
-                AND
-                (IntegratedTranslatablePlaces.itpVersion = ?)
-            ';
-            $q = array(
-                $locale->getID(),
-                $packageHandle,
-                $packageVersion,
-            );
+                    (IntegratedTranslatablePlaces.itpVersion = ?)
+                    AND
+                    (IntegratedTranslations.itLocale = ?)
+                ';
+                $q = array(
+                    $packageHandle,
+                    $packageVersion,
+                    $locale->getID(),
+                );
+                break;
+            case 'untranslated':
+                $from = '
+                        IntegratedTranslatablePlaces
+                    INNER JOIN
+                        IntegratedTranslatables
+                    ON
+                        (IntegratedTranslatables.itID = IntegratedTranslatablePlaces.itpTranslatable)
+                    LEFT JOIN
+                        IntegratedTranslations
+                    ON
+                        (? = IntegratedTranslations.itLocale)
+                        AND
+                        (IntegratedTranslatablePlaces.itpTranslatable = IntegratedTranslations.itTranslatable)
+                ';
+                $where = '
+                    (IntegratedTranslatablePlaces.itpPackage = ?)
+                    AND
+                    (IntegratedTranslatablePlaces.itpVersion = ?)
+                    AND
+                    (IntegratedTranslations.itTranslatable IS NULL)
+                ';
+                $q = array(
+                    $locale->getID(),
+                    $packageHandle,
+                    $packageVersion,
+                );
+                break;
+            default:
+                $from = '
+                        IntegratedTranslatablePlaces
+                    INNER JOIN
+                        IntegratedTranslatables
+                    ON
+                        (IntegratedTranslatables.itID = IntegratedTranslatablePlaces.itpTranslatable)
+                    LEFT JOIN
+                        IntegratedTranslations
+                    ON
+                        (? = IntegratedTranslations.itLocale)
+                        AND
+                        (IntegratedTranslatablePlaces.itpTranslatable = IntegratedTranslations.itTranslatable)
+                ';
+                $where = '
+                    (IntegratedTranslatablePlaces.itpPackage = ?)
+                    AND
+                    (IntegratedTranslatablePlaces.itpVersion = ?)
+                ';
+                $q = array(
+                    $locale->getID(),
+                    $packageHandle,
+                    $packageVersion,
+                );
+                break;
         }
         $select = "
              IntegratedTranslatablePlaces.itpLocations,
