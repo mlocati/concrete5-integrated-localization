@@ -304,8 +304,8 @@ class IntegratedLocalizationTranslateController extends Controller
                 default:
                     throw new Exception(t('Invalid format identifier: %s', $format));
             }
-            $tsh = Loader::helper('translations_source', 'integrated_localization');
-            /* @var $tsh TranslationsSourceHelper */
+            $tsh = Loader::helper('translations', 'integrated_localization');
+            /* @var $tsh TranslationsHelper */
             $translations = $tsh->loadTranslationsByPackage($locale, $package, $version, $only, $unapprovedAsFuzzy);
             $translations->setLanguage($locale->getID());
             $translations->setPluralForms($locale->getPluralCount(), $locale->getPluralRule());
@@ -371,8 +371,8 @@ class IntegratedLocalizationTranslateController extends Controller
                     $markAsApproved = true;
                 }
             }
-            $tsh = Loader::helper('translations_source', 'integrated_localization');
-            /* @var $tsh TranslationsSourceHelper */
+            $tsh = Loader::helper('translations', 'integrated_localization');
+            /* @var $tsh TranslationsHelper */
             if (!@ini_get('safe_mode')) {
                 @set_time_limit(0);
                 @ini_set('max_execution_time', 0);

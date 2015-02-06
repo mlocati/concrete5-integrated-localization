@@ -19,8 +19,8 @@ class FetchGitTranslations extends Job
             @set_time_limit(0);
             @ini_set('max_execution_time', 0);
         }
-        $tsh = Loader::helper('translations_source', 'integrated_localization');
-        /* @var $tsh TranslationsSourceHelper */
+        $tsh = Loader::helper('translations', 'integrated_localization');
+        /* @var $tsh TranslationsHelper */
         $db = Loader::db();
         /* @var $db ADODB_mysql */
         Loader::model('git_repository', 'integrated_localization');
@@ -62,16 +62,16 @@ class FetchGitTranslations extends Job
     /**
      * Parse a core directory containing
      * @param array|null $stats
-     * @param TranslationsSourceHelper $tsh
+     * @param TranslationsHelper $tsh
      * @param string $directory
      * @param string $version
      * @throws Exception
-     * @return array Same result of TranslationsSourceHelper::saveTranslatables
-     * @see TranslationsSourceHelper::saveTranslatables
+     * @return array Same result of TranslationsHelper::saveTranslatables
+     * @see TranslationsHelper::saveTranslatables
      */
     private static function parseCoreDirectory($stats, $tsh, $directory, $version)
     {
-        /* @var $tsh TranslationsSourceHelper */
+        /* @var $tsh TranslationsHelper */
         if (!(is_file("$directory/index.php") && is_file("$directory/concrete/dispatcher.php"))) {
             $directory2 = "$directory/web";
             if (is_file("$directory2/index.php") && is_file("$directory2/concrete/dispatcher.php")) {

@@ -78,8 +78,8 @@ try {
     echo "Package version: ", $ipl->getPackageVersion(), "\n";
 
     echo "Importing/updating translatable strings... ";
-    $tsh = Loader::helper('translations_source', 'integrated_localization');
-    /* @var $tsh TranslationsSourceHelper */
+    $tsh = Loader::helper('translations', 'integrated_localization');
+    /* @var $tsh TranslationsHelper */
     $tsh->saveTranslatables($ipl->getTranslatables(), $ipl->getPackageHandle(), $ipl->getPackageVersion());
     echo "done.\n";
     

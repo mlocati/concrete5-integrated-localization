@@ -3,7 +3,7 @@
 /**
  * Handles translatable strings from core/packages
  */
-class TranslationsSourceHelper
+class TranslationsHelper
 {
     /**
      * Import translatable strings from core/packages into the database

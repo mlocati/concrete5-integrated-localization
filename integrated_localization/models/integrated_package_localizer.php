@@ -220,8 +220,8 @@ class IntegratedPackageLocalizer
             }
         }
         if ($readFromDB) {
-            $tsh = Loader::helper('translations_source', 'integrated_localization');
-            /* @var $tsh TranslationsSourceHelper */
+            $tsh = Loader::helper('translations', 'integrated_localization');
+            /* @var $tsh TranslationsHelper */
             $tsh->fillInTranslations($locale, $translations);
         }
 
