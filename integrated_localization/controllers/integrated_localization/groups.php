@@ -214,14 +214,19 @@ class IntegratedLocalizationGroupsController extends Controller
         } else {
             $this->set('addingNewLocale', true);
             $languages = array();
-            foreach (\Gettext\Utils\Locales::getLanguages(true, true) as $languageID => $languageName) {
-                if (\Gettext\Utils\Locales::getLocaleInfo($languageID)) {
-                    $languages[$languageID] = $languageName;
+            foreach (\Gettext\Languages\Language::getAll() as $language) {
+                if (strpos($language->id, '_') === false) {
+                    $languages[$language->id] = $language->name;
                 }
             }
             natcasesort($languages);
             $this->set('languages', $languages);
-            $territories = \Gettext\Utils\Locales::getTerritories(true, true);
+            $territories = array();
+            foreach(\Gettext\Languages\CldrData::getTerritoryNames() as $territoryID => $territoryName) {
+                if(preg_match('/^[A-Z][A-Z]$/', $territoryID)) {
+                    $territories[$territoryID] = $territoryName;
+                }
+            }
             natcasesort($territories);
             $this->set('territories', $territories);
         }
@@ -234,47 +239,43 @@ class IntegratedLocalizationGroupsController extends Controller
             $this->set('error', t('You need to login in order to suggest the creation of a new language'));
             $this->view();
         } else {
-            $languages = \Gettext\Utils\Locales::getLanguages(true, true);
             $s = $this->post('language');
-            $language = is_string($s) ? $s : '';
-            if (($language === '') || (!isset($languages[$language]))) {
+            $languageID = is_string($s) ? $s : '';
+            if ($languageID === '') {
                 $this->set('error', t('Please specify the language'));
                 $this->new_locale();
             } else {
-                $territories = \Gettext\Utils\Locales::getTerritories(true, true);
-                $s = $this->post('territory');
-                $territory = is_string($s) ? $s : '';
-                if (($territory === '') || (($territory !== '-') && (!isset($territories[$territory])))) {
+                $territoryID = is_string($s) ? $s : '';
+                if ($territoryID === '') {
                     $this->set('error', t('Please specify the country'));
                     $this->new_locale();
                 } else {
-                    $id = $language;
-                    $name = $languages[$language];
-                    if ($territory === '-') {
-                        $territory = '';
+                    $builtID = $languageID;
+                    if ($territoryID === '-') {
+                        $territoryID = '';
                     } else {
-                        $id .= '_'.$territory;
-                        $name .= ' ('.$territories[$territory].')';
+                        $builtID .= '_'.$territoryID;
                     }
-                    Loader::model('integrated_locale', 'integrated_localization');
-                    $already = IntegratedLocale::getByID($id, true, true);
-                    if (isset($already)) {
-                        if ($already->getIsSource()) {
-                            $this->set('error', t("The language '%s' is the one used by the code and can't be translated.", $already->getName()));
-                        } elseif (!$already->getApproved()) {
-                            $this->set('error', t("Someone else already asked to create the language '%s'.", $already->getName()));
-                        } else {
-                            $this->set('error', t("The translation group for '%s' already exists.", $already->getName()));
-                        }
+                    $language = \Gettext\Languages\Language::getById($builtID);
+                    if (!isset($language)) {
+                        $this->set('error', t("We don't know the locale code '%s'!", $builtID));
                         $this->new_locale();
                     } else {
-                        $localeInfo = \Gettext\Utils\Locales::getLocaleInfo($id);
-                        if (!isset($localeInfo)) {
-                            $this->set('error', t("We don't know the locale code '%s'!", "$name - $id"));
+                        $id = $language->id;
+                        Loader::model('integrated_locale', 'integrated_localization');
+                        $already = IntegratedLocale::getByID($id, true, true);
+                        if (isset($already)) {
+                            if ($already->getIsSource()) {
+                                $this->set('error', t("The language '%s' is the one used by the code and can't be translated.", $already->getName()));
+                            } elseif (!$already->getApproved()) {
+                                $this->set('error', t("Someone else already asked to create the language '%s'.", $already->getName()));
+                            } else {
+                                $this->set('error', t("The translation group for '%s' already exists.", $already->getName()));
+                            }
                             $this->new_locale();
                         } else {
                             try {
-                                $newLocale = IntegratedLocale::add($id, $name, $localeInfo['plurals'], $localeInfo['pluralRule']);
+                                $newLocale = IntegratedLocale::add($id, $language->name, count($language->categories), $language->formula);
                             } catch (Exception $x) {
                                 $this->set('error', $x->getMessage());
                                 $this->new_locale();

@@ -99,7 +99,7 @@ if ($editing) {
         <div class="control-group">
             <label class="control-label" for="pluralRule"><?php echo t('Plural rule'); ?></label>
             <div class="controls">
-                <div class="input"><?php echo $fh->text('pluralRule', $editing->getPluralRule(), array('maxlength' => '255', 'required' => 'required', 'class' => 'span9')); ?></div>
+                <div class="input"><?php echo $fh->text('pluralRule', $editing->getPluralRule(), array('maxlength' => '400', 'required' => 'required', 'class' => 'span9')); ?></div>
             </div>
         </div>
         <div class="clearfix">

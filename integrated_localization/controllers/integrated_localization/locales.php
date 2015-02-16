@@ -63,18 +63,38 @@ class IntegratedLocalizationLocalesController extends Controller
         $this->set('message', t("The request to adopt the locale '%s' has been denied", $th->specialchars($localeName)));
         $this->view();
     }
+    private static function getLanguages()
+    {
+        $languages = array();
+        foreach (\Gettext\Languages\Language::getAll(true, true) as $language) {
+            if (strpos($language->id, '_') === false) {
+                $languages[$language->id] = $language->name;
+            }
+        }
+        natcasesort($languages);
+
+        return $languages;
+    }
+    private static function getCountries()
+    {
+        $countries = array();
+        foreach (\Gettext\Languages\CldrData::getTerritoryNames() as $territoryID => $territoryName) {
+            if (preg_match('/^[A-Z][A-Z]$/', $territoryID)) {
+                $countries[$territoryID] = $territoryName;
+            }
+        }
+        natcasesort($countries);
+
+        return $countries;
+    }
     public function edit($localeID)
     {
         Loader::model('integrated_locale', 'integrated_localization');
         $locale = IntegratedLocale::getByID($localeID, true);
         if ($locale) {
             $this->set('editing', $locale);
-            $languages = \Gettext\Utils\Locales::getLanguages(true, true);
-            natcasesort($languages);
-            $this->set('languages', $languages);
-            $countries = \Gettext\Utils\Locales::getTerritories(true, true);
-            natcasesort($countries);
-            $this->set('countries', $countries);
+            $this->set('languages', self::getLanguages());
+            $this->set('countries', self::getCountries());
         } else {
             $th = Loader::helper('text');
             /* @var $th TextHelper */
@@ -92,26 +112,28 @@ class IntegratedLocalizationLocalesController extends Controller
                 if ((!is_string($languageID)) || ($languageID === '')) {
                     throw new Exception(t('Please specify the language'));
                 }
-                $languages = \Gettext\Utils\Locales::getLanguages(true, true);
+                $languages = self::getLanguages();
                 if (!isset($languages[$languageID])) {
                     throw new Exception(t('Invalid language identifier: %s', $languageID));
                 }
                 $countryID = $this->post('country');
-                if (!is_string($country)) {
-                    $country = '';
+                if (!is_string($countryID)) {
+                    $countryID = '';
                 }
                 if ($countryID !== '') {
-                    $countries = \Gettext\Utils\Locales::getTerritories(true, true);
+                    $countries = self::getCountries();
                     if (!isset($countries[$countryID])) {
                         throw new Exception(t('Invalid country identifier: %s', $countryID));
                     }
                 }
-                $id = $languageID.(($countryID === '') ? '' : "_$countryID");
+                $builtID = $languageID.(($countryID === '') ? '' : "_$countryID");
+                $languageInfo = \Gettext\Languages\Language::getById($builtID);
+                if (!isset($languageInfo)) {
+                    $_POST['auto_plural'] = '';
+                    throw new Exception(t('Invalid language and/or country.'));
+                }
                 if ($this->post('auto_name') === '1') {
-                    $name = $languages[$languageID];
-                    if ($countryID !== '') {
-                        $name .= ' ('.$countries[$countryID].')';
-                    }
+                    $name = $languageInfo->name;
                 } else {
                     $s = $this->post('name');
                     $name = is_string($s) ? trim($s) : '';
@@ -120,13 +142,8 @@ class IntegratedLocalizationLocalesController extends Controller
                     }
                 }
                 if ($this->post('auto_plural') === '1') {
-                    $pluralInfo = \Gettext\Utils\Locales::getLocaleInfo($id);
-                    if (!isset($pluralInfo)) {
-                        $_POST['auto_plural'] = '';
-                        throw new Exception(t('Unable to automatically determine the plurals info. Please specify them manually.'));
-                    }
-                    $pluralCount = $pluralInfo['plurals'];
-                    $pluralRule = $pluralInfo['pluralRule'];
+                    $pluralCount = count($languageInfo->categories);
+                    $pluralRule = $languageInfo->formula;
                 } else {
                     $s = $this->post('pluralCount');
                     $s = is_string($s) ? preg_replace('/\D/', '', $s) : '';
@@ -140,13 +157,13 @@ class IntegratedLocalizationLocalesController extends Controller
                         throw new Exception(t('Please specify the plural rule'));
                     }
                 }
-                if ($id !== $locale->getID()) {
-                    if (IntegratedLocale::getByID($id, true, true)) {
-                        throw new Exception(t('Another locale with id "%s" is already defined', $id));
+                if ($languageInfo->id !== $locale->getID()) {
+                    if (IntegratedLocale::getByID($languageInfo->id, true, true)) {
+                        throw new Exception(t('Another locale with id "%s" is already defined', $languageInfo->id));
                     }
                 }
                 $locale->update(array(
-                    'id' => $id,
+                    'id' => $languageInfo->id,
                     'name' => $name,
                     'pluralCount' => $pluralCount,
                     'pluralRule' => $pluralRule,

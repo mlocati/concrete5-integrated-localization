@@ -24,7 +24,7 @@
 			<NOTNULL />
 		</field>
 		<!-- Plural rules -->
-		<field name="ilPluralRule" type="C" size="255">
+		<field name="ilPluralRule" type="C" size="400">
 			<NOTNULL />
 		</field>
 		<!-- Is this locale approved? -->
