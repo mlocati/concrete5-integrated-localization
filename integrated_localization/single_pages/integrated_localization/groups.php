@@ -159,7 +159,7 @@ if (isset($addingNewLocale) && $addingNewLocale) {
                             ?></a><?php
                         }
                     ?></td>
-                    <td><?php echo $th->specialchars($locale->getName()); ?></td>
+                    <td><?php echo $th->specialchars($locale->getID()); ?></td>
                     <td><?php
                         if($locale->getIsSource()) {
                             echo t('Source language');

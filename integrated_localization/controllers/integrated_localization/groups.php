@@ -245,6 +245,7 @@ class IntegratedLocalizationGroupsController extends Controller
                 $this->set('error', t('Please specify the language'));
                 $this->new_locale();
             } else {
+                $s = $this->post('territory');
                 $territoryID = is_string($s) ? $s : '';
                 if ($territoryID === '') {
                     $this->set('error', t('Please specify the country'));
@@ -281,7 +282,7 @@ class IntegratedLocalizationGroupsController extends Controller
                                 $this->new_locale();
                             }
                             if (isset($newLocale)) {
-                                $this->set('message', t("Your request to create the translation group for '' has been submitted.", $newLocale->getName()));
+                                $this->set('message', t("Your request to create the translation group for '%s' has been submitted.", $newLocale->getName()));
                                 $this->view();
                             }
                         }

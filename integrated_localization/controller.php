@@ -136,6 +136,7 @@ class IntegratedLocalizationPackage extends Package
 
     public function on_start()
     {
+        Loader::library('3rdparty/gettext/languages/src/autoloader', 'integrated_localization');
         Loader::library('3rdparty/gettext/gettext/src/autoloader', 'integrated_localization');
         Loader::library('3rdparty/mlocati/concrete5-translation-library/src/autoloader', 'integrated_localization');
     }
