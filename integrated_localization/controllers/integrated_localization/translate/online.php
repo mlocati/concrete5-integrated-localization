@@ -34,7 +34,6 @@ class IntegratedLocalizationTranslateOnlineController extends Controller
                 throw new Exception(t('Invalid package/version'));
             }
             $jsonTranslations = array();
-            $pluralCases = array();
             foreach ($translations as $translation) {
                 /* @var $translation \Gettext\Translation */
                 $jsonTranslation = array();
@@ -90,7 +89,7 @@ class IntegratedLocalizationTranslateOnlineController extends Controller
             $this->set('locale', $locale);
             $this->set('jsonOptions', $jsonOptions);
             $this->set('translations', $jsonTranslations);
-            $this->set('pluralCases', $pluralCases);
+            $this->set('pluralCases', $locale->getPluralCases());
             $this->set('isCoordinator', $isCoordinator);
             $hh = Loader::helper('html');
             /* @var $hh HtmlHelper */
