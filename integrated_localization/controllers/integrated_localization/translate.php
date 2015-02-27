@@ -362,7 +362,7 @@ class IntegratedLocalizationTranslateController extends Controller
             if ($translations->count() < 1) {
                 throw new Exception(t('No translations found in the uploaded file!'));
             }
-            $translations->setPluralForms($locale->getPluralCount(), $locale->getPluralRule());
+            $translations->setPluralForms($locale->getPluralCount(), $locale->getPluralFormula());
             $markAsApproved = false;
             if ($access > TranslatorAccess::LOCALE_TRANSLATOR) {
                 if ($this->post('as-approved') === 'Sure!') {

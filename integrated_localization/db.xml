@@ -18,13 +18,12 @@
 			<NOTNULL />
 			<DEFAULT value="0" />
 		</field>
-		<!-- Number of plural forms -->
-		<field name="ilPluralCount" type="I1">
-			<UNSIGNED />
+		<!-- Plural formula -->
+		<field name="ilPluralFormula" type="C" size="400">
 			<NOTNULL />
 		</field>
-		<!-- Plural rules -->
-		<field name="ilPluralRule" type="C" size="400">
+		<!-- Plural cases -->
+		<field name="ilPluralCases" type="C" size="1000">
 			<NOTNULL />
 		</field>
 		<!-- Is this locale approved? -->

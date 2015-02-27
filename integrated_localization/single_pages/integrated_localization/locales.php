@@ -17,18 +17,34 @@ if ($editing) {
     ?>
     <script>
     $(document).ready(function() {
+        var $form = $('#integratedlocalization-locale-details');
         var originalPluralCount = <?php echo json_encode($editing->getPluralCount()); ?>;
-        $('#pluralCount').prop({type: 'number', min: 1, max: 6});
-        $('#integratedlocalization-locale-details')
+        function updateState() {
+            var numEnabled = 0;
+            $('input.pluralcase-use').each(function() {
+                var $checkbox = $(this);
+                var pluralCase = $checkbox.attr('data-pluralcase');
+                var $examples = $('#pluralcase-' + pluralCase + '-examples');
+                if(pluralCase === 'other') {
+                    $checkbox.attr('checked', 'checked');
+                }
+                if($checkbox.is(':checked')) {
+                    $examples.removeAttr('readonly').attr('required', 'required');
+                    numEnabled++;
+                } else {
+                    $examples.removeAttr('required').attr('readonly', 'readonly');
+                }
+            });
+            return numEnabled;
+        }
+        $form.find('input.pluralcase-use').on('click', function() {
+            updateState();
+        })
+        updateState();
+        $form
             .removeAttr('onsubmit')
             .on('submit', function() {
-                var pluralCount = parseInt($('#pluralCount').val(), 10);
-                if((!pluralCount) || (pluralCount < 1) || (pluralCount > 6)) {
-                    alert(<?php echo json_encode('Please enter the number of plurals, between 1 and 6'); ?>);
-                    $('#pluralCount').select().focus();
-                    return false;
-                }
-                $('#pluralCount').val(pluralCount.toString());
+                var pluralCount = updateState();
                 <?php if ($totalPluralTranslations > 0) { ?>
                     if(pluralCount != originalPluralCount) {
                         if(!confirm(<?php echo json_encode(t("WARNING!!!\nIf you change the number of plural rules, all the %d plural translations will be deleted!!!\n\nAre you sure you want to proceed anyway?", $totalPluralTranslations)); ?>)) {
@@ -47,7 +63,7 @@ if ($editing) {
         });
         updateAutoName();
         function updateAutoPlural() {
-            $('#pluralCount,#pluralRule').closest('.control-group')[$('#auto_plural').is(':checked') ? 'hide' : 'show']('fast');
+            $('#pluralCount,#pluralFormula').closest('.control-group')[$('#auto_plural').is(':checked') ? 'hide' : 'show']('fast');
         }
         $('#auto_plural').on('change', function() {
             updateAutoPlural();
@@ -91,15 +107,39 @@ if ($editing) {
             </div>
         </div>
         <div class="control-group">
-            <label class="control-label" for="pluralCount"><?php echo t('# of plurals'); ?></label>
+            <label class="control-label" for="pluralFormula"><?php echo t('Plurals'); ?></label>
             <div class="controls">
-                <div class="input"><?php echo $fh->text('pluralCount', (string) $editing->getPluralCount(), array('required' => 'required', 'class' => 'span1')); ?></div>
-            </div>
-        </div>
-        <div class="control-group">
-            <label class="control-label" for="pluralRule"><?php echo t('Plural rule'); ?></label>
-            <div class="controls">
-                <div class="input"><?php echo $fh->text('pluralRule', $editing->getPluralRule(), array('maxlength' => '400', 'required' => 'required', 'class' => 'span9')); ?></div>
+                <p><b><?php echo t('Formula'); ?></b></p>
+                <div class="input"><?php echo $fh->text('pluralFormula', $editing->getPluralFormula(), array('maxlength' => '400', 'required' => 'required', 'class' => 'span9')); ?></div>
+                <table class="table">
+                    <thead><tr>
+                        <th><?php echo t('Plural case'); ?></th>
+                        <th><?php echo t('Examples'); ?></th>
+                    </tr></thead>
+                    <tbody><?php
+                        $pluralCases = $editing->getPluralCases();
+                        foreach(array(
+                            'zero' => t('Zero'),
+                            'one' => t('One'),
+                            'two' => t('Two'),
+                            'few' => t('Few'),
+                            'many' => t('Many'),
+                            'other' => t('Other'),
+                        ) as $pluralCaseID => $pluralCaseName) {
+                            $useAttrs = array('class' => 'pluralcase-use', 'data-pluralcase' => $pluralCaseID);
+                            $examplesAttrs = array('class' => 'pluralcase-example', 'data-pluralcase' => $pluralCaseID, 'span7');
+                            if ($pluralCaseID === 'other') {
+                                $useAttrs['readonly'] = 'readonly';
+                                $useAttrs['onclick'] = 'return false';
+                                $examplesAttrs['required'] = 'required';
+                            }
+                            ?><tr>
+                                <th><label class="checkbox"><?php echo $fh->checkbox("pluralcase-$pluralCaseID", '1',  isset($pluralCases[$pluralCaseID]), $useAttrs); ?><?php echo $pluralCaseName; ?></label></th>
+                                <td><?php echo $fh->text("pluralcase-$pluralCaseID-examples", isset($pluralCases[$pluralCaseID]) ? $pluralCases[$pluralCaseID] : '', $examplesAttrs); ?></td>
+                            </tr><?php
+                        }
+                    ?></tbody>
+                </table>
             </div>
         </div>
         <div class="clearfix">

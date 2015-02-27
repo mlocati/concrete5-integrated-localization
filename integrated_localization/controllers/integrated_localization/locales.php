@@ -141,20 +141,39 @@ class IntegratedLocalizationLocalesController extends Controller
                         throw new Exception(t('Please specify the locale name'));
                     }
                 }
+                $pluralCases = array();
                 if ($this->post('auto_plural') === '1') {
-                    $pluralCount = count($languageInfo->categories);
-                    $pluralRule = $languageInfo->formula;
-                } else {
-                    $s = $this->post('pluralCount');
-                    $s = is_string($s) ? preg_replace('/\D/', '', $s) : '';
-                    $pluralCount = ($s === '') ? null : intval($s);
-                    if ((!isset($pluralCount)) || ($pluralCount < 1) || ($pluralCount > 6)) {
-                        throw new Exception(t('Please specify the plural count (between %1$d and %2$d).', 1, 6));
+                    $pluralFormula = $languageInfo->formula;
+                    foreach ($languageInfo->categories as $category) {
+                        $pluralCases[$category->id] = $category->formula;
                     }
-                    $s = $this->post('pluralRule');
-                    $pluralRule = is_string($s) ? trim($s) : '';
-                    if ($pluralRule === '') {
-                        throw new Exception(t('Please specify the plural rule'));
+                    
+                } else {
+                    $s = $this->post('pluralFormula');
+                    $pluralFormula = is_string($s) ? trim($s) : '';
+                    if ($pluralFormula === '') {
+                        throw new Exception(t('Please specify the plurals formula'));
+                    }
+                    foreach(array(
+                            'zero' => t('Zero'),
+                            'one' => t('One'),
+                            'two' => t('Two'),
+                            'few' => t('Few'),
+                            'many' => t('Many'),
+                            'other' => t('Other'),
+                    ) as $pluralCaseID => $pluralCaseName) {
+                        $checked = $this->post("pluralcase-$pluralCaseID");
+                        if(empty($checked)) {
+                            if($pluralCaseID === 'other') {
+                                throw new Exception(t("The plural case '%s' must be specified", $pluralCaseID));
+                            }
+                        } else {
+                            $pluralCases[$pluralCaseID] = $this->post("pluralcase-$pluralCaseID-examples");
+                            $pluralCases[$pluralCaseID] = is_string($pluralCases[$pluralCaseID]) ? trim($pluralCases[$pluralCaseID]) : '';
+                            if($pluralCases[$pluralCaseID] === '') {
+                                throw new Exception(t("The examples for the plural case '%s' must be specified", $pluralCaseID));
+                            }
+                        }
                     }
                 }
                 if ($languageInfo->id !== $locale->getID()) {
@@ -165,8 +184,8 @@ class IntegratedLocalizationLocalesController extends Controller
                 $locale->update(array(
                     'id' => $languageInfo->id,
                     'name' => $name,
-                    'pluralCount' => $pluralCount,
-                    'pluralRule' => $pluralRule,
+                    'pluralFormula' => $pluralFormula,
+                    'pluralCases' => $pluralCases
                 ));
                 $this->redirect('/integrated_localization/locales', 'saved', $locale->getName());
             } catch (Exception $x) {

@@ -15,13 +15,13 @@ class IntegratedLocale
      */
     private $isSource;
     /**
-     * @var int
-     */
-    private $pluralCount;
-    /**
      * @var string
      */
-    private $pluralRule;
+    private $pluralFormula;
+    /**
+     * @var array
+     */
+    private $pluralCases;
     /**
      * @var bool
      */
@@ -42,8 +42,8 @@ class IntegratedLocale
         $this->id = $row['ilID'];
         $this->name = $row['ilName'];
         $this->isSource = empty($row['ilIsSource']) ? false : true;
-        $this->pluralCount = (int) $row['ilPluralCount'];
-        $this->pluralRule = $row['ilPluralRule'];
+        $this->pluralFormula = $row['ilPluralFormula'];
+        $this->pluralCases = self::unserializePluralCases($row['ilPluralCases']);
         $this->approved = empty($row['ilApproved']) ? false : true;
         $this->requestedBy = isset($row['ilRequestedBy']) ? ((int) $row['ilRequestedBy']) : null;
         $this->requestedOn = isset($row['ilRequestedOn']) ? $row['ilRequestedOn'] : '';
@@ -101,14 +101,21 @@ class IntegratedLocale
      */
     public function getPluralCount()
     {
-        return $this->pluralCount;
+        return count($this->pluralCases);
     }
     /**
      * @return string
      */
-    public function getPluralRule()
+    public function getPluralFormula()
     {
-        return $this->pluralRule;
+        return $this->pluralFormula;
+    }
+    /**
+     * @return array
+     */
+    public function getPluralCases()
+    {
+        return $this->pluralCases;
     }
     /**
      * @return bool
@@ -134,6 +141,7 @@ class IntegratedLocale
     /**
      * @param string $localeID
      * @param bool $onlyIfApproved
+     *
      * @return IntegratedLocale|null
      */
     public static function getByID($localeID, $includeUnapproved = false, $includeSourceLocale = false)
@@ -155,6 +163,7 @@ class IntegratedLocale
     /**
      * @param bool $onlyApproved
      * @param bool $excludeSourceLocale
+     *
      * @return IntegratedLocale[]
      */
     public static function getList($includeUnapproved = false, $includeSourceLocale = false)
@@ -173,6 +182,7 @@ class IntegratedLocale
     /**
      * @param string $where
      * @param array $q
+     *
      * @return IntegratedLocale[]
      */
     protected static function find($where = '', $q = array())
@@ -197,6 +207,7 @@ class IntegratedLocale
     /**
      * @param string $id
      * @param string $name
+     *
      * @return string
      */
     private static function getAdministratorsGroupNameFor($id, $name)
@@ -213,6 +224,7 @@ class IntegratedLocale
     /**
      * @param string $id
      * @param string $name
+     *
      * @return string
      */
     private static function getTranslatorsGroupNameFor($id, $name)
@@ -229,6 +241,7 @@ class IntegratedLocale
     /**
      * @param string $id
      * @param string $name
+     *
      * @return string
      */
     private static function getAspirantTranslatorsGroupNameFor($id, $name)
@@ -245,6 +258,7 @@ class IntegratedLocale
     /**
      * @param string $id
      * @param string $name
+     *
      * @return string
      */
     private static function getAdministratorsGroupDescriptionFor($id, $name)
@@ -261,6 +275,7 @@ class IntegratedLocale
     /**
      * @param string $id
      * @param string $name
+     *
      * @return string
      */
     private static function getTranslatorsGroupDescriptionFor($id, $name)
@@ -277,6 +292,7 @@ class IntegratedLocale
     /**
      * @param string $id
      * @param string $name
+     *
      * @return string
      */
     private static function getAspirantTranslatorsGroupDescriptionFor($id, $name)
@@ -291,7 +307,7 @@ class IntegratedLocale
         return self::getAspirantTranslatorsGroupDescriptionFor($this->getID(), $this->getName());
     }
     /**
-     * return Group|null
+     * return Group|null.
      */
     public function getAdministratorsGroup()
     {
@@ -303,7 +319,7 @@ class IntegratedLocale
         return $group;
     }
     /**
-     * return Group|null
+     * return Group|null.
      */
     public function getTranslatorsGroup()
     {
@@ -315,7 +331,7 @@ class IntegratedLocale
         return $group;
     }
     /**
-     * return Group|null
+     * return Group|null.
      */
     public function getAspirantTranslatorsGroup()
     {
@@ -394,6 +410,7 @@ class IntegratedLocale
      */
     protected function splitID()
     {
+        $matches = null;
         preg_match('/^([a-z]{2,3})(?:[_\-]([a-z]{4}))?(?:[_\-]([a-z]{2}|[0-9]{3}))?(?:$|[_\-])/i', $this->getID(), $matches);
 
         return array(
@@ -412,6 +429,73 @@ class IntegratedLocale
         $n = $db->GetOne("SELECT COUNT(*) FROM IntegratedTranslations WHERE (itLocale = ?) AND (itText1 IS NOT NULL) AND (itText1 <> '')", array($this->getID()));
 
         return empty($n) ? 0 : (int) $n;
+    }
+    /**
+     * @param array $pluralCases
+     *
+     * @throws Exception
+     *
+     * @return string
+     */
+    private static function serializePluralCases($pluralCases)
+    {
+        if ((!is_array($pluralCases)) || (!isset($pluralCases['other']))) {
+            throw new Exception(t('Invalid plural cases'));
+        }
+        $lines = array();
+        foreach ($pluralCases as $case => $examples) {
+            switch($case) {
+                case 'zero':
+                case 'one':
+                case 'two':
+                case 'few':
+                case 'many':
+                case 'other':
+                    $lines[] = "$case:$examples";
+                    break;
+                default:
+                    throw new Exception(t('Invalid plural cases'));
+            }
+        }
+
+        return implode("\n", $lines);
+    }
+    /**
+     * @param string $pluralCases
+     *
+     * @throws Exception
+     *
+     * @return array
+     */
+    private static function unserializePluralCases($pluralCases)
+    {
+        if ((!is_string($pluralCases)) || ($pluralCases === '')) {
+            throw new Exception(t('Invalid plural cases'));
+        }
+        $result = array();
+        foreach (explode("\n", $pluralCases) as $line) {
+            $line = trim($line);
+            if ($line !== '') {
+                list($case, $examples) = explode(':', $line, 2);
+                switch($case) {
+                    case 'zero':
+                    case 'one':
+                    case 'two':
+                    case 'few':
+                    case 'many':
+                    case 'other':
+                        $result[$case] = isset($examples) ? $examples : '';
+                        break;
+                    default:
+                        throw new Exception(t('Invalid plural cases'));
+                }
+            }
+        }
+        if (!isset($result['other'])) {
+            throw new Exception(t('Invalid plural cases'));
+        }
+
+        return $result;
     }
     /**
      * @param array $newInfo
@@ -437,27 +521,21 @@ class IntegratedLocale
         } else {
             $name = $this->getName();
         }
-        if (isset($newInfo['pluralCount'])) {
-            $pluralCount = $newInfo['pluralCount'];
-            if (!is_int($pluralCount)) {
-                if (is_string($pluralCount) && is_numeric($pluralCount)) {
-                    $pluralCount = @intval($pluralCount);
-                }
-            }
-            if ((!is_int($pluralCount)) || ($pluralCount < 1) || ($pluralCount > 6)) {
-                throw new Exception(t('Invalid plural count'));
-            }
-        } else {
-            $pluralCount = $this->getPluralCount();
-        }
-        if (isset($newInfo['pluralRule'])) {
-            $pluralRule = $newInfo['pluralRule'];
-            if ((!is_string($pluralRule)) || ($pluralRule !== trim($pluralRule)) || ($pluralRule === '')) {
+        if (isset($newInfo['pluralFormula'])) {
+            $pluralFormula = $newInfo['pluralFormula'];
+            if ((!is_string($pluralFormula)) || ($pluralFormula !== trim($pluralFormula)) || ($pluralFormula === '')) {
                 throw new Exception(t('Invalid plural rule'));
             }
         } else {
-            $pluralRule = $this->getPluralRule();
+            $pluralFormula = $this->getPluralFormula();
         }
+        if (isset($newInfo['pluralCases'])) {
+            $pluralCases = $newInfo['pluralCases'];
+        } else {
+            $pluralCases = $this->getPluralCases();
+        }
+        $pluralCasesString = self::serializePluralCases($pluralCases);
+
         $db = Loader::db();
         /* @var $db ADODB_mysql */
         $db->Execute('START TRANSACTION');
@@ -476,7 +554,7 @@ class IntegratedLocale
                     $g->update(self::getAspirantTranslatorsGroupNameFor($id, $name), self::getAspirantTranslatorsGroupDescriptionFor($id, $name));
                 }
             }
-            if ($pluralCount !== $this->getPluralCount()) {
+            if (count($pluralCases) !== $this->getPluralCount()) {
                 $db->Execute("DELETE FROM IntegratedTranslations WHERE (itLocale = ?) AND (itText1 IS NOT NULL) AND (itText1 <> '')", array($this->getID()));
             }
             if ($id !== $this->getID()) {
@@ -487,8 +565,8 @@ class IntegratedLocale
                     UPDATE IntegratedLocales SET
                         ilID = ?,
                         ilName = ?,
-                        ilPluralCount = ?,
-                        ilPluralRule = ?
+                        ilPluralFormula = ?,
+                        ilPluralCases = ?
                     WHERE
                         ilID = ?
                     LIMIT 1
@@ -496,8 +574,8 @@ class IntegratedLocale
                 array(
                     $id,
                     $name,
-                    $pluralCount,
-                    $pluralRule,
+                    $pluralFormula,
+                    $pluralCasesString,
                     $this->getID(),
                 )
             );
@@ -511,19 +589,21 @@ class IntegratedLocale
         }
         $this->id = $id;
         $this->name = $name;
-        $this->pluralCount = $pluralCount;
-        $this->pluralRule = $pluralRule;
+        $this->pluralFormula = $pluralFormula;
+        $this->pluralCases = $pluralCases;
     }
     /**
      * @param string $id
      * @param string $name
-     * @param int $plurals
-     * @param string $pluralRule
+     * @param string $pluralFormula
+     * @param array $pluralCases
      * @param bool $approved
+     *
      * @throws Exception
+     *
      * @return IntegratedLocale
      */
-    public static function add($id, $name, $plurals, $pluralRule, $approved = false)
+    public static function add($id, $name, $pluralFormula, $pluralCases, $approved = false)
     {
         $w = 'INSERT INTO IntegratedLocales SET ';
         $q = array();
@@ -531,10 +611,10 @@ class IntegratedLocale
         $q[] = $id;
         $w .= ', ilName = ?';
         $q[] = $name;
-        $w .= ', ilPluralCount = ?';
-        $q[] = $plurals;
-        $w .= ', ilPluralRule = ?';
-        $q[] = $pluralRule;
+        $w .= ', ilPluralFormula = ?';
+        $q[] = $pluralFormula;
+        $w .= ', ilPluralCases = ?';
+        $q[] = self::serializePluralCases($pluralCases);
         $w .= ', ilApproved = ?';
         $q[] = $approved ? 1 : 0;
         if (User::isLoggedIn()) {

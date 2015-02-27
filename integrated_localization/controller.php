@@ -34,71 +34,90 @@ class IntegratedLocalizationPackage extends Package
 
     private static function installOrUpgrade($pkg, $fromVersion)
     {
+        self::on_start();
         Loader::model('job');
         Loader::model('page');
         Loader::model('single_page');
         Loader::model('block_type');
         Loader::model('group');
         $db = Loader::db();
+        /* @var $db ADODB_mysql */
         if ($fromVersion === '') {
-            /* @var $db ADODB_mysql */
-            $db->Execute("
-                INSERT IGNORE INTO IntegratedLocales
-                    (ilID    , ilName                            , ilIsSource, ilPluralCount, ilPluralRule                                                                                 , ilApproved, ilRequestedBy, ilRequestedOn)
-                    VALUES
-                    ('en_US' , 'English (United States)'         , 1         , 2            , '(n != 1)'                                                                                   , 1         , NULL         , NULL         ),
-                    ('ar'    , 'Arabic'                          , 0         , 6            , 'n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5', 0         , 1            , NOW()        ),
-                    ('ast_ES', 'Asturian (Spain)'                , 0         , 2            , '(n != 1)'                                                                                   , 0         , 1            , NOW()        ),
-                    ('bg_BG' , 'Bulgarian (Bulgaria)'            , 0         , 2            , '(n != 1)'                                                                                   , 0         , 1            , NOW()        ),
-                    ('bs_BA' , 'Bosnian (Bosnia and Herzegovina)', 0         , 3            , '(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)'         , 0         , 1            , NOW()        ),
-                    ('ca'    , 'Catalan'                         , 0         , 2            , '(n != 1)'                                                                                   , 0         , 1            , NOW()        ),
-                    ('cs_CZ' , 'Czech (Czech Republic)'          , 0         , 3            , '(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2'                                                        , 0         , 1            , NOW()        ),
-                    ('da_DK' , 'Danish (Denmark)'                , 0         , 2            , '(n != 1)'                                                                                   , 0         , 1            , NOW()        ),
-                    ('de_DE' , 'German (Germany)'                , 0         , 2            , '(n != 1)'                                                                                   , 0         , 1            , NOW()        ),
-                    ('el_GR' , 'Greek (Greece)'                  , 0         , 2            , '(n != 1)'                                                                                   , 0         , 1            , NOW()        ),
-                    ('en_GB' , 'English (United Kingdom)'        , 0         , 2            , '(n != 1)'                                                                                   , 0         , 1            , NOW()        ),
-                    ('es_AR' , 'Spanish (Argentina)'             , 0         , 2            , '(n != 1)'                                                                                   , 0         , 1            , NOW()        ),
-                    ('es_ES' , 'Spanish (Spain)'                 , 0         , 2            , '(n != 1)'                                                                                   , 0         , 1            , NOW()        ),
-                    ('es_MX' , 'Spanish (Mexico)'                , 0         , 2            , '(n != 1)'                                                                                   , 0         , 1            , NOW()        ),
-                    ('es_PE' , 'Spanish (Peru)'                  , 0         , 2            , '(n != 1)'                                                                                   , 0         , 1            , NOW()        ),
-                    ('et_EE' , 'Estonian (Estonia)'              , 0         , 2            , '(n != 1)'                                                                                   , 0         , 1            , NOW()        ),
-                    ('fa_IR' , 'Persian (Iran)'                  , 0         , 1            , '0'                                                                                          , 0         , 1            , NOW()        ),
-                    ('fi_FI' , 'Finnish (Finland)'               , 0         , 2            , '(n != 1)'                                                                                   , 0         , 1            , NOW()        ),
-                    ('fr_FR' , 'French (France)'                 , 0         , 2            , '(n > 1)'                                                                                    , 0         , 1            , NOW()        ),
-                    ('he_IL' , 'Hebrew (Israel)'                 , 0         , 2            , '(n != 1)'                                                                                   , 0         , 1            , NOW()        ),
-                    ('hi_IN' , 'Hindi (India)'                   , 0         , 2            , '(n != 1)'                                                                                   , 0         , 1            , NOW()        ),
-                    ('hr_HR' , 'Croatian (Croatia)'              , 0         , 3            , 'n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2'           , 0         , 1            , NOW()        ),
-                    ('hu_HU' , 'Hungarian (Hungary)'             , 0         , 2            , '(n != 1)'                                                                                   , 0         , 1            , NOW()        ),
-                    ('id_ID' , 'Indonesian (Indonesia)'          , 0         , 1            , '0'                                                                                          , 0         , 1            , NOW()        ),
-                    ('it_IT' , 'Italian (Italy)'                 , 0         , 2            , '(n != 1)'                                                                                   , 0         , 1            , NOW()        ),
-                    ('ja_JP' , 'Japanese (Japan)'                , 0         , 1            , '0'                                                                                          , 0         , 1            , NOW()        ),
-                    ('km_KH' , 'Khmer (Cambodia)'                , 0         , 1            , '0'                                                                                          , 0         , 1            , NOW()        ),
-                    ('ko_KR' , 'Korean (Korea)'                  , 0         , 1            , '0'                                                                                          , 0         , 1            , NOW()        ),
-                    ('ku'    , 'Kurdish'                         , 0         , 2            , '(n != 1)'                                                                                   , 0         , 1            , NOW()        ),
-                    ('lt_LT' , 'Lithuanian (Lithuania)'          , 0         , 3            , '(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n%100<10 || n%100>=20) ? 1 : 2)'                    , 0         , 1            , NOW()        ),
-                    ('lv_LV' , 'Latvian (Latvia)'                , 0         , 3            , '(n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : 2)'                                                , 0         , 1            , NOW()        ),
-                    ('mk_MK' , 'Macedonian (Macedonia)'          , 0         , 2            , '(n % 10 == 1 && n % 100 != 11) ? 0 : 1'                                                     , 0         , 1            , NOW()        ),
-                    ('ml_IN' , 'Malayalam (India)'               , 0         , 2            , '(n != 1)'                                                                                   , 0         , 1            , NOW()        ),
-                    ('my_MM' , 'Burmese (Myanmar)'               , 0         , 1            , '0'                                                                                          , 0         , 1            , NOW()        ),
-                    ('nb_NO' , 'Norwegian Bokmål (Norway)'       , 0         , 2            , '(n != 1)'                                                                                   , 0         , 1            , NOW()        ),
-                    ('nl_NL' , 'Dutch (Netherlands)'             , 0         , 2            , '(n != 1)'                                                                                   , 0         , 1            , NOW()        ),
-                    ('pl_PL' , 'Polish (Poland)'                 , 0         , 3            , '(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)'                         , 0         , 1            , NOW()        ),
-                    ('pt_BR' , 'Portuguese (Brazil)'             , 0         , 2            , '(n > 1)'                                                                                    , 0         , 1            , NOW()        ),
-                    ('pt_PT' , 'Portuguese (Portugal)'           , 0         , 2            , '(n != 1)'                                                                                   , 0         , 1            , NOW()        ),
-                    ('ro_RO' , 'Romanian (Romania)'              , 0         , 3            , '(n==1?0:(((n%100>19)||((n%100==0)&&(n!=0)))?2:1))'                                          , 0         , 1            , NOW()        ),
-                    ('ru_RU' , 'Russian (Russia)'                , 0         , 3            , '(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)'         , 0         , 1            , NOW()        ),
-                    ('sk_SK' , 'Slovak (Slovakia)'               , 0         , 3            , '(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2'                                                        , 0         , 1            , NOW()        ),
-                    ('sl_SI' , 'Slovenian (Slovenia)'            , 0         , 4            , '(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3)'                               , 0         , 1            , NOW()        ),
-                    ('sr_RS' , 'Serbian (Serbia)'                , 0         , 3            , '(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)'         , 0         , 1            , NOW()        ),
-                    ('sv_SE' , 'Swedish (Sweden)'                , 0         , 2            , '(n != 1)'                                                                                   , 0         , 1            , NOW()        ),
-                    ('ta_IN' , 'Tamil (India)'                   , 0         , 2            , '(n != 1)'                                                                                   , 0         , 1            , NOW()        ),
-                    ('th_TH' , 'Thai (Thailand)'                 , 0         , 1            , '0'                                                                                          , 0         , 1            , NOW()        ),
-                    ('tr_TR' , 'Turkish (Turkey)'                , 0         , 1            , '0'                                                                                          , 0         , 1            , NOW()        ),
-                    ('uk_UA' , 'Ukrainian (Ukraine)'             , 0         , 3            , '(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)'         , 0         , 1            , NOW()        ),
-                    ('vi_VN' , 'Vietnamese (Viet Nam)'           , 0         , 1            , '0'                                                                                          , 0         , 1            , NOW()        ),
-                    ('zh_CN' , 'Chinese (China)'                 , 0         , 1            , '0'                                                                                          , 0         , 1            , NOW()        ),
-                    ('zh_TW' , 'Chinese (Taiwan)'                , 0         , 1            , '0'                                                                                          , 0         , 1            , NOW()        )
-            ");
+            Loader::model('integrated_locale', 'integrated_localization');
+            foreach(array(
+                'en_US' => true,
+                'ar' => false,
+                'ast_ES' => false,
+                'bg_BG' => false,
+                'bs_BA' => false,
+                'ca' => false,
+                'cs_CZ' => false,
+                'da_DK' => false,
+                'de_DE' => false,
+                'el_GR' => false,
+                'en_GB' => false,
+                'es_AR' => false,
+                'es_ES' => false,
+                'es_MX' => false,
+                'es_PE' => false,
+                'et_EE' => false,
+                'fa_IR' => false,
+                'fi_FI' => false,
+                'fr_FR' => false,
+                'he_IL' => false,
+                'hi_IN' => false,
+                'hr_HR' => false,
+                'hu_HU' => false,
+                'id_ID' => false,
+                'it_IT' => false,
+                'ja_JP' => false,
+                'km_KH' => false,
+                'ko_KR' => false,
+                'ku' => false,
+                'lt_LT' => false,
+                'lv_LV' => false,
+                'mk_MK' => false,
+                'ml_IN' => false,
+                'my_MM' => false,
+                'nb_NO' => false,
+                'nl_NL' => false,
+                'pl_PL' => false,
+                'pt_BR' => false,
+                'pt_PT' => false,
+                'ro_RO' => false,
+                'ru_RU' => false,
+                'sk_SK' => false,
+                'sl_SI' => false,
+                'sr_RS' => false,
+                'sv_SE' => false,
+                'ta_IN' => false,
+                'th_TH' => false,
+                'tr_TR' => false,
+                'uk_UA' => false,
+                'vi_VN' => false,
+                'zh_CN' => false,
+                'zh_TW' => false,
+            ) as $localeID => $isSource)
+            {
+                $existing = IntegratedLocale::getByID($localeID);
+                if(!isset($existing)) {
+                    $language = \Gettext\Languages\Language::getById($localeID);
+                    $pluralCases = array();
+                    foreach($language->categories as $category) {
+                        $pluralCases[$category->id] = $category->examples;
+                    }
+                    IntegratedLocale::add(
+                        $language->id,
+                        $language->name,
+                        $language->formula,
+                        $pluralCases,
+                        true
+                    );
+                    if($isSource) {
+                        $db->Execute("UPDATE IntegratedLocales SET ilIsSource = 1, ilRequestedBy = NULL, ilRequestedOn = NULL WHERE ilID = ? LIMIT 1", $language->id);
+                    }
+                }
+            }
             if (!Job::getByHandle('fetch_git_translations')) {
                 Job::installByPackage('fetch_git_translations', $pkg);
             }

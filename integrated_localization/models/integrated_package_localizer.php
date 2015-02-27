@@ -199,7 +199,7 @@ class IntegratedPackageLocalizer
         }
         $pluralCount = $locale->getPluralCount();
         $translations->setLanguage($locale->getID());
-        $translations->setPluralForms($pluralCount, $locale->getPluralRule());
+        $translations->setPluralForms($pluralCount, $locale->getPluralFormula());
         if ($readFromPackageFiles) {
             $gettextDir = $this->controllerDirectory.'/languages/'.$locale->getID().'/LC_MESSAGES';
             if (is_dir($gettextDir)) {

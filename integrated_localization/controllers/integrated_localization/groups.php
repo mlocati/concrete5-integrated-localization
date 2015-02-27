@@ -275,8 +275,12 @@ class IntegratedLocalizationGroupsController extends Controller
                             }
                             $this->new_locale();
                         } else {
+                            $pluralCases = array();
+                            foreach($language->categories as $category) {
+                                $pluralCases[$category->id] = $category->examples;
+                            }
                             try {
-                                $newLocale = IntegratedLocale::add($id, $language->name, count($language->categories), $language->formula);
+                                $newLocale = IntegratedLocale::add($id, $language->name, $language->formula, $pluralCases);
                             } catch (Exception $x) {
                                 $this->set('error', $x->getMessage());
                                 $this->new_locale();

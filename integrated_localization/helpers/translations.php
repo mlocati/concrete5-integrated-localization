@@ -135,7 +135,7 @@ class TranslationsHelper
         $pluralCount = $locale->getPluralCount();
         $translations = clone $translations;
         $translations->setLanguage($locale->getID());
-        $translations->setPluralForms($pluralCount, $locale->getPluralRule());
+        $translations->setPluralForms($pluralCount, $locale->getPluralFormula());
         $markAsApproved = $markAsApproved ? 1 : 0;
         $db = Loader::db();
         /* @var $db ADODB_mysql */
@@ -285,7 +285,7 @@ class TranslationsHelper
         $translations = new \Gettext\Translations();
         $translations->setHeader('Project-Id-Version', "$packageHandle v$packageVersion");
         $translations->setLanguage($locale->getID());
-        $translations->setPluralForms($pluralCount, $locale->getPluralRule());
+        $translations->setPluralForms($pluralCount, $locale->getPluralFormula());
         $db = Loader::db();
         /* @var $db ADODB_mysql */
         switch($only) {
@@ -436,7 +436,7 @@ class TranslationsHelper
         /* @var $db ADODB_mysql */
         $pluralCount = $locale->getPluralCount();
         $translations->setLanguage($locale->getID());
-        $translations->setPluralForms($pluralCount, $locale->getPluralRule());
+        $translations->setPluralForms($pluralCount, $locale->getPluralFormula());
         $total = count($translations);
         $current = 0;
         $searchGroup = array();
