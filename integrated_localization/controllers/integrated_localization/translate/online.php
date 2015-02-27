@@ -19,7 +19,6 @@ class IntegratedLocalizationTranslateOnlineController extends Controller
             if (!isset($locale)) {
                 throw new Exception(t('Invalid locale identifier: %s', $localeID));
             }
-            $numPlurals = $locale->getPluralCount();
             $th = Loader::helper('translators', 'integrated_localization');
             /* @var $th TranslatorsHelper */
             $access = $th->getCurrentUserAccess($locale);
@@ -33,6 +32,7 @@ class IntegratedLocalizationTranslateOnlineController extends Controller
             if($translations->count() < 1) {
                 throw new Exception(t('Invalid package/version'));
             }
+            $numPlurals = $locale->getPluralCount();
             $jsonTranslations = array();
             foreach ($translations as $translation) {
                 /* @var $translation \Gettext\Translation */
@@ -120,7 +120,89 @@ class IntegratedLocalizationTranslateOnlineController extends Controller
             if (!isset($locale)) {
                 throw new Exception(t('Invalid locale identifier: %s', $localeID));
             }
-            throw new Exception(print_r($_POST, true));
+            $th = Loader::helper('translators', 'integrated_localization');
+            /* @var $th TranslatorsHelper */
+            $access = $th->getCurrentUserAccess($locale);
+            if ($access < TranslatorAccess::LOCALE_TRANSLATOR) {
+                throw new Exception(t('Access denied'));
+            }
+            $db = Loader::db();
+            /* @var $db ADODB_mysql */
+            $current = $db->GetRow(
+                "
+                    select
+                        itID as translationID,
+                        IFNULL(itPlural, '') != '' as plural,
+                        itTranslatable as translated,
+                        itApproved as approved
+                    from
+                        IntegratedTranslatables
+                        left join IntegratedTranslations on IntegratedTranslatables.itID = IntegratedTranslations.itTranslatable
+                    where
+                        IntegratedTranslatables.itHash = ?
+                        and ((itLocale is null) or (itLocale = ?))
+                    limit 1
+                ",
+                array($this->post('id'), $locale->getID())
+            );
+            if(empty($current) || empty($current['translationID'])) {
+                throw new Exception(t('Unable to find the specified translatable string'));
+            }
+            $translationID = intval($current['translationID']);
+            if(!empty($current['approved'])) {
+                if ($access < TranslatorAccess::LOCALE_ADMINISTRATOR) {
+                    throw new Exception(t('Access denied'));
+                }
+            }
+            if($this->post('clear') === '1') {
+                $db->Execute('delete from IntegratedTranslations where (itLocale = ?) and (itTranslatable = ?) limit 1', array($locale->getID(), $translationID));
+            } else {
+                $translatedStrings = $this->post('translated');
+                if(!is_array($translatedStrings)) {
+                    throw new Exception(t('Invalid parameter: %s', 'translated'));
+                }
+                $fields = array();
+                $values = array();
+                $count = empty($current['plural']) ? 1 : $locale->getPluralCount();
+                for($index = 0; $index < $count; $index++) {
+                    $value = '';
+                    if(isset($translatedStrings[$index]) && is_string($translatedStrings[$index])) {
+                        $value = $translatedStrings[$index];
+                    }
+                    if($value === '') {
+                        throw new Exception(t('Invalid parameter: %s', 'translated['.$index.']'));
+                    }
+                    $fields[] = 'itText'.$index;
+                    $values[] = $value;
+                }
+                if($access >= TranslatorAccess::LOCALE_ADMINISTRATOR) {
+                    $approve = $this->post('approved');
+                    if (($approve === '0') || ($approve === '1')) {
+                        $fields[] = 'itApproved';
+                        $values[] = intval($approve);
+                    } else {
+                        throw new Exception(t('Invalid parameter: %s', 'approve'));
+                    }
+                }
+                if(empty($current['translated'])) {
+                    $sql = 'insert into IntegratedTranslations set ';
+                } else {
+                    $sql = 'update IntegratedTranslations set ';
+                }
+                foreach($fields as $index => $name) {
+                    $sql .= (($index > 0) ? ', ' : '').$name.' = ?';
+                }
+                if(empty($current['translated'])) {
+                    $sql .= ', itLocale = ?, itTranslatable = ?';
+                    $values[] = $locale->getID();
+                    $values[] = $translationID;
+                } else {
+                    $sql .= ' where (itLocale = ?) and (itTranslatable = ?) limit 1';
+                    $values[] = $locale->getID();
+                    $values[] = $translationID;
+                }
+                $db->Execute($sql, $values);
+            }
         } catch (Exception $x) {
             echo $jh->encode(array(
                 'error' => true,
