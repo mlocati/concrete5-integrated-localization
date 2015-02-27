@@ -16,8 +16,35 @@
 	@import "bs3/dropdowns.less";
 	@import "bs3/button-groups.less";
 	@import "bs3/navs.less";
-	input, textarea {
+	.clearfix:before, .clearfix:after,
+	.nav:before, .nav:after,
+	.navbar:before, .navbar:after,
+	.navbar-header:before, .navbar-header:after,
+	.navbar-collapse:before, .navbar-collapse:after,
+	.panel-body:before, .panel-body:after {
+		content: " ";
+		display: table;
+	}
+	* {
 		.box-sizing(border-box);
+	}
+	.clearfix:after,
+	.container:after,
+	.container-fluid:after,
+	.row:after,
+	.form-horizontal .form-group:after, 
+	.btn-toolbar:after, 
+	.btn-group-vertical>.btn-group:after,
+	.nav:after,
+	.navbar:after,
+	.navbar-header:after,
+	.navbar-collapse:after,
+	.pager:after,
+	.panel-body:after {
+		clear: both;
+	}
+	ul, ol {
+		margin-top: 0;
 	}
 	.ccm-translator-col-original {
 		.panel-heading span {
@@ -49,6 +76,9 @@
 	.ccm-translator-col-translations {
 		> .panel {
 			visibility: hidden;
+		}
+		.tab-pane {
+			padding: 20px 20px 0 20px;
 		}
 	}
 }

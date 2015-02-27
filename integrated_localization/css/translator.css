@@ -1659,11 +1659,59 @@ select[multiple].integratedlocalization-translator .input-group-sm > .input-grou
   border-top-right-radius: 0;
   border-top-left-radius: 0;
 }
-.integratedlocalization-translator input,
-.integratedlocalization-translator textarea {
+.integratedlocalization-translator .clearfix:before,
+.integratedlocalization-translator .clearfix:after,
+.integratedlocalization-translator .nav:before,
+.integratedlocalization-translator .nav:after,
+.integratedlocalization-translator .navbar:before,
+.integratedlocalization-translator .navbar:after,
+.integratedlocalization-translator .navbar-header:before,
+.integratedlocalization-translator .navbar-header:after,
+.integratedlocalization-translator .navbar-collapse:before,
+.integratedlocalization-translator .navbar-collapse:after,
+.integratedlocalization-translator .panel-body:before,
+.integratedlocalization-translator .panel-body:after,
+.integratedlocalization-translator .integratedlocalization-translator .form-horizontal .form-group:before,
+.integratedlocalization-translator .integratedlocalization-translator .form-horizontal .form-group:after,
+.integratedlocalization-translator .integratedlocalization-translator .panel-body:before,
+.integratedlocalization-translator .integratedlocalization-translator .panel-body:after,
+.integratedlocalization-translator .integratedlocalization-translator .btn-toolbar:before,
+.integratedlocalization-translator .integratedlocalization-translator .btn-toolbar:after,
+.integratedlocalization-translator .integratedlocalization-translator .btn-group-vertical > .btn-group:before,
+.integratedlocalization-translator .integratedlocalization-translator .btn-group-vertical > .btn-group:after,
+.integratedlocalization-translator .integratedlocalization-translator .nav:before,
+.integratedlocalization-translator .integratedlocalization-translator .nav:after {
+  content: " ";
+  display: table;
+}
+.integratedlocalization-translator * {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
+}
+.integratedlocalization-translator .clearfix:after,
+.integratedlocalization-translator .container:after,
+.integratedlocalization-translator .container-fluid:after,
+.integratedlocalization-translator .row:after,
+.integratedlocalization-translator .form-horizontal .form-group:after,
+.integratedlocalization-translator .btn-toolbar:after,
+.integratedlocalization-translator .btn-group-vertical > .btn-group:after,
+.integratedlocalization-translator .nav:after,
+.integratedlocalization-translator .navbar:after,
+.integratedlocalization-translator .navbar-header:after,
+.integratedlocalization-translator .navbar-collapse:after,
+.integratedlocalization-translator .pager:after,
+.integratedlocalization-translator .panel-body:after,
+.integratedlocalization-translator .integratedlocalization-translator .form-horizontal .form-group:after,
+.integratedlocalization-translator .integratedlocalization-translator .panel-body:after,
+.integratedlocalization-translator .integratedlocalization-translator .btn-toolbar:after,
+.integratedlocalization-translator .integratedlocalization-translator .btn-group-vertical > .btn-group:after,
+.integratedlocalization-translator .integratedlocalization-translator .nav:after {
+  clear: both;
+}
+.integratedlocalization-translator ul,
+.integratedlocalization-translator ol {
+  margin-top: 0;
 }
 .integratedlocalization-translator .ccm-translator-col-original .panel-heading span {
   float: left;
@@ -1692,4 +1740,7 @@ select[multiple].integratedlocalization-translator .input-group-sm > .input-grou
 }
 .integratedlocalization-translator .ccm-translator-col-translations > .panel {
   visibility: hidden;
+}
+.integratedlocalization-translator .ccm-translator-col-translations .tab-pane {
+  padding: 20px 20px 0 20px;
 }
