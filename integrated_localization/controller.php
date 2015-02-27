@@ -7,7 +7,7 @@ class IntegratedLocalizationPackage extends Package
 
     protected $appVersionRequired = '5.5.2';
 
-    protected $pkgVersion = '0.0.7';
+    protected $pkgVersion = '0.0.8';
 
     public function getPackageName()
     {
@@ -114,6 +114,7 @@ class IntegratedLocalizationPackage extends Package
             '/integrated_localization/locales' => array('name' => t('Locales'), 'description' => ''),
             '/integrated_localization/groups' => array('name' => t('Translators\' Groups'), 'description' => ''),
             '/integrated_localization/translate' => array('name' => t('Translate'), 'description' => ''),
+            '/integrated_localization/translate/online' => array('name' => t('Translate Online'), 'description' => ''),
         ) as $path => $info) {
             $sp = Page::getByPath($path);
             /* @var $sp Page */

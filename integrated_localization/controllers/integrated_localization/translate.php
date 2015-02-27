@@ -307,8 +307,6 @@ class IntegratedLocalizationTranslateController extends Controller
             $tsh = Loader::helper('translations', 'integrated_localization');
             /* @var $tsh TranslationsHelper */
             $translations = $tsh->loadTranslationsByPackage($locale, $package, $version, $only, $unapprovedAsFuzzy);
-            $translations->setLanguage($locale->getID());
-            $translations->setPluralForms($locale->getPluralCount(), $locale->getPluralRule());
             $filename = (($package === '_') ? 'concrete5core' : $package).'@'.$version.'-'.$localeID.$filenameSuffix;
             switch ($format) {
                 case 'po-dev':

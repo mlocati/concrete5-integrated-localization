@@ -1,0 +1,1501 @@
+.integratedlocalization-translator fieldset {
+  padding: 0;
+  margin: 0;
+  border: 0;
+  min-width: 0;
+}
+.integratedlocalization-translator legend {
+  display: block;
+  width: 100%;
+  padding: 0;
+  margin-bottom: 20px;
+  font-size: 21px;
+  line-height: inherit;
+  color: #333333;
+  border: 0;
+  border-bottom: 1px solid #e5e5e5;
+}
+.integratedlocalization-translator label {
+  display: inline-block;
+  max-width: 100%;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+.integratedlocalization-translator input[type="search"] {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+.integratedlocalization-translator input[type="radio"],
+.integratedlocalization-translator input[type="checkbox"] {
+  margin: 4px 0 0;
+  margin-top: 1px \9;
+  line-height: normal;
+}
+.integratedlocalization-translator input[type="file"] {
+  display: block;
+}
+.integratedlocalization-translator input[type="range"] {
+  display: block;
+  width: 100%;
+}
+.integratedlocalization-translator select[multiple],
+.integratedlocalization-translator select[size] {
+  height: auto;
+}
+.integratedlocalization-translator input[type="file"]:focus,
+.integratedlocalization-translator input[type="radio"]:focus,
+.integratedlocalization-translator input[type="checkbox"]:focus {
+  outline: thin dotted;
+  outline: 5px auto -webkit-focus-ring-color;
+  outline-offset: -2px;
+}
+.integratedlocalization-translator output {
+  display: block;
+  padding-top: 7px;
+  font-size: 14px;
+  line-height: 1.428571429;
+  color: #555555;
+}
+.integratedlocalization-translator .form-control {
+  display: block;
+  width: 100%;
+  height: 34px;
+  padding: 6px 12px;
+  font-size: 14px;
+  line-height: 1.428571429;
+  color: #555555;
+  background-color: #ffffff;
+  background-image: none;
+  border: 1px solid #cccccc;
+  border-radius: 4px;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+  -webkit-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+  -o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+  transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+}
+.integratedlocalization-translator .form-control:focus {
+  border-color: #66afe9;
+  outline: 0;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102, 175, 233, 0.6);
+  box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102, 175, 233, 0.6);
+}
+.integratedlocalization-translator .form-control::-moz-placeholder {
+  color: #999999;
+  opacity: 1;
+}
+.integratedlocalization-translator .form-control:-ms-input-placeholder {
+  color: #999999;
+}
+.integratedlocalization-translator .form-control::-webkit-input-placeholder {
+  color: #999999;
+}
+.integratedlocalization-translator .form-control[disabled],
+.integratedlocalization-translator .form-control[readonly],
+fieldset[disabled] .integratedlocalization-translator .form-control {
+  cursor: not-allowed;
+  background-color: #eeeeee;
+  opacity: 1;
+}
+textarea.integratedlocalization-translator .form-control {
+  height: auto;
+}
+.integratedlocalization-translator input[type="search"] {
+  -webkit-appearance: none;
+}
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+  .integratedlocalization-translator input[type="date"],
+  .integratedlocalization-translator input[type="time"],
+  .integratedlocalization-translator input[type="datetime-local"],
+  .integratedlocalization-translator input[type="month"] {
+    line-height: 34px;
+  }
+  .integratedlocalization-translator input[type="date"].input-sm,
+  .integratedlocalization-translator input[type="time"].input-sm,
+  .integratedlocalization-translator input[type="datetime-local"].input-sm,
+  .integratedlocalization-translator input[type="month"].input-sm,
+  .input-group-sm .integratedlocalization-translator input[type="date"],
+  .input-group-sm .integratedlocalization-translator input[type="time"],
+  .input-group-sm .integratedlocalization-translator input[type="datetime-local"],
+  .input-group-sm .integratedlocalization-translator input[type="month"] {
+    line-height: 30px;
+  }
+  .integratedlocalization-translator input[type="date"].input-lg,
+  .integratedlocalization-translator input[type="time"].input-lg,
+  .integratedlocalization-translator input[type="datetime-local"].input-lg,
+  .integratedlocalization-translator input[type="month"].input-lg,
+  .input-group-lg .integratedlocalization-translator input[type="date"],
+  .input-group-lg .integratedlocalization-translator input[type="time"],
+  .input-group-lg .integratedlocalization-translator input[type="datetime-local"],
+  .input-group-lg .integratedlocalization-translator input[type="month"] {
+    line-height: 46px;
+  }
+}
+.integratedlocalization-translator .form-group {
+  margin-bottom: 15px;
+}
+.integratedlocalization-translator .radio,
+.integratedlocalization-translator .checkbox {
+  position: relative;
+  display: block;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+.integratedlocalization-translator .radio label,
+.integratedlocalization-translator .checkbox label {
+  min-height: 20px;
+  padding-left: 20px;
+  margin-bottom: 0;
+  font-weight: normal;
+  cursor: pointer;
+}
+.integratedlocalization-translator .radio input[type="radio"],
+.integratedlocalization-translator .radio-inline input[type="radio"],
+.integratedlocalization-translator .checkbox input[type="checkbox"],
+.integratedlocalization-translator .checkbox-inline input[type="checkbox"] {
+  position: absolute;
+  margin-left: -20px;
+  margin-top: 4px \9;
+}
+.integratedlocalization-translator .radio + .radio,
+.integratedlocalization-translator .checkbox + .checkbox {
+  margin-top: -5px;
+}
+.integratedlocalization-translator .radio-inline,
+.integratedlocalization-translator .checkbox-inline {
+  display: inline-block;
+  padding-left: 20px;
+  margin-bottom: 0;
+  vertical-align: middle;
+  font-weight: normal;
+  cursor: pointer;
+}
+.integratedlocalization-translator .radio-inline + .radio-inline,
+.integratedlocalization-translator .checkbox-inline + .checkbox-inline {
+  margin-top: 0;
+  margin-left: 10px;
+}
+.integratedlocalization-translator input[type="radio"][disabled],
+.integratedlocalization-translator input[type="checkbox"][disabled],
+.integratedlocalization-translator input[type="radio"].disabled,
+.integratedlocalization-translator input[type="checkbox"].disabled,
+fieldset[disabled] .integratedlocalization-translator input[type="radio"],
+fieldset[disabled] .integratedlocalization-translator input[type="checkbox"] {
+  cursor: not-allowed;
+}
+.integratedlocalization-translator .radio-inline.disabled,
+.integratedlocalization-translator .checkbox-inline.disabled,
+fieldset[disabled] .integratedlocalization-translator .radio-inline,
+fieldset[disabled] .integratedlocalization-translator .checkbox-inline {
+  cursor: not-allowed;
+}
+.integratedlocalization-translator .radio.disabled label,
+.integratedlocalization-translator .checkbox.disabled label,
+fieldset[disabled] .integratedlocalization-translator .radio label,
+fieldset[disabled] .integratedlocalization-translator .checkbox label {
+  cursor: not-allowed;
+}
+.integratedlocalization-translator .form-control-static {
+  padding-top: 7px;
+  padding-bottom: 7px;
+  margin-bottom: 0;
+}
+.integratedlocalization-translator .form-control-static.input-lg,
+.integratedlocalization-translator .form-control-static.input-sm {
+  padding-left: 0;
+  padding-right: 0;
+}
+.integratedlocalization-translator .input-sm {
+  height: 30px;
+  padding: 5px 10px;
+  font-size: 12px;
+  line-height: 1.5;
+  border-radius: 3px;
+}
+select.integratedlocalization-translator .input-sm {
+  height: 30px;
+  line-height: 30px;
+}
+textarea.integratedlocalization-translator .input-sm,
+select[multiple].integratedlocalization-translator .input-sm {
+  height: auto;
+}
+.integratedlocalization-translator .form-group-sm .form-control {
+  height: 30px;
+  padding: 5px 10px;
+  font-size: 12px;
+  line-height: 1.5;
+  border-radius: 3px;
+}
+select.integratedlocalization-translator .form-group-sm .form-control {
+  height: 30px;
+  line-height: 30px;
+}
+textarea.integratedlocalization-translator .form-group-sm .form-control,
+select[multiple].integratedlocalization-translator .form-group-sm .form-control {
+  height: auto;
+}
+.integratedlocalization-translator .form-group-sm .form-control-static {
+  height: 30px;
+  padding: 5px 10px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.integratedlocalization-translator .input-lg {
+  height: 46px;
+  padding: 10px 16px;
+  font-size: 18px;
+  line-height: 1.3333333;
+  border-radius: 6px;
+}
+select.integratedlocalization-translator .input-lg {
+  height: 46px;
+  line-height: 46px;
+}
+textarea.integratedlocalization-translator .input-lg,
+select[multiple].integratedlocalization-translator .input-lg {
+  height: auto;
+}
+.integratedlocalization-translator .form-group-lg .form-control {
+  height: 46px;
+  padding: 10px 16px;
+  font-size: 18px;
+  line-height: 1.3333333;
+  border-radius: 6px;
+}
+select.integratedlocalization-translator .form-group-lg .form-control {
+  height: 46px;
+  line-height: 46px;
+}
+textarea.integratedlocalization-translator .form-group-lg .form-control,
+select[multiple].integratedlocalization-translator .form-group-lg .form-control {
+  height: auto;
+}
+.integratedlocalization-translator .form-group-lg .form-control-static {
+  height: 46px;
+  padding: 10px 16px;
+  font-size: 18px;
+  line-height: 1.3333333;
+}
+.integratedlocalization-translator .has-feedback {
+  position: relative;
+}
+.integratedlocalization-translator .has-feedback .form-control {
+  padding-right: 42.5px;
+}
+.integratedlocalization-translator .form-control-feedback {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 2;
+  display: block;
+  width: 34px;
+  height: 34px;
+  line-height: 34px;
+  text-align: center;
+  pointer-events: none;
+}
+.integratedlocalization-translator .input-lg + .form-control-feedback {
+  width: 46px;
+  height: 46px;
+  line-height: 46px;
+}
+.integratedlocalization-translator .input-sm + .form-control-feedback {
+  width: 30px;
+  height: 30px;
+  line-height: 30px;
+}
+.integratedlocalization-translator .has-success .help-block,
+.integratedlocalization-translator .has-success .control-label,
+.integratedlocalization-translator .has-success .radio,
+.integratedlocalization-translator .has-success .checkbox,
+.integratedlocalization-translator .has-success .radio-inline,
+.integratedlocalization-translator .has-success .checkbox-inline,
+.integratedlocalization-translator .has-success.radio label,
+.integratedlocalization-translator .has-success.checkbox label,
+.integratedlocalization-translator .has-success.radio-inline label,
+.integratedlocalization-translator .has-success.checkbox-inline label {
+  color: #3c763d;
+}
+.integratedlocalization-translator .has-success .form-control {
+  border-color: #3c763d;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+}
+.integratedlocalization-translator .has-success .form-control:focus {
+  border-color: #2b542c;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #67b168;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #67b168;
+}
+.integratedlocalization-translator .has-success .input-group-addon {
+  color: #3c763d;
+  border-color: #3c763d;
+  background-color: #dff0d8;
+}
+.integratedlocalization-translator .has-success .form-control-feedback {
+  color: #3c763d;
+}
+.integratedlocalization-translator .has-warning .help-block,
+.integratedlocalization-translator .has-warning .control-label,
+.integratedlocalization-translator .has-warning .radio,
+.integratedlocalization-translator .has-warning .checkbox,
+.integratedlocalization-translator .has-warning .radio-inline,
+.integratedlocalization-translator .has-warning .checkbox-inline,
+.integratedlocalization-translator .has-warning.radio label,
+.integratedlocalization-translator .has-warning.checkbox label,
+.integratedlocalization-translator .has-warning.radio-inline label,
+.integratedlocalization-translator .has-warning.checkbox-inline label {
+  color: #8a6d3b;
+}
+.integratedlocalization-translator .has-warning .form-control {
+  border-color: #8a6d3b;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+}
+.integratedlocalization-translator .has-warning .form-control:focus {
+  border-color: #66512c;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #c0a16b;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #c0a16b;
+}
+.integratedlocalization-translator .has-warning .input-group-addon {
+  color: #8a6d3b;
+  border-color: #8a6d3b;
+  background-color: #fcf8e3;
+}
+.integratedlocalization-translator .has-warning .form-control-feedback {
+  color: #8a6d3b;
+}
+.integratedlocalization-translator .has-error .help-block,
+.integratedlocalization-translator .has-error .control-label,
+.integratedlocalization-translator .has-error .radio,
+.integratedlocalization-translator .has-error .checkbox,
+.integratedlocalization-translator .has-error .radio-inline,
+.integratedlocalization-translator .has-error .checkbox-inline,
+.integratedlocalization-translator .has-error.radio label,
+.integratedlocalization-translator .has-error.checkbox label,
+.integratedlocalization-translator .has-error.radio-inline label,
+.integratedlocalization-translator .has-error.checkbox-inline label {
+  color: #a94442;
+}
+.integratedlocalization-translator .has-error .form-control {
+  border-color: #a94442;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+}
+.integratedlocalization-translator .has-error .form-control:focus {
+  border-color: #843534;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #ce8483;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #ce8483;
+}
+.integratedlocalization-translator .has-error .input-group-addon {
+  color: #a94442;
+  border-color: #a94442;
+  background-color: #f2dede;
+}
+.integratedlocalization-translator .has-error .form-control-feedback {
+  color: #a94442;
+}
+.integratedlocalization-translator .has-feedback label ~ .form-control-feedback {
+  top: 25px;
+}
+.integratedlocalization-translator .has-feedback label.sr-only ~ .form-control-feedback {
+  top: 0;
+}
+.integratedlocalization-translator .help-block {
+  display: block;
+  margin-top: 5px;
+  margin-bottom: 10px;
+  color: #737373;
+}
+@media (min-width: 768px) {
+  .integratedlocalization-translator .form-inline .form-group {
+    display: inline-block;
+    margin-bottom: 0;
+    vertical-align: middle;
+  }
+  .integratedlocalization-translator .form-inline .form-control {
+    display: inline-block;
+    width: auto;
+    vertical-align: middle;
+  }
+  .integratedlocalization-translator .form-inline .form-control-static {
+    display: inline-block;
+  }
+  .integratedlocalization-translator .form-inline .input-group {
+    display: inline-table;
+    vertical-align: middle;
+  }
+  .integratedlocalization-translator .form-inline .input-group .input-group-addon,
+  .integratedlocalization-translator .form-inline .input-group .input-group-btn,
+  .integratedlocalization-translator .form-inline .input-group .form-control {
+    width: auto;
+  }
+  .integratedlocalization-translator .form-inline .input-group > .form-control {
+    width: 100%;
+  }
+  .integratedlocalization-translator .form-inline .control-label {
+    margin-bottom: 0;
+    vertical-align: middle;
+  }
+  .integratedlocalization-translator .form-inline .radio,
+  .integratedlocalization-translator .form-inline .checkbox {
+    display: inline-block;
+    margin-top: 0;
+    margin-bottom: 0;
+    vertical-align: middle;
+  }
+  .integratedlocalization-translator .form-inline .radio label,
+  .integratedlocalization-translator .form-inline .checkbox label {
+    padding-left: 0;
+  }
+  .integratedlocalization-translator .form-inline .radio input[type="radio"],
+  .integratedlocalization-translator .form-inline .checkbox input[type="checkbox"] {
+    position: relative;
+    margin-left: 0;
+  }
+  .integratedlocalization-translator .form-inline .has-feedback .form-control-feedback {
+    top: 0;
+  }
+}
+.integratedlocalization-translator .form-horizontal .radio,
+.integratedlocalization-translator .form-horizontal .checkbox,
+.integratedlocalization-translator .form-horizontal .radio-inline,
+.integratedlocalization-translator .form-horizontal .checkbox-inline {
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-top: 7px;
+}
+.integratedlocalization-translator .form-horizontal .radio,
+.integratedlocalization-translator .form-horizontal .checkbox {
+  min-height: 27px;
+}
+.integratedlocalization-translator .form-horizontal .form-group {
+  margin-left: -15px;
+  margin-right: -15px;
+}
+@media (min-width: 768px) {
+  .integratedlocalization-translator .form-horizontal .control-label {
+    text-align: right;
+    margin-bottom: 0;
+    padding-top: 7px;
+  }
+}
+.integratedlocalization-translator .form-horizontal .has-feedback .form-control-feedback {
+  right: 15px;
+}
+@media (min-width: 768px) {
+  .integratedlocalization-translator .form-horizontal .form-group-lg .control-label {
+    padding-top: 14.333333px;
+  }
+}
+@media (min-width: 768px) {
+  .integratedlocalization-translator .form-horizontal .form-group-sm .control-label {
+    padding-top: 6px;
+  }
+}
+.integratedlocalization-translator .list-group {
+  margin-bottom: 20px;
+  padding-left: 0;
+}
+.integratedlocalization-translator .list-group-item {
+  position: relative;
+  display: block;
+  padding: 10px 15px;
+  margin-bottom: -1px;
+  background-color: #ffffff;
+  border: 1px solid #dddddd;
+}
+.integratedlocalization-translator .list-group-item:first-child {
+  border-top-right-radius: 4px;
+  border-top-left-radius: 4px;
+}
+.integratedlocalization-translator .list-group-item:last-child {
+  margin-bottom: 0;
+  border-bottom-right-radius: 4px;
+  border-bottom-left-radius: 4px;
+}
+.integratedlocalization-translator a.list-group-item {
+  color: #555555;
+}
+.integratedlocalization-translator a.list-group-item .list-group-item-heading {
+  color: #333333;
+}
+.integratedlocalization-translator a.list-group-item:hover,
+.integratedlocalization-translator a.list-group-item:focus {
+  text-decoration: none;
+  color: #555555;
+  background-color: #f5f5f5;
+}
+.integratedlocalization-translator .list-group-item.disabled,
+.integratedlocalization-translator .list-group-item.disabled:hover,
+.integratedlocalization-translator .list-group-item.disabled:focus {
+  background-color: #eeeeee;
+  color: #777777;
+  cursor: not-allowed;
+}
+.integratedlocalization-translator .list-group-item.disabled .list-group-item-heading,
+.integratedlocalization-translator .list-group-item.disabled:hover .list-group-item-heading,
+.integratedlocalization-translator .list-group-item.disabled:focus .list-group-item-heading {
+  color: inherit;
+}
+.integratedlocalization-translator .list-group-item.disabled .list-group-item-text,
+.integratedlocalization-translator .list-group-item.disabled:hover .list-group-item-text,
+.integratedlocalization-translator .list-group-item.disabled:focus .list-group-item-text {
+  color: #777777;
+}
+.integratedlocalization-translator .list-group-item.active,
+.integratedlocalization-translator .list-group-item.active:hover,
+.integratedlocalization-translator .list-group-item.active:focus {
+  z-index: 2;
+  color: #ffffff;
+  background-color: #337ab7;
+  border-color: #337ab7;
+}
+.integratedlocalization-translator .list-group-item.active .list-group-item-heading,
+.integratedlocalization-translator .list-group-item.active:hover .list-group-item-heading,
+.integratedlocalization-translator .list-group-item.active:focus .list-group-item-heading,
+.integratedlocalization-translator .list-group-item.active .list-group-item-heading > small,
+.integratedlocalization-translator .list-group-item.active:hover .list-group-item-heading > small,
+.integratedlocalization-translator .list-group-item.active:focus .list-group-item-heading > small,
+.integratedlocalization-translator .list-group-item.active .list-group-item-heading > .small,
+.integratedlocalization-translator .list-group-item.active:hover .list-group-item-heading > .small,
+.integratedlocalization-translator .list-group-item.active:focus .list-group-item-heading > .small {
+  color: inherit;
+}
+.integratedlocalization-translator .list-group-item.active .list-group-item-text,
+.integratedlocalization-translator .list-group-item.active:hover .list-group-item-text,
+.integratedlocalization-translator .list-group-item.active:focus .list-group-item-text {
+  color: #c7ddef;
+}
+.integratedlocalization-translator .list-group-item-success {
+  color: #3c763d;
+  background-color: #dff0d8;
+}
+a.integratedlocalization-translator .list-group-item-success {
+  color: #3c763d;
+}
+a.integratedlocalization-translator .list-group-item-success .list-group-item-heading {
+  color: inherit;
+}
+a.integratedlocalization-translator .list-group-item-success:hover,
+a.integratedlocalization-translator .list-group-item-success:focus {
+  color: #3c763d;
+  background-color: #d0e9c6;
+}
+a.integratedlocalization-translator .list-group-item-success.active,
+a.integratedlocalization-translator .list-group-item-success.active:hover,
+a.integratedlocalization-translator .list-group-item-success.active:focus {
+  color: #fff;
+  background-color: #3c763d;
+  border-color: #3c763d;
+}
+.integratedlocalization-translator .list-group-item-info {
+  color: #31708f;
+  background-color: #d9edf7;
+}
+a.integratedlocalization-translator .list-group-item-info {
+  color: #31708f;
+}
+a.integratedlocalization-translator .list-group-item-info .list-group-item-heading {
+  color: inherit;
+}
+a.integratedlocalization-translator .list-group-item-info:hover,
+a.integratedlocalization-translator .list-group-item-info:focus {
+  color: #31708f;
+  background-color: #c4e3f3;
+}
+a.integratedlocalization-translator .list-group-item-info.active,
+a.integratedlocalization-translator .list-group-item-info.active:hover,
+a.integratedlocalization-translator .list-group-item-info.active:focus {
+  color: #fff;
+  background-color: #31708f;
+  border-color: #31708f;
+}
+.integratedlocalization-translator .list-group-item-warning {
+  color: #8a6d3b;
+  background-color: #fcf8e3;
+}
+a.integratedlocalization-translator .list-group-item-warning {
+  color: #8a6d3b;
+}
+a.integratedlocalization-translator .list-group-item-warning .list-group-item-heading {
+  color: inherit;
+}
+a.integratedlocalization-translator .list-group-item-warning:hover,
+a.integratedlocalization-translator .list-group-item-warning:focus {
+  color: #8a6d3b;
+  background-color: #faf2cc;
+}
+a.integratedlocalization-translator .list-group-item-warning.active,
+a.integratedlocalization-translator .list-group-item-warning.active:hover,
+a.integratedlocalization-translator .list-group-item-warning.active:focus {
+  color: #fff;
+  background-color: #8a6d3b;
+  border-color: #8a6d3b;
+}
+.integratedlocalization-translator .list-group-item-danger {
+  color: #a94442;
+  background-color: #f2dede;
+}
+a.integratedlocalization-translator .list-group-item-danger {
+  color: #a94442;
+}
+a.integratedlocalization-translator .list-group-item-danger .list-group-item-heading {
+  color: inherit;
+}
+a.integratedlocalization-translator .list-group-item-danger:hover,
+a.integratedlocalization-translator .list-group-item-danger:focus {
+  color: #a94442;
+  background-color: #ebcccc;
+}
+a.integratedlocalization-translator .list-group-item-danger.active,
+a.integratedlocalization-translator .list-group-item-danger.active:hover,
+a.integratedlocalization-translator .list-group-item-danger.active:focus {
+  color: #fff;
+  background-color: #a94442;
+  border-color: #a94442;
+}
+.integratedlocalization-translator .list-group-item-heading {
+  margin-top: 0;
+  margin-bottom: 5px;
+}
+.integratedlocalization-translator .list-group-item-text {
+  margin-bottom: 0;
+  line-height: 1.3;
+}
+.integratedlocalization-translator .input-group {
+  position: relative;
+  display: table;
+  border-collapse: separate;
+}
+.integratedlocalization-translator .input-group[class*="col-"] {
+  float: none;
+  padding-left: 0;
+  padding-right: 0;
+}
+.integratedlocalization-translator .input-group .form-control {
+  position: relative;
+  z-index: 2;
+  float: left;
+  width: 100%;
+  margin-bottom: 0;
+}
+.integratedlocalization-translator .input-group-lg > .form-control,
+.integratedlocalization-translator .input-group-lg > .input-group-addon,
+.integratedlocalization-translator .input-group-lg > .input-group-btn > .btn {
+  height: 46px;
+  padding: 10px 16px;
+  font-size: 18px;
+  line-height: 1.3333333;
+  border-radius: 6px;
+}
+select.integratedlocalization-translator .input-group-lg > .form-control,
+select.integratedlocalization-translator .input-group-lg > .input-group-addon,
+select.integratedlocalization-translator .input-group-lg > .input-group-btn > .btn {
+  height: 46px;
+  line-height: 46px;
+}
+textarea.integratedlocalization-translator .input-group-lg > .form-control,
+textarea.integratedlocalization-translator .input-group-lg > .input-group-addon,
+textarea.integratedlocalization-translator .input-group-lg > .input-group-btn > .btn,
+select[multiple].integratedlocalization-translator .input-group-lg > .form-control,
+select[multiple].integratedlocalization-translator .input-group-lg > .input-group-addon,
+select[multiple].integratedlocalization-translator .input-group-lg > .input-group-btn > .btn {
+  height: auto;
+}
+.integratedlocalization-translator .input-group-sm > .form-control,
+.integratedlocalization-translator .input-group-sm > .input-group-addon,
+.integratedlocalization-translator .input-group-sm > .input-group-btn > .btn {
+  height: 30px;
+  padding: 5px 10px;
+  font-size: 12px;
+  line-height: 1.5;
+  border-radius: 3px;
+}
+select.integratedlocalization-translator .input-group-sm > .form-control,
+select.integratedlocalization-translator .input-group-sm > .input-group-addon,
+select.integratedlocalization-translator .input-group-sm > .input-group-btn > .btn {
+  height: 30px;
+  line-height: 30px;
+}
+textarea.integratedlocalization-translator .input-group-sm > .form-control,
+textarea.integratedlocalization-translator .input-group-sm > .input-group-addon,
+textarea.integratedlocalization-translator .input-group-sm > .input-group-btn > .btn,
+select[multiple].integratedlocalization-translator .input-group-sm > .form-control,
+select[multiple].integratedlocalization-translator .input-group-sm > .input-group-addon,
+select[multiple].integratedlocalization-translator .input-group-sm > .input-group-btn > .btn {
+  height: auto;
+}
+.integratedlocalization-translator .input-group-addon,
+.integratedlocalization-translator .input-group-btn,
+.integratedlocalization-translator .input-group .form-control {
+  display: table-cell;
+}
+.integratedlocalization-translator .input-group-addon:not(:first-child):not(:last-child),
+.integratedlocalization-translator .input-group-btn:not(:first-child):not(:last-child),
+.integratedlocalization-translator .input-group .form-control:not(:first-child):not(:last-child) {
+  border-radius: 0;
+}
+.integratedlocalization-translator .input-group-addon,
+.integratedlocalization-translator .input-group-btn {
+  width: 1%;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+.integratedlocalization-translator .input-group-addon {
+  padding: 6px 12px;
+  font-size: 14px;
+  font-weight: normal;
+  line-height: 1;
+  color: #555555;
+  text-align: center;
+  background-color: #eeeeee;
+  border: 1px solid #cccccc;
+  border-radius: 4px;
+}
+.integratedlocalization-translator .input-group-addon.input-sm {
+  padding: 5px 10px;
+  font-size: 12px;
+  border-radius: 3px;
+}
+.integratedlocalization-translator .input-group-addon.input-lg {
+  padding: 10px 16px;
+  font-size: 18px;
+  border-radius: 6px;
+}
+.integratedlocalization-translator .input-group-addon input[type="radio"],
+.integratedlocalization-translator .input-group-addon input[type="checkbox"] {
+  margin-top: 0;
+}
+.integratedlocalization-translator .input-group .form-control:first-child,
+.integratedlocalization-translator .input-group-addon:first-child,
+.integratedlocalization-translator .input-group-btn:first-child > .btn,
+.integratedlocalization-translator .input-group-btn:first-child > .btn-group > .btn,
+.integratedlocalization-translator .input-group-btn:first-child > .dropdown-toggle,
+.integratedlocalization-translator .input-group-btn:last-child > .btn:not(:last-child):not(.dropdown-toggle),
+.integratedlocalization-translator .input-group-btn:last-child > .btn-group:not(:last-child) > .btn {
+  border-bottom-right-radius: 0;
+  border-top-right-radius: 0;
+}
+.integratedlocalization-translator .input-group-addon:first-child {
+  border-right: 0;
+}
+.integratedlocalization-translator .input-group .form-control:last-child,
+.integratedlocalization-translator .input-group-addon:last-child,
+.integratedlocalization-translator .input-group-btn:last-child > .btn,
+.integratedlocalization-translator .input-group-btn:last-child > .btn-group > .btn,
+.integratedlocalization-translator .input-group-btn:last-child > .dropdown-toggle,
+.integratedlocalization-translator .input-group-btn:first-child > .btn:not(:first-child),
+.integratedlocalization-translator .input-group-btn:first-child > .btn-group:not(:first-child) > .btn {
+  border-bottom-left-radius: 0;
+  border-top-left-radius: 0;
+}
+.integratedlocalization-translator .input-group-addon:last-child {
+  border-left: 0;
+}
+.integratedlocalization-translator .input-group-btn {
+  position: relative;
+  font-size: 0;
+  white-space: nowrap;
+}
+.integratedlocalization-translator .input-group-btn > .btn {
+  position: relative;
+}
+.integratedlocalization-translator .input-group-btn > .btn + .btn {
+  margin-left: -1px;
+}
+.integratedlocalization-translator .input-group-btn > .btn:hover,
+.integratedlocalization-translator .input-group-btn > .btn:focus,
+.integratedlocalization-translator .input-group-btn > .btn:active {
+  z-index: 2;
+}
+.integratedlocalization-translator .input-group-btn:first-child > .btn,
+.integratedlocalization-translator .input-group-btn:first-child > .btn-group {
+  margin-right: -1px;
+}
+.integratedlocalization-translator .input-group-btn:last-child > .btn,
+.integratedlocalization-translator .input-group-btn:last-child > .btn-group {
+  margin-left: -1px;
+}
+.integratedlocalization-translator .panel {
+  margin-bottom: 20px;
+  background-color: #ffffff;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+}
+.integratedlocalization-translator .panel-body {
+  padding: 15px;
+}
+.integratedlocalization-translator .panel-heading {
+  padding: 10px 15px;
+  border-bottom: 1px solid transparent;
+  border-top-right-radius: 3px;
+  border-top-left-radius: 3px;
+}
+.integratedlocalization-translator .panel-heading > .dropdown .dropdown-toggle {
+  color: inherit;
+}
+.integratedlocalization-translator .panel-title {
+  margin-top: 0;
+  margin-bottom: 0;
+  font-size: 16px;
+  color: inherit;
+}
+.integratedlocalization-translator .panel-title > a,
+.integratedlocalization-translator .panel-title > small,
+.integratedlocalization-translator .panel-title > .small,
+.integratedlocalization-translator .panel-title > small > a,
+.integratedlocalization-translator .panel-title > .small > a {
+  color: inherit;
+}
+.integratedlocalization-translator .panel-footer {
+  padding: 10px 15px;
+  background-color: #f5f5f5;
+  border-top: 1px solid #dddddd;
+  border-bottom-right-radius: 3px;
+  border-bottom-left-radius: 3px;
+}
+.integratedlocalization-translator .panel > .list-group,
+.integratedlocalization-translator .panel > .panel-collapse > .list-group {
+  margin-bottom: 0;
+}
+.integratedlocalization-translator .panel > .list-group .list-group-item,
+.integratedlocalization-translator .panel > .panel-collapse > .list-group .list-group-item {
+  border-width: 1px 0;
+  border-radius: 0;
+}
+.integratedlocalization-translator .panel > .list-group:first-child .list-group-item:first-child,
+.integratedlocalization-translator .panel > .panel-collapse > .list-group:first-child .list-group-item:first-child {
+  border-top: 0;
+  border-top-right-radius: 3px;
+  border-top-left-radius: 3px;
+}
+.integratedlocalization-translator .panel > .list-group:last-child .list-group-item:last-child,
+.integratedlocalization-translator .panel > .panel-collapse > .list-group:last-child .list-group-item:last-child {
+  border-bottom: 0;
+  border-bottom-right-radius: 3px;
+  border-bottom-left-radius: 3px;
+}
+.integratedlocalization-translator .panel-heading + .list-group .list-group-item:first-child {
+  border-top-width: 0;
+}
+.integratedlocalization-translator .list-group + .panel-footer {
+  border-top-width: 0;
+}
+.integratedlocalization-translator .panel > .table,
+.integratedlocalization-translator .panel > .table-responsive > .table,
+.integratedlocalization-translator .panel > .panel-collapse > .table {
+  margin-bottom: 0;
+}
+.integratedlocalization-translator .panel > .table caption,
+.integratedlocalization-translator .panel > .table-responsive > .table caption,
+.integratedlocalization-translator .panel > .panel-collapse > .table caption {
+  padding-left: 15px;
+  padding-right: 15px;
+}
+.integratedlocalization-translator .panel > .table:first-child,
+.integratedlocalization-translator .panel > .table-responsive:first-child > .table:first-child {
+  border-top-right-radius: 3px;
+  border-top-left-radius: 3px;
+}
+.integratedlocalization-translator .panel > .table:first-child > thead:first-child > tr:first-child,
+.integratedlocalization-translator .panel > .table-responsive:first-child > .table:first-child > thead:first-child > tr:first-child,
+.integratedlocalization-translator .panel > .table:first-child > tbody:first-child > tr:first-child,
+.integratedlocalization-translator .panel > .table-responsive:first-child > .table:first-child > tbody:first-child > tr:first-child {
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+}
+.integratedlocalization-translator .panel > .table:first-child > thead:first-child > tr:first-child td:first-child,
+.integratedlocalization-translator .panel > .table-responsive:first-child > .table:first-child > thead:first-child > tr:first-child td:first-child,
+.integratedlocalization-translator .panel > .table:first-child > tbody:first-child > tr:first-child td:first-child,
+.integratedlocalization-translator .panel > .table-responsive:first-child > .table:first-child > tbody:first-child > tr:first-child td:first-child,
+.integratedlocalization-translator .panel > .table:first-child > thead:first-child > tr:first-child th:first-child,
+.integratedlocalization-translator .panel > .table-responsive:first-child > .table:first-child > thead:first-child > tr:first-child th:first-child,
+.integratedlocalization-translator .panel > .table:first-child > tbody:first-child > tr:first-child th:first-child,
+.integratedlocalization-translator .panel > .table-responsive:first-child > .table:first-child > tbody:first-child > tr:first-child th:first-child {
+  border-top-left-radius: 3px;
+}
+.integratedlocalization-translator .panel > .table:first-child > thead:first-child > tr:first-child td:last-child,
+.integratedlocalization-translator .panel > .table-responsive:first-child > .table:first-child > thead:first-child > tr:first-child td:last-child,
+.integratedlocalization-translator .panel > .table:first-child > tbody:first-child > tr:first-child td:last-child,
+.integratedlocalization-translator .panel > .table-responsive:first-child > .table:first-child > tbody:first-child > tr:first-child td:last-child,
+.integratedlocalization-translator .panel > .table:first-child > thead:first-child > tr:first-child th:last-child,
+.integratedlocalization-translator .panel > .table-responsive:first-child > .table:first-child > thead:first-child > tr:first-child th:last-child,
+.integratedlocalization-translator .panel > .table:first-child > tbody:first-child > tr:first-child th:last-child,
+.integratedlocalization-translator .panel > .table-responsive:first-child > .table:first-child > tbody:first-child > tr:first-child th:last-child {
+  border-top-right-radius: 3px;
+}
+.integratedlocalization-translator .panel > .table:last-child,
+.integratedlocalization-translator .panel > .table-responsive:last-child > .table:last-child {
+  border-bottom-right-radius: 3px;
+  border-bottom-left-radius: 3px;
+}
+.integratedlocalization-translator .panel > .table:last-child > tbody:last-child > tr:last-child,
+.integratedlocalization-translator .panel > .table-responsive:last-child > .table:last-child > tbody:last-child > tr:last-child,
+.integratedlocalization-translator .panel > .table:last-child > tfoot:last-child > tr:last-child,
+.integratedlocalization-translator .panel > .table-responsive:last-child > .table:last-child > tfoot:last-child > tr:last-child {
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+}
+.integratedlocalization-translator .panel > .table:last-child > tbody:last-child > tr:last-child td:first-child,
+.integratedlocalization-translator .panel > .table-responsive:last-child > .table:last-child > tbody:last-child > tr:last-child td:first-child,
+.integratedlocalization-translator .panel > .table:last-child > tfoot:last-child > tr:last-child td:first-child,
+.integratedlocalization-translator .panel > .table-responsive:last-child > .table:last-child > tfoot:last-child > tr:last-child td:first-child,
+.integratedlocalization-translator .panel > .table:last-child > tbody:last-child > tr:last-child th:first-child,
+.integratedlocalization-translator .panel > .table-responsive:last-child > .table:last-child > tbody:last-child > tr:last-child th:first-child,
+.integratedlocalization-translator .panel > .table:last-child > tfoot:last-child > tr:last-child th:first-child,
+.integratedlocalization-translator .panel > .table-responsive:last-child > .table:last-child > tfoot:last-child > tr:last-child th:first-child {
+  border-bottom-left-radius: 3px;
+}
+.integratedlocalization-translator .panel > .table:last-child > tbody:last-child > tr:last-child td:last-child,
+.integratedlocalization-translator .panel > .table-responsive:last-child > .table:last-child > tbody:last-child > tr:last-child td:last-child,
+.integratedlocalization-translator .panel > .table:last-child > tfoot:last-child > tr:last-child td:last-child,
+.integratedlocalization-translator .panel > .table-responsive:last-child > .table:last-child > tfoot:last-child > tr:last-child td:last-child,
+.integratedlocalization-translator .panel > .table:last-child > tbody:last-child > tr:last-child th:last-child,
+.integratedlocalization-translator .panel > .table-responsive:last-child > .table:last-child > tbody:last-child > tr:last-child th:last-child,
+.integratedlocalization-translator .panel > .table:last-child > tfoot:last-child > tr:last-child th:last-child,
+.integratedlocalization-translator .panel > .table-responsive:last-child > .table:last-child > tfoot:last-child > tr:last-child th:last-child {
+  border-bottom-right-radius: 3px;
+}
+.integratedlocalization-translator .panel > .panel-body + .table,
+.integratedlocalization-translator .panel > .panel-body + .table-responsive,
+.integratedlocalization-translator .panel > .table + .panel-body,
+.integratedlocalization-translator .panel > .table-responsive + .panel-body {
+  border-top: 1px solid #dddddd;
+}
+.integratedlocalization-translator .panel > .table > tbody:first-child > tr:first-child th,
+.integratedlocalization-translator .panel > .table > tbody:first-child > tr:first-child td {
+  border-top: 0;
+}
+.integratedlocalization-translator .panel > .table-bordered,
+.integratedlocalization-translator .panel > .table-responsive > .table-bordered {
+  border: 0;
+}
+.integratedlocalization-translator .panel > .table-bordered > thead > tr > th:first-child,
+.integratedlocalization-translator .panel > .table-responsive > .table-bordered > thead > tr > th:first-child,
+.integratedlocalization-translator .panel > .table-bordered > tbody > tr > th:first-child,
+.integratedlocalization-translator .panel > .table-responsive > .table-bordered > tbody > tr > th:first-child,
+.integratedlocalization-translator .panel > .table-bordered > tfoot > tr > th:first-child,
+.integratedlocalization-translator .panel > .table-responsive > .table-bordered > tfoot > tr > th:first-child,
+.integratedlocalization-translator .panel > .table-bordered > thead > tr > td:first-child,
+.integratedlocalization-translator .panel > .table-responsive > .table-bordered > thead > tr > td:first-child,
+.integratedlocalization-translator .panel > .table-bordered > tbody > tr > td:first-child,
+.integratedlocalization-translator .panel > .table-responsive > .table-bordered > tbody > tr > td:first-child,
+.integratedlocalization-translator .panel > .table-bordered > tfoot > tr > td:first-child,
+.integratedlocalization-translator .panel > .table-responsive > .table-bordered > tfoot > tr > td:first-child {
+  border-left: 0;
+}
+.integratedlocalization-translator .panel > .table-bordered > thead > tr > th:last-child,
+.integratedlocalization-translator .panel > .table-responsive > .table-bordered > thead > tr > th:last-child,
+.integratedlocalization-translator .panel > .table-bordered > tbody > tr > th:last-child,
+.integratedlocalization-translator .panel > .table-responsive > .table-bordered > tbody > tr > th:last-child,
+.integratedlocalization-translator .panel > .table-bordered > tfoot > tr > th:last-child,
+.integratedlocalization-translator .panel > .table-responsive > .table-bordered > tfoot > tr > th:last-child,
+.integratedlocalization-translator .panel > .table-bordered > thead > tr > td:last-child,
+.integratedlocalization-translator .panel > .table-responsive > .table-bordered > thead > tr > td:last-child,
+.integratedlocalization-translator .panel > .table-bordered > tbody > tr > td:last-child,
+.integratedlocalization-translator .panel > .table-responsive > .table-bordered > tbody > tr > td:last-child,
+.integratedlocalization-translator .panel > .table-bordered > tfoot > tr > td:last-child,
+.integratedlocalization-translator .panel > .table-responsive > .table-bordered > tfoot > tr > td:last-child {
+  border-right: 0;
+}
+.integratedlocalization-translator .panel > .table-bordered > thead > tr:first-child > td,
+.integratedlocalization-translator .panel > .table-responsive > .table-bordered > thead > tr:first-child > td,
+.integratedlocalization-translator .panel > .table-bordered > tbody > tr:first-child > td,
+.integratedlocalization-translator .panel > .table-responsive > .table-bordered > tbody > tr:first-child > td,
+.integratedlocalization-translator .panel > .table-bordered > thead > tr:first-child > th,
+.integratedlocalization-translator .panel > .table-responsive > .table-bordered > thead > tr:first-child > th,
+.integratedlocalization-translator .panel > .table-bordered > tbody > tr:first-child > th,
+.integratedlocalization-translator .panel > .table-responsive > .table-bordered > tbody > tr:first-child > th {
+  border-bottom: 0;
+}
+.integratedlocalization-translator .panel > .table-bordered > tbody > tr:last-child > td,
+.integratedlocalization-translator .panel > .table-responsive > .table-bordered > tbody > tr:last-child > td,
+.integratedlocalization-translator .panel > .table-bordered > tfoot > tr:last-child > td,
+.integratedlocalization-translator .panel > .table-responsive > .table-bordered > tfoot > tr:last-child > td,
+.integratedlocalization-translator .panel > .table-bordered > tbody > tr:last-child > th,
+.integratedlocalization-translator .panel > .table-responsive > .table-bordered > tbody > tr:last-child > th,
+.integratedlocalization-translator .panel > .table-bordered > tfoot > tr:last-child > th,
+.integratedlocalization-translator .panel > .table-responsive > .table-bordered > tfoot > tr:last-child > th {
+  border-bottom: 0;
+}
+.integratedlocalization-translator .panel > .table-responsive {
+  border: 0;
+  margin-bottom: 0;
+}
+.integratedlocalization-translator .panel-group {
+  margin-bottom: 20px;
+}
+.integratedlocalization-translator .panel-group .panel {
+  margin-bottom: 0;
+  border-radius: 4px;
+}
+.integratedlocalization-translator .panel-group .panel + .panel {
+  margin-top: 5px;
+}
+.integratedlocalization-translator .panel-group .panel-heading {
+  border-bottom: 0;
+}
+.integratedlocalization-translator .panel-group .panel-heading + .panel-collapse > .panel-body,
+.integratedlocalization-translator .panel-group .panel-heading + .panel-collapse > .list-group {
+  border-top: 1px solid #dddddd;
+}
+.integratedlocalization-translator .panel-group .panel-footer {
+  border-top: 0;
+}
+.integratedlocalization-translator .panel-group .panel-footer + .panel-collapse .panel-body {
+  border-bottom: 1px solid #dddddd;
+}
+.integratedlocalization-translator .panel-default {
+  border-color: #dddddd;
+}
+.integratedlocalization-translator .panel-default > .panel-heading {
+  color: #333333;
+  background-color: #f5f5f5;
+  border-color: #dddddd;
+}
+.integratedlocalization-translator .panel-default > .panel-heading + .panel-collapse > .panel-body {
+  border-top-color: #dddddd;
+}
+.integratedlocalization-translator .panel-default > .panel-heading .badge {
+  color: #f5f5f5;
+  background-color: #333333;
+}
+.integratedlocalization-translator .panel-default > .panel-footer + .panel-collapse > .panel-body {
+  border-bottom-color: #dddddd;
+}
+.integratedlocalization-translator .panel-primary {
+  border-color: #337ab7;
+}
+.integratedlocalization-translator .panel-primary > .panel-heading {
+  color: #ffffff;
+  background-color: #337ab7;
+  border-color: #337ab7;
+}
+.integratedlocalization-translator .panel-primary > .panel-heading + .panel-collapse > .panel-body {
+  border-top-color: #337ab7;
+}
+.integratedlocalization-translator .panel-primary > .panel-heading .badge {
+  color: #337ab7;
+  background-color: #ffffff;
+}
+.integratedlocalization-translator .panel-primary > .panel-footer + .panel-collapse > .panel-body {
+  border-bottom-color: #337ab7;
+}
+.integratedlocalization-translator .panel-success {
+  border-color: #d6e9c6;
+}
+.integratedlocalization-translator .panel-success > .panel-heading {
+  color: #3c763d;
+  background-color: #dff0d8;
+  border-color: #d6e9c6;
+}
+.integratedlocalization-translator .panel-success > .panel-heading + .panel-collapse > .panel-body {
+  border-top-color: #d6e9c6;
+}
+.integratedlocalization-translator .panel-success > .panel-heading .badge {
+  color: #dff0d8;
+  background-color: #3c763d;
+}
+.integratedlocalization-translator .panel-success > .panel-footer + .panel-collapse > .panel-body {
+  border-bottom-color: #d6e9c6;
+}
+.integratedlocalization-translator .panel-info {
+  border-color: #bce8f1;
+}
+.integratedlocalization-translator .panel-info > .panel-heading {
+  color: #31708f;
+  background-color: #d9edf7;
+  border-color: #bce8f1;
+}
+.integratedlocalization-translator .panel-info > .panel-heading + .panel-collapse > .panel-body {
+  border-top-color: #bce8f1;
+}
+.integratedlocalization-translator .panel-info > .panel-heading .badge {
+  color: #d9edf7;
+  background-color: #31708f;
+}
+.integratedlocalization-translator .panel-info > .panel-footer + .panel-collapse > .panel-body {
+  border-bottom-color: #bce8f1;
+}
+.integratedlocalization-translator .panel-warning {
+  border-color: #faebcc;
+}
+.integratedlocalization-translator .panel-warning > .panel-heading {
+  color: #8a6d3b;
+  background-color: #fcf8e3;
+  border-color: #faebcc;
+}
+.integratedlocalization-translator .panel-warning > .panel-heading + .panel-collapse > .panel-body {
+  border-top-color: #faebcc;
+}
+.integratedlocalization-translator .panel-warning > .panel-heading .badge {
+  color: #fcf8e3;
+  background-color: #8a6d3b;
+}
+.integratedlocalization-translator .panel-warning > .panel-footer + .panel-collapse > .panel-body {
+  border-bottom-color: #faebcc;
+}
+.integratedlocalization-translator .panel-danger {
+  border-color: #ebccd1;
+}
+.integratedlocalization-translator .panel-danger > .panel-heading {
+  color: #a94442;
+  background-color: #f2dede;
+  border-color: #ebccd1;
+}
+.integratedlocalization-translator .panel-danger > .panel-heading + .panel-collapse > .panel-body {
+  border-top-color: #ebccd1;
+}
+.integratedlocalization-translator .panel-danger > .panel-heading .badge {
+  color: #f2dede;
+  background-color: #a94442;
+}
+.integratedlocalization-translator .panel-danger > .panel-footer + .panel-collapse > .panel-body {
+  border-bottom-color: #ebccd1;
+}
+.integratedlocalization-translator .caret {
+  display: inline-block;
+  width: 0;
+  height: 0;
+  margin-left: 2px;
+  vertical-align: middle;
+  border-top: 4px solid;
+  border-right: 4px solid transparent;
+  border-left: 4px solid transparent;
+}
+.integratedlocalization-translator .dropup,
+.integratedlocalization-translator .dropdown {
+  position: relative;
+}
+.integratedlocalization-translator .dropdown-toggle:focus {
+  outline: 0;
+}
+.integratedlocalization-translator .dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 1000;
+  display: none;
+  float: left;
+  min-width: 160px;
+  padding: 5px 0;
+  margin: 2px 0 0;
+  list-style: none;
+  font-size: 14px;
+  text-align: left;
+  background-color: #ffffff;
+  border: 1px solid #cccccc;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+  -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+  background-clip: padding-box;
+}
+.integratedlocalization-translator .dropdown-menu.pull-right {
+  right: 0;
+  left: auto;
+}
+.integratedlocalization-translator .dropdown-menu .divider {
+  height: 1px;
+  margin: 9px 0;
+  overflow: hidden;
+  background-color: #e5e5e5;
+}
+.integratedlocalization-translator .dropdown-menu > li > a {
+  display: block;
+  padding: 3px 20px;
+  clear: both;
+  font-weight: normal;
+  line-height: 1.428571429;
+  color: #333333;
+  white-space: nowrap;
+}
+.integratedlocalization-translator .dropdown-menu > li > a:hover,
+.integratedlocalization-translator .dropdown-menu > li > a:focus {
+  text-decoration: none;
+  color: #262626;
+  background-color: #f5f5f5;
+}
+.integratedlocalization-translator .dropdown-menu > .active > a,
+.integratedlocalization-translator .dropdown-menu > .active > a:hover,
+.integratedlocalization-translator .dropdown-menu > .active > a:focus {
+  color: #ffffff;
+  text-decoration: none;
+  outline: 0;
+  background-color: #337ab7;
+}
+.integratedlocalization-translator .dropdown-menu > .disabled > a,
+.integratedlocalization-translator .dropdown-menu > .disabled > a:hover,
+.integratedlocalization-translator .dropdown-menu > .disabled > a:focus {
+  color: #777777;
+}
+.integratedlocalization-translator .dropdown-menu > .disabled > a:hover,
+.integratedlocalization-translator .dropdown-menu > .disabled > a:focus {
+  text-decoration: none;
+  background-color: transparent;
+  background-image: none;
+  filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
+  cursor: not-allowed;
+}
+.integratedlocalization-translator .open > .dropdown-menu {
+  display: block;
+}
+.integratedlocalization-translator .open > a {
+  outline: 0;
+}
+.integratedlocalization-translator .dropdown-menu-right {
+  left: auto;
+  right: 0;
+}
+.integratedlocalization-translator .dropdown-menu-left {
+  left: 0;
+  right: auto;
+}
+.integratedlocalization-translator .dropdown-header {
+  display: block;
+  padding: 3px 20px;
+  font-size: 12px;
+  line-height: 1.428571429;
+  color: #777777;
+  white-space: nowrap;
+}
+.integratedlocalization-translator .dropdown-backdrop {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  z-index: 990;
+}
+.integratedlocalization-translator .pull-right > .dropdown-menu {
+  right: 0;
+  left: auto;
+}
+.integratedlocalization-translator .dropup .caret,
+.integratedlocalization-translator .navbar-fixed-bottom .dropdown .caret {
+  border-top: 0;
+  border-bottom: 4px solid;
+  content: "";
+}
+.integratedlocalization-translator .dropup .dropdown-menu,
+.integratedlocalization-translator .navbar-fixed-bottom .dropdown .dropdown-menu {
+  top: auto;
+  bottom: 100%;
+  margin-bottom: 2px;
+}
+@media (min-width: 768px) {
+  .integratedlocalization-translator .navbar-right .dropdown-menu {
+    left: auto;
+    right: 0;
+  }
+  .integratedlocalization-translator .navbar-right .dropdown-menu-left {
+    left: 0;
+    right: auto;
+  }
+}
+.integratedlocalization-translator .btn-group,
+.integratedlocalization-translator .btn-group-vertical {
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
+}
+.integratedlocalization-translator .btn-group > .btn,
+.integratedlocalization-translator .btn-group-vertical > .btn {
+  position: relative;
+  float: left;
+}
+.integratedlocalization-translator .btn-group > .btn:hover,
+.integratedlocalization-translator .btn-group-vertical > .btn:hover,
+.integratedlocalization-translator .btn-group > .btn:focus,
+.integratedlocalization-translator .btn-group-vertical > .btn:focus,
+.integratedlocalization-translator .btn-group > .btn:active,
+.integratedlocalization-translator .btn-group-vertical > .btn:active,
+.integratedlocalization-translator .btn-group > .btn.active,
+.integratedlocalization-translator .btn-group-vertical > .btn.active {
+  z-index: 2;
+}
+.integratedlocalization-translator .btn-group .btn + .btn,
+.integratedlocalization-translator .btn-group .btn + .btn-group,
+.integratedlocalization-translator .btn-group .btn-group + .btn,
+.integratedlocalization-translator .btn-group .btn-group + .btn-group {
+  margin-left: -1px;
+}
+.integratedlocalization-translator .btn-toolbar {
+  margin-left: -5px;
+}
+.integratedlocalization-translator .btn-toolbar .btn-group,
+.integratedlocalization-translator .btn-toolbar .input-group {
+  float: left;
+}
+.integratedlocalization-translator .btn-toolbar > .btn,
+.integratedlocalization-translator .btn-toolbar > .btn-group,
+.integratedlocalization-translator .btn-toolbar > .input-group {
+  margin-left: 5px;
+}
+.integratedlocalization-translator .btn-group > .btn:not(:first-child):not(:last-child):not(.dropdown-toggle) {
+  border-radius: 0;
+}
+.integratedlocalization-translator .btn-group > .btn:first-child {
+  margin-left: 0;
+}
+.integratedlocalization-translator .btn-group > .btn:first-child:not(:last-child):not(.dropdown-toggle) {
+  border-bottom-right-radius: 0;
+  border-top-right-radius: 0;
+}
+.integratedlocalization-translator .btn-group > .btn:last-child:not(:first-child),
+.integratedlocalization-translator .btn-group > .dropdown-toggle:not(:first-child) {
+  border-bottom-left-radius: 0;
+  border-top-left-radius: 0;
+}
+.integratedlocalization-translator .btn-group > .btn-group {
+  float: left;
+}
+.integratedlocalization-translator .btn-group > .btn-group:not(:first-child):not(:last-child) > .btn {
+  border-radius: 0;
+}
+.integratedlocalization-translator .btn-group > .btn-group:first-child:not(:last-child) > .btn:last-child,
+.integratedlocalization-translator .btn-group > .btn-group:first-child:not(:last-child) > .dropdown-toggle {
+  border-bottom-right-radius: 0;
+  border-top-right-radius: 0;
+}
+.integratedlocalization-translator .btn-group > .btn-group:last-child:not(:first-child) > .btn:first-child {
+  border-bottom-left-radius: 0;
+  border-top-left-radius: 0;
+}
+.integratedlocalization-translator .btn-group .dropdown-toggle:active,
+.integratedlocalization-translator .btn-group.open .dropdown-toggle {
+  outline: 0;
+}
+.integratedlocalization-translator .btn-group > .btn + .dropdown-toggle {
+  padding-left: 8px;
+  padding-right: 8px;
+}
+.integratedlocalization-translator .btn-group > .btn-lg + .dropdown-toggle {
+  padding-left: 12px;
+  padding-right: 12px;
+}
+.integratedlocalization-translator .btn-group.open .dropdown-toggle {
+  -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+  box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+}
+.integratedlocalization-translator .btn-group.open .dropdown-toggle.btn-link {
+  -webkit-box-shadow: none;
+  box-shadow: none;
+}
+.integratedlocalization-translator .btn .caret {
+  margin-left: 0;
+}
+.integratedlocalization-translator .btn-lg .caret {
+  border-width: 5px 5px 0;
+  border-bottom-width: 0;
+}
+.integratedlocalization-translator .dropup .btn-lg .caret {
+  border-width: 0 5px 5px;
+}
+.integratedlocalization-translator .btn-group-vertical > .btn,
+.integratedlocalization-translator .btn-group-vertical > .btn-group,
+.integratedlocalization-translator .btn-group-vertical > .btn-group > .btn {
+  display: block;
+  float: none;
+  width: 100%;
+  max-width: 100%;
+}
+.integratedlocalization-translator .btn-group-vertical > .btn-group > .btn {
+  float: none;
+}
+.integratedlocalization-translator .btn-group-vertical > .btn + .btn,
+.integratedlocalization-translator .btn-group-vertical > .btn + .btn-group,
+.integratedlocalization-translator .btn-group-vertical > .btn-group + .btn,
+.integratedlocalization-translator .btn-group-vertical > .btn-group + .btn-group {
+  margin-top: -1px;
+  margin-left: 0;
+}
+.integratedlocalization-translator .btn-group-vertical > .btn:not(:first-child):not(:last-child) {
+  border-radius: 0;
+}
+.integratedlocalization-translator .btn-group-vertical > .btn:first-child:not(:last-child) {
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+.integratedlocalization-translator .btn-group-vertical > .btn:last-child:not(:first-child) {
+  border-bottom-left-radius: 4px;
+  border-top-right-radius: 0;
+  border-top-left-radius: 0;
+}
+.integratedlocalization-translator .btn-group-vertical > .btn-group:not(:first-child):not(:last-child) > .btn {
+  border-radius: 0;
+}
+.integratedlocalization-translator .btn-group-vertical > .btn-group:first-child:not(:last-child) > .btn:last-child,
+.integratedlocalization-translator .btn-group-vertical > .btn-group:first-child:not(:last-child) > .dropdown-toggle {
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+.integratedlocalization-translator .btn-group-vertical > .btn-group:last-child:not(:first-child) > .btn:first-child {
+  border-top-right-radius: 0;
+  border-top-left-radius: 0;
+}
+.integratedlocalization-translator .btn-group-justified {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: separate;
+}
+.integratedlocalization-translator .btn-group-justified > .btn,
+.integratedlocalization-translator .btn-group-justified > .btn-group {
+  float: none;
+  display: table-cell;
+  width: 1%;
+}
+.integratedlocalization-translator .btn-group-justified > .btn-group .btn {
+  width: 100%;
+}
+.integratedlocalization-translator .btn-group-justified > .btn-group .dropdown-menu {
+  left: auto;
+}
+.integratedlocalization-translator [data-toggle="buttons"] > .btn input[type="radio"],
+.integratedlocalization-translator [data-toggle="buttons"] > .btn-group > .btn input[type="radio"],
+.integratedlocalization-translator [data-toggle="buttons"] > .btn input[type="checkbox"],
+.integratedlocalization-translator [data-toggle="buttons"] > .btn-group > .btn input[type="checkbox"] {
+  position: absolute;
+  clip: rect(0, 0, 0, 0);
+  pointer-events: none;
+}
+.integratedlocalization-translator input,
+.integratedlocalization-translator textarea {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+.integratedlocalization-translator .ccm-translator-col-original .panel-heading span {
+  float: left;
+  width: 50%;
+  height: 20px;
+  overflow: hidden;
+}
+.integratedlocalization-translator .ccm-translator-col-original ul {
+  overflow: scroll;
+  overflow-x: hidden;
+  margin-left: 0;
+}
+.integratedlocalization-translator .ccm-translator-col-original ul li {
+  margin-left: 0;
+  transition: all 0.2s linear;
+  cursor: pointer;
+}
+.integratedlocalization-translator .ccm-translator-col-original ul li:hover {
+  background-color: #dedede;
+}
+.integratedlocalization-translator .ccm-translator-col-original ul li span {
+  float: left;
+  width: 50%;
+  height: 20px;
+  overflow: hidden;
+}
+.integratedlocalization-translator .ccm-translator-col-translations > .panel {
+  visibility: hidden;
+}

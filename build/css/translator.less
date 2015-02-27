@@ -1,0 +1,53 @@
+.integratedlocalization-translator {
+	@import "bs3/variables.less";
+	@import "bs3/mixins/panels.less";
+	@import "bs3/mixins/tab-focus.less";
+	@import "bs3/mixins/border-radius.less";
+	@import "bs3/mixins/forms.less";
+	@import "bs3/mixins/grid.less";
+	@import "bs3/mixins/vendor-prefixes.less";
+	@import "bs3/mixins/nav-divider.less";
+	@import "bs3/mixins/reset-filter.less";
+	@import "bs3/mixins/list-group.less";
+	@import "bs3/forms.less";
+	@import "bs3/list-group.less";
+	@import "bs3/input-groups.less";
+	@import "bs3/panels.less";
+	@import "bs3/dropdowns.less";
+	@import "bs3/button-groups.less";
+	input, textarea {
+		.box-sizing(border-box);
+	}
+	.ccm-translator-col-original {
+		.panel-heading span {
+			float: left;
+			width: 50%;
+			height: 20px;
+			overflow: hidden;
+		}
+		ul {
+			overflow: scroll;
+			overflow-x: hidden;
+			margin-left: 0;
+			li {
+				margin-left: 0;
+				transition: all 0.2s linear;
+		   	cursor: pointer;
+		   	&:hover {
+					background-color: #dedede;
+				}
+				span {
+					float: left;
+					width: 50%;
+					height: 20px;
+					overflow: hidden;
+				}
+			}
+		}
+	}
+	.ccm-translator-col-translations {
+		> .panel {
+			visibility: hidden;
+		}
+	}
+}

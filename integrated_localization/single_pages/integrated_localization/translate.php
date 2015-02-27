@@ -21,7 +21,7 @@ if (isset($locales['selected']) && isset($selectedVersion)) {
 }
 ?>
 <div>
-    <?php echo t('Selected language:'); ?> 
+    <?php echo t('Selected language:'); ?>
     <select onchange="<?php echo $th->specialchars('window.location.href = '.json_encode($languagePlaceholderURL).'.replace("LOCALE_PLACEHOLDER", this.value);'); ?>"><?php
         if (!isset($locales['selected'])) {
             ?><option value="" selected="selected"><?php echo t('*** Please select'); ?></option><?php
@@ -89,7 +89,7 @@ switch($tab) {
                         </tr>
                         <?php
                     }
-                    ?>       
+                    ?>
                 </tbody>
             </table>
             <?php
@@ -257,6 +257,24 @@ if (window.localStorage) {
 
 if (isset($selectedPackage) && isset($selectedVersion)) {
     $stats = $this->controller->getVersionStats($selectedPackage, $selectedVersion, $locales['selected'], true);
+
+    $trh = Loader::helper('translators', 'integrated_localization');
+    /* @var $trh TranslatorsHelper */
+
+    $isLoggedIn = false;
+    $isCoordinator = false;
+    $localeAccess = TranslatorAccess::NONE;
+
+    if (User::isLoggedIn()) {
+        $localeAccess = $trh->getCurrentUserAccess($locales['selected']);
+        switch ($trh->getCurrentUserAccess($locales['selected'])) {
+            case TranslatorAccess::SITE_ADMINISTRATOR:
+            case TranslatorAccess::LOCALE_ADMINISTRATOR:
+            case TranslatorAccess::GLOBAL_ADMINISTRATOR:
+                $isCoordinator = true;
+                break;
+        }
+    }
     ?>
     <h3><?php echo $th->specialchars($selectedPackageNameWithVersion); ?></h3>
     <fieldset>
@@ -277,6 +295,20 @@ if (isset($selectedPackage) && isset($selectedVersion)) {
                 <td><?php echo t('%.2f %%', ($stats['approved'] * 100) / $stats['total']); ?></td>
             </tr>
         </table>
+    </fieldset>
+    <fieldset>
+        <legend><?php echo t('Translate Online'); ?></legend>
+        <?php
+        if ($localeAccess >= TranslatorAccess::LOCALE_TRANSLATOR) {
+            ?><p><a href="<?php echo View::url('/integrated_localization/translate/online', 'view', $selectedPackage, $selectedVersion, $locales['selected']->getID()); ?>" class="btn btn-default"><span><?php echo t('Translate'); ?></span></a></p><?php
+        } elseif ($localeAccess === TranslatorAccess::LOCALE_ASPIRANT) {
+            ?><div class="alert"><?php echo t('You have to wait that your application request will be approved in order to help us with translations'); ?></div><?php
+        } elseif ($isLoggedIn) {
+            ?><p><?php echo t('Do you want to help us translating? <a href="%1$s">Click here</a> to join the %2$s translation group!', View::url('/integrated_localization/groups', 'group', $locales['selected']->getID()), $th->specialchars($locales['selected']->getName())); ?></p><?php
+        } else {
+            ?><p><?php echo t('Do you want to help us translating? <a href="%3$s">Login</a> and <a href="%1$s">click here</a> to join the %2$s translation group!', View::url('/integrated_localization/groups', 'group', $locales['selected']->getID()), $th->specialchars($locales['selected']->getName()), View::url('/login?rcID='.$c->getCollectionID())); ?></p><?php
+        }
+        ?>
     </fieldset>
     <fieldset>
         <legend><?php echo t('Download Translations'); ?></legend>
@@ -303,7 +335,7 @@ if (isset($selectedPackage) && isset($selectedVersion)) {
                         ?>><?php echo t('only untranslated strings'); ?></a><?php
                     ?></td>
                     <td><a<?php
-                        if ($hasTranslated) { 
+                        if ($hasTranslated) {
                             ?> href="<?php echo $this->action('download', $selectedPackage, $selectedVersion, $locales['selected']->getID(), 'po'); ?>?translated"<?php
                         } else {
                             ?> href="javascript:void(0)" disabled="disabled" style="color: gray; cursor: text; text-decoration: none"<?php
@@ -338,53 +370,40 @@ if (isset($selectedPackage) && isset($selectedVersion)) {
     <fieldset>
         <legend><?php echo t('Upload Translations'); ?></legend>
         <?php
-        if (User::isLoggedIn()) {
-            $isCoordinator = false;
-            $trh = Loader::helper('translators', 'integrated_localization');
-            /* @var $trh TranslatorsHelper */
-            switch ($trh->getCurrentUserAccess($locales['selected'])) {
-                case TranslatorAccess::SITE_ADMINISTRATOR:
-                case TranslatorAccess::LOCALE_ADMINISTRATOR:
-                case TranslatorAccess::GLOBAL_ADMINISTRATOR:
-                    $isCoordinator = true;
-                    /* Fall-through */
-                case TranslatorAccess::LOCALE_TRANSLATOR:
+        if ($localeAccess >= TranslatorAccess::LOCALE_TRANSLATOR) {
+            ?>
+            <form class="form-horizontal" method="POST" enctype="multipart/form-data" onsubmit="if(this.already)return false;this.already=true">
+                <div class="control-group">
+                    <label class="control-label" for="ilUploadTranslations"><?php echo t('Upload .po file'); ?></label>
+                    <div class="controls">
+                        <input type="file" id="ilUploadTranslations" name="new-translations" required="required" />
+                    </div>
+                </div>
+                <?php
+                if ($isCoordinator) {
                     ?>
-                    <form class="form-horizontal" method="POST" enctype="multipart/form-data" onsubmit="if(this.already)return false;this.already=true">
-                        <div class="control-group">
-                            <label class="control-label" for="ilUploadTranslations"><?php echo t('Upload .po file'); ?></label>
-                            <div class="controls">
-                                <input type="file" id="ilUploadTranslations" name="new-translations" required="required" />
-                            </div>
+                    <div class="control-group">
+                        <label class="control-label"><?php echo t('Options'); ?></label>
+                        <div class="controls">
+                            <label class="checkbox">
+                                <input type="checkbox" name="as-approved" value="Sure!"> <?php echo t('Mark non-fuzzy translations as approved'); ?>
+                            </label>
                         </div>
-                        <?php
-                        if ($isCoordinator) {
-                            ?>
-                            <div class="control-group">
-                                <label class="control-label"><?php echo t('Options'); ?></label>
-                                <div class="controls">
-                                    <label class="checkbox">
-                                        <input type="checkbox" name="as-approved" value="Sure!"> <?php echo t('Mark non-fuzzy translations as approved'); ?>
-                                    </label>
-                                </div>
-                            </div>
-                            <?php
-                        }
-                        ?>
-                        <div class="control-group">
-                            <div class="controls">
-                                <button type="submit" class="btn btn-default"><?php echo t('Upload'); ?></button>
-                            </div>
-                        </div>
-                    </form>
+                    </div>
                     <?php
-                    break;
-                case TranslatorAccess::LOCALE_ASPIRANT:
-                    ?><div class="alert"><?php echo t('You have to wait that your application request will be approved in order to submit translations'); ?></div><?phpbreak;
-                default:
-                    ?><p><?php echo t('Do you want to help us translating? <a href="%1$s">Click here</a> to join the %2$s translation group!', View::url('/integrated_localization/groups', 'group', $locales['selected']->getID()), $th->specialchars($locales['selected']->getName())); ?></p><?php
-                    break;
-            }
+                }
+                ?>
+                <div class="control-group">
+                    <div class="controls">
+                        <button type="submit" class="btn btn-default"><?php echo t('Upload'); ?></button>
+                    </div>
+                </div>
+            </form>
+            <?php
+        } elseif ($localeAccess === TranslatorAccess::LOCALE_ASPIRANT) {
+            ?><div class="alert"><?php echo t('You have to wait that your application request will be approved in order to submit translations'); ?></div><?php
+        } elseif ($isLoggedIn) {
+            ?><p><?php echo t('Do you want to help us translating? <a href="%1$s">Click here</a> to join the %2$s translation group!', View::url('/integrated_localization/groups', 'group', $locales['selected']->getID()), $th->specialchars($locales['selected']->getName())); ?></p><?php
         } else {
             ?><p><?php echo t('Do you want to help us translating? <a href="%3$s">Login</a> and <a href="%1$s">click here</a> to join the %2$s translation group!', View::url('/integrated_localization/groups', 'group', $locales['selected']->getID()), $th->specialchars($locales['selected']->getName()), View::url('/login?rcID='.$c->getCollectionID())); ?></p><?php
         }
