@@ -6,7 +6,7 @@ class IntegratedLocalizationPackage extends Package
 
     protected $appVersionRequired = '5.5.2';
 
-    protected $pkgVersion = '0.0.8';
+    protected $pkgVersion = '0.1.0';
 
     public function getPackageName()
     {
