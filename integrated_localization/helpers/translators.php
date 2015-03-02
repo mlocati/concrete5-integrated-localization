@@ -1,7 +1,7 @@
 <?php defined('C5_EXECUTE') or die('Access Denied.');
 
 /**
- * Handles translatable strings from core/packages
+ * Handles translatable strings from core/packages.
  */
 class TranslatorsHelper
 {
@@ -20,7 +20,7 @@ class TranslatorsHelper
         return 'Users that can administer all the locales and translations';
     }
     /**
-     * return Group|null
+     * return Group|null.
      */
     public function getAdministratorsGroup()
     {
@@ -33,6 +33,7 @@ class TranslatorsHelper
     }
     /**
      * @param IntegratedLocale|string|null $locale
+     *
      * @return int One of the TranslatorRight::... constants
      */
     public function getCurrentUserAccess($locale = null)
@@ -43,9 +44,9 @@ class TranslatorsHelper
         return $this->getUserAccess($me, $locale);
     }
     /**
-     *
      * @param User|int|null $user
      * @param IntegratedLocale|string|null $locale
+     *
      * @return int One of the TranslatorRight::... constants
      */
     public function getUserAccess($user, $locale = null)

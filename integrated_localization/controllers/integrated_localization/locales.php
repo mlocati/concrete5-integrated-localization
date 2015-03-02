@@ -147,14 +147,13 @@ class IntegratedLocalizationLocalesController extends Controller
                     foreach ($languageInfo->categories as $category) {
                         $pluralCases[$category->id] = $category->formula;
                     }
-                    
                 } else {
                     $s = $this->post('pluralFormula');
                     $pluralFormula = is_string($s) ? trim($s) : '';
                     if ($pluralFormula === '') {
                         throw new Exception(t('Please specify the plurals formula'));
                     }
-                    foreach(array(
+                    foreach (array(
                             'zero' => t('Zero'),
                             'one' => t('One'),
                             'two' => t('Two'),
@@ -163,14 +162,14 @@ class IntegratedLocalizationLocalesController extends Controller
                             'other' => t('Other'),
                     ) as $pluralCaseID => $pluralCaseName) {
                         $checked = $this->post("pluralcase-$pluralCaseID");
-                        if(empty($checked)) {
-                            if($pluralCaseID === 'other') {
+                        if (empty($checked)) {
+                            if ($pluralCaseID === 'other') {
                                 throw new Exception(t("The plural case '%s' must be specified", $pluralCaseID));
                             }
                         } else {
                             $pluralCases[$pluralCaseID] = $this->post("pluralcase-$pluralCaseID-examples");
                             $pluralCases[$pluralCaseID] = is_string($pluralCases[$pluralCaseID]) ? trim($pluralCases[$pluralCaseID]) : '';
-                            if($pluralCases[$pluralCaseID] === '') {
+                            if ($pluralCases[$pluralCaseID] === '') {
                                 throw new Exception(t("The examples for the plural case '%s' must be specified", $pluralCaseID));
                             }
                         }
@@ -185,7 +184,7 @@ class IntegratedLocalizationLocalesController extends Controller
                     'id' => $languageInfo->id,
                     'name' => $name,
                     'pluralFormula' => $pluralFormula,
-                    'pluralCases' => $pluralCases
+                    'pluralCases' => $pluralCases,
                 ));
                 $this->redirect('/integrated_localization/locales', 'saved', $locale->getName());
             } catch (Exception $x) {

@@ -219,7 +219,7 @@ class IntegratedTranslatedRepository
         /* @var $rs ADORecordSet_mysql */
         while ($row = $rs->FetchRow()) {
             $itr = new IntegratedTranslatedRepository($row);
-            if(strpos($packageVersion, 'dev-') === 0) {
+            if (strpos($packageVersion, 'dev-') === 0) {
                 if (($itr->getDevelopKey() !== '') && ($packageVersion === $itr->getDevelopKey())) {
                     $result = $itr;
                 }

@@ -1,13 +1,15 @@
 <?php defined('C5_EXECUTE') or die('Access Denied.');
 
 /**
- * Extends some missing functions in the FileHelper
+ * Extends some missing functions in the FileHelper.
  */
 class FileExtendedHelper
 {
     /**
      * @param bool $createSubfolder
+     *
      * @throws Exception
+     *
      * @return string
      */
     public function getTempSandboxDirectory($createSubfolder)
@@ -59,8 +61,10 @@ EOT
         return $dir;
     }
     /**
-     * Removes a file or a directory (even if not empty)
+     * Removes a file or a directory (even if not empty).
+     *
      * @param string $path
+     *
      * @return boolean
      */
     public function deleteFromFileSystem($path)
@@ -95,7 +99,9 @@ EOT
     /**
      * @param string $fieldName
      * @param bool $allowEmpty
+     *
      * @throws Exception
+     *
      * @return array|null
      */
     public function getUploadedFile($fieldName, $allowEmpty = false)

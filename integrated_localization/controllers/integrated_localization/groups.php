@@ -222,8 +222,8 @@ class IntegratedLocalizationGroupsController extends Controller
             natcasesort($languages);
             $this->set('languages', $languages);
             $territories = array();
-            foreach(\Gettext\Languages\CldrData::getTerritoryNames() as $territoryID => $territoryName) {
-                if(preg_match('/^[A-Z][A-Z]$/', $territoryID)) {
+            foreach (\Gettext\Languages\CldrData::getTerritoryNames() as $territoryID => $territoryName) {
+                if (preg_match('/^[A-Z][A-Z]$/', $territoryID)) {
                     $territories[$territoryID] = $territoryName;
                 }
             }
@@ -276,7 +276,7 @@ class IntegratedLocalizationGroupsController extends Controller
                             $this->new_locale();
                         } else {
                             $pluralCases = array();
-                            foreach($language->categories as $category) {
+                            foreach ($language->categories as $category) {
                                 $pluralCases[$category->id] = $category->examples;
                             }
                             try {

@@ -1,16 +1,19 @@
 <?php defined('C5_EXECUTE') or die('Access Denied.');
 
 /**
- * Handles translatable strings from core/packages
+ * Handles translatable strings from core/packages.
  */
 class TranslationsHelper
 {
     /**
-     * Import translatable strings from core/packages into the database
+     * Import translatable strings from core/packages into the database.
+     *
      * @param \Gettext\Translations $translations The translatable strings to import
      * @param string $packageHandle The package handle ('_' for the core)
      * @param string $packageVersion The package version ('dev-...' for the core development versions)
+     *
      * @throws Exception
+     *
      * @return array Keys are:
      * - int total: number of total entries found
      * - int updated: number of new entries updated
@@ -269,6 +272,7 @@ class TranslationsHelper
      * @param string $packageHandle
      * @param string $packageVersion
      * @param string $only 'translated' to load only translated strings, 'untranslated' to load only untranslated strings. Anything else: load all the strings
+     *
      * @return \Gettext\Translations
      */
     public function loadTranslationsByPackage($locale, $packageHandle, $packageVersion, $only = '', $unapprovedAsFuzzy = false)
@@ -288,7 +292,7 @@ class TranslationsHelper
         $translations->setPluralForms($pluralCount, $locale->getPluralFormula());
         $db = Loader::db();
         /* @var $db ADODB_mysql */
-        switch($only) {
+        switch ($only) {
             case 'translated':
                 $from = '
                         IntegratedTranslatablePlaces

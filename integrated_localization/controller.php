@@ -2,7 +2,6 @@
 
 class IntegratedLocalizationPackage extends Package
 {
-
     protected $pkgHandle = 'integrated_localization';
 
     protected $appVersionRequired = '5.5.2';
@@ -44,7 +43,7 @@ class IntegratedLocalizationPackage extends Package
         /* @var $db ADODB_mysql */
         if ($fromVersion === '') {
             Loader::model('integrated_locale', 'integrated_localization');
-            foreach(array(
+            foreach (array(
                 'en_US' => true,
                 'ar' => false,
                 'ast_ES' => false,
@@ -97,13 +96,12 @@ class IntegratedLocalizationPackage extends Package
                 'vi_VN' => false,
                 'zh_CN' => false,
                 'zh_TW' => false,
-            ) as $localeID => $isSource)
-            {
+            ) as $localeID => $isSource) {
                 $existing = IntegratedLocale::getByID($localeID, true, true);
-                if(!isset($existing)) {
+                if (!isset($existing)) {
                     $language = \Gettext\Languages\Language::getById($localeID);
                     $pluralCases = array();
-                    foreach($language->categories as $category) {
+                    foreach ($language->categories as $category) {
                         $pluralCases[$category->id] = $category->examples;
                     }
                     IntegratedLocale::add(
@@ -113,7 +111,7 @@ class IntegratedLocalizationPackage extends Package
                         $pluralCases,
                         true
                     );
-                    if($isSource) {
+                    if ($isSource) {
                         $db->Execute("UPDATE IntegratedLocales SET ilIsSource = 1, ilRequestedBy = NULL, ilRequestedOn = NULL WHERE ilID = ? LIMIT 1", $language->id);
                     }
                 }
@@ -152,7 +150,7 @@ class IntegratedLocalizationPackage extends Package
         if (!is_object($bt)) {
             BlockType::installBlockTypeFromPackage('package_languages_builder', $pkg);
         }
-        if($fromVersion === '') {
+        if ($fromVersion === '') {
             $db->Execute("
                 insert ignore into IntegratedTranslatedRepositories set
                     itrName = 'concrete5 Core pre 5.7',

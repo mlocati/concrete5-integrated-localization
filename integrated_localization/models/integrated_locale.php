@@ -444,7 +444,7 @@ class IntegratedLocale
         }
         $lines = array();
         foreach ($pluralCases as $case => $examples) {
-            switch($case) {
+            switch ($case) {
                 case 'zero':
                 case 'one':
                 case 'two':
@@ -477,7 +477,7 @@ class IntegratedLocale
             $line = trim($line);
             if ($line !== '') {
                 list($case, $examples) = explode(':', $line, 2);
-                switch($case) {
+                switch ($case) {
                     case 'zero':
                     case 'one':
                     case 'two':

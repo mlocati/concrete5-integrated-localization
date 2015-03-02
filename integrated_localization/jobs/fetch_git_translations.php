@@ -2,7 +2,6 @@
 
 class FetchGitTranslations extends Job
 {
-
     public function getJobName()
     {
         return t('Fetch git translations');
@@ -28,7 +27,7 @@ class FetchGitTranslations extends Job
             'repositories' => 0,
             'branches' => 0,
         );
-        foreach(IntegratedTranslatedRepository::getListForAutomatedJob() as $itr) {
+        foreach (IntegratedTranslatedRepository::getListForAutomatedJob() as $itr) {
             $repository = $itr->getGitRepository();
             // Fetch latest version and switch to HEAD
             $repository->update();
@@ -36,7 +35,7 @@ class FetchGitTranslations extends Job
                 $stats = self::parseRepositoryDirectory($stats, $tsh, $repository->getDirectory(), $itr->getPackageHandle(), $itr->getDevelopKey(), $itr->getWebRoot());
                 $stats['branches']++;
             }
-            if($itr->getTagsFilter() !== '') {
+            if ($itr->getTagsFilter() !== '') {
                 foreach ($repository->getTaggedVersions() as $tag => $version) {
                     // Load new versions
                     if (!$db->GetOne("SELECT itpTranslatable FROM IntegratedTranslatablePlaces WHERE (itpPackage = ?) AND (itpVersion = ?)", array($itr->getPackageHandle(), $version))) {
@@ -61,15 +60,19 @@ class FetchGitTranslations extends Job
         );
     }
     /**
-     * Parse a core directory containing
+     * Parse a core directory containing.
+     *
      * @param array|null $stats
      * @param TranslationsHelper $tsh
      * @param string $directory
      * @param string $packageHandle
      * @param string $version
      * @param string $webRoot;
+     *
      * @throws Exception
+     *
      * @return array Same result of TranslationsHelper::saveTranslatables
+     *
      * @see TranslationsHelper::saveTranslatables
      */
     private static function parseRepositoryDirectory($stats, $tsh, $directory, $packageHandle, $version, $webRoot)
@@ -77,7 +80,7 @@ class FetchGitTranslations extends Job
         if ($webRoot !== '') {
             $directory = "$directory/$webRoot";
         }
-        if($packageHandle === '_') {
+        if ($packageHandle === '_') {
             if (!is_file("$directory/index.php") && is_file("$directory/concrete/dispatcher.php")) {
                 throw new Exception(t('Unable to find the core web root in the directory %s', $directory));
             }
