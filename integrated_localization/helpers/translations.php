@@ -394,7 +394,7 @@ class TranslationsHelper
                 }
             }
             if (isset($row['itpLocations']) && ($row['itpLocations'] !== '')) {
-                foreach (explode("\x04", $row['iitpLocations']) as $location) {
+                foreach (explode("\x04", $row['itpLocations']) as $location) {
                     if ($location !== '') {
                         $line = null;
                         if (preg_match('/^(.+):(\d+)$/', $location, $m)) {
