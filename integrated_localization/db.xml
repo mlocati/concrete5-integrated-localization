@@ -77,7 +77,7 @@
 			<NOTNULL />
 			<KEY />
 		</field>
-		<!-- Package handle (use '-' for core) -->
+		<!-- Package handle (use '_' for core) -->
 		<field name="itpPackage" type="C" size="64">
 			<NOTNULL />
 			<KEY />
@@ -146,6 +146,47 @@
 		<index name="itTranslatable">
 			<col>itTranslatable</col>
 		</index>
+	</table>
+
+	<!-- List of repositories for packages -->
+	<table name="IntegratedTranslatedRepositories">
+		<!-- Record identifier -->
+		<field name="itrID" type="I">
+			<UNSIGNED />
+			<NOTNULL />
+			<AUTOINCREMENT />
+			<KEY />
+		</field>
+		<!-- Repository shown name -->
+		<field name="itrName" type="C" size="50">
+			<NOTNULL />
+		</field>
+		<!-- Package handle ('_' for the core versions) -->
+		<field name="itrPackageHandle" type="C" size="64">
+			<NOTNULL />
+		</field>
+		<!-- Repository URI -->
+		<field name="itrUri" type="C" size="255">
+			<NOTNULL />
+		</field>
+		<!-- Name of the development branch -->
+		<field name="itrDevelopBranch" type="C" size="100">
+			<NOTNULL />
+		</field>
+		<!-- Key for the development branch -->
+		<field name="itrDevelopKey" type="C" size="30">
+			<NOTNULL />
+		</field>
+		<!-- Filter for the tagged versions (eg '=> 5.7') -->
+		<field name="itrTagsFilter" type="C" size="30" />
+		<!-- Include this repository in the automated job that extracts translations? -->
+		<field name="itrInAutomatedJob" type="I1">
+			<UNSIGNED />
+			<NOTNULL />
+			<DEFAULT value="0" />
+		</field>
+		<!-- Relative path to the web root folder -->
+		<field name="itrWebRoot" type="C" size="100" />
 	</table>
 
 </schema>

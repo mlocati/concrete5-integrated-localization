@@ -64,7 +64,8 @@ $(document).ready(function() {
     plurals: <?php echo $jh->encode($pluralCases); ?>,
     translations: <?php echo $jh->encode($translations, $jsonOptions); ?>,
     approvalSupport: true,
-    canModifyApproved: <?php echo $isCoordinator ? 'true' : 'false'; ?>
+    canModifyApproved: <?php echo $isCoordinator ? 'true' : 'false'; ?>,
+    referencePatterns: <?php echo $jh->encode($referencePatterns); ?>
   })
 });
 </script>

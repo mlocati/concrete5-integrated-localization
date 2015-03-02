@@ -73,10 +73,7 @@ class IntegratedLocalizationTranslateOnlineController extends Controller
                     $jsonTranslation['comments'] = $extractedComments;
                 }
                 if ($translation->hasReferences()) {
-                    $jsonTranslation['references'] = array();
-                    foreach ($translation->getReferences() as $ref) {
-                        $jsonTranslation['references'][] = isset($ref[1]) ? "{$ref[0]}:{$ref[1]}" : $ref[0];
-                    }
+                    $jsonTranslation['references'] = $translation->getReferences();
                 }
                 $jsonTranslations[] = $jsonTranslation;
             }
@@ -91,6 +88,8 @@ class IntegratedLocalizationTranslateOnlineController extends Controller
             $this->set('translations', $jsonTranslations);
             $this->set('pluralCases', $locale->getPluralCases());
             $this->set('isCoordinator', $isCoordinator);
+            Loader::model('integrated_translated_repository', 'integrated_localization');
+            $this->set('referencePatterns', IntegratedTranslatedRepository::getReferencePatterns($package, $version));
             $hh = Loader::helper('html');
             /* @var $hh HtmlHelper */
             $this->addHeaderItem($hh->css('translator.css', 'integrated_localization'));

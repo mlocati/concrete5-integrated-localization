@@ -44,22 +44,11 @@ class GitRepository
         return $output;
     }
 
-    public function __construct($url, $branch, $tagsFilter = '')
+    public function __construct($url, $branch, $tagsFilter = null)
     {
         $this->url = $url;
         $this->branch = $branch;
-        $this->tagsFilter = null;
-        if (is_string($tagsFilter) && preg_match('/^\s*([<>=]+)\s*(\d+(?:\.\d+)?)\s*$/', $tagsFilter, $m)) {
-            switch ($m[1]) {
-                case '<=':
-                case '<':
-                case '=':
-                case '>=':
-                case '>':
-                    $this->tagsFilter = array('operator' => $m[1], 'version' => $m[2]);
-                    break;
-            }
-        }
+        $this->tagsFilter = $tagsFilter;
         $feh = Loader::helper('file_extended', 'integrated_localization');
         /* @var $feh FileExtendedHelper */
         $this->directory = $feh->getTempSandboxDirectory(false).'/'.strtolower(trim(preg_replace('/[^\w\.]+/', '-', $url), '-'));

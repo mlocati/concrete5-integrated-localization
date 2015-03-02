@@ -99,7 +99,7 @@ class IntegratedLocalizationPackage extends Package
                 'zh_TW' => false,
             ) as $localeID => $isSource)
             {
-                $existing = IntegratedLocale::getByID($localeID);
+                $existing = IntegratedLocale::getByID($localeID, true, true);
                 if(!isset($existing)) {
                     $language = \Gettext\Languages\Language::getById($localeID);
                     $pluralCases = array();
@@ -151,6 +151,30 @@ class IntegratedLocalizationPackage extends Package
         $bt = BlockType::getByHandle('package_languages_builder');
         if (!is_object($bt)) {
             BlockType::installBlockTypeFromPackage('package_languages_builder', $pkg);
+        }
+        if($fromVersion === '') {
+            $db->Execute("
+                insert ignore into IntegratedTranslatedRepositories set
+                    itrName = 'concrete5 Core pre 5.7',
+		              itrPackageHandle = '_',
+		              itrUri = 'https://github.com/concrete5/concrete5.git',
+		              itrDevelopBranch = 'master',
+                    itrDevelopKey = 'dev-5.6',
+		              itrTagsFilter = '< 5.7',
+                    itrInAutomatedJob = 1,
+                    itrWebRoot = 'web'
+            ");
+            $db->Execute("
+                insert ignore into IntegratedTranslatedRepositories set
+                    itrName = 'concrete5 Core from 5.7',
+		              itrPackageHandle = '_',
+		              itrUri = 'https://github.com/concrete5/concrete5-5.7.0.git',
+		              itrDevelopBranch = 'develop',
+                    itrDevelopKey = 'dev-5.7',
+		              itrTagsFilter = '>= 5.7',
+                    itrInAutomatedJob = 1,
+                    itrWebRoot = 'web'
+            ");
         }
     }
 
