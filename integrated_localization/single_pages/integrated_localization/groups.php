@@ -97,19 +97,19 @@ if (isset($addingNewLocale) && $addingNewLocale) {
                                         ?>
                                         <a class="btn btn-mini btn-success" onclick="<?php echo $th->specialchars('return confirm('.json_encode(t('Are you sure?')).')'); ?>" href="<?php echo $this->action('update_user_group', $viewingLocale->getID(), $member->getUserID(), TranslatorAccess::LOCALE_ASPIRANT, TranslatorAccess::LOCALE_TRANSLATOR); ?>"><?php echo t('Accept as translator'); ?></a>
                                         <a class="btn btn-mini btn-warning" onclick="<?php echo $th->specialchars('return confirm('.json_encode(t('Are you sure?')).')'); ?>" href="<?php echo $this->action('update_user_group', $viewingLocale->getID(), $member->getUserID(), TranslatorAccess::LOCALE_ASPIRANT, TranslatorAccess::LOCALE_ADMINISTRATOR); ?>"><?php echo t('Accept as administrator'); ?></a>
-                                        <a class="btn btn-mini btn-danger" onclick="<?php echo $th->specialchars('return confirm('.json_encode(t('Are you sure?')).')'); ?>" href="<?php echo $this->action('kickuser', $viewingLocale->getID(), $member->getUserID()); ?>"><?php echo t('Deny'); ?></a>
+                                        <a class="btn btn-mini btn-danger" onclick="<?php echo $th->specialchars('return confirm('.json_encode(t('Are you sure?')).')'); ?>" href="<?php echo $this->action('kick_user', $viewingLocale->getID(), $member->getUserID()); ?>"><?php echo t('Deny'); ?></a>
                                         <?php
                                         break;
                                     case TranslatorAccess::LOCALE_TRANSLATOR:
                                         ?>
                                         <a class="btn btn-mini btn-success" onclick="<?php echo $th->specialchars('return confirm('.json_encode(t('Are you sure?')).')'); ?>" href="<?php echo $this->action('update_user_group', $viewingLocale->getID(), $member->getUserID(), TranslatorAccess::LOCALE_TRANSLATOR, TranslatorAccess::LOCALE_ADMINISTRATOR); ?>"><?php echo t('Promote to administrators'); ?></a>
-                                        <a class="btn btn-mini btn-danger" onclick="<?php echo $th->specialchars('return confirm('.json_encode(t('Are you sure?')).')'); ?>" href="<?php echo $this->action('kickuser', $viewingLocale->getID(), $member->getUserID()); ?>"><?php echo t('Remove from translators'); ?></a>
+                                        <a class="btn btn-mini btn-danger" onclick="<?php echo $th->specialchars('return confirm('.json_encode(t('Are you sure?')).')'); ?>" href="<?php echo $this->action('kick_user', $viewingLocale->getID(), $member->getUserID()); ?>"><?php echo t('Remove from translators'); ?></a>
                                         <?php
                                         break;
                                     case TranslatorAccess::LOCALE_ADMINISTRATOR:
                                         ?>
                                         <a class="btn btn-mini btn-warning" onclick="<?php echo $th->specialchars('return confirm('.json_encode(t('Are you sure?')).')'); ?>" href="<?php echo $this->action('update_user_group', $viewingLocale->getID(), $member->getUserID(), TranslatorAccess::LOCALE_ADMINISTRATOR, TranslatorAccess::LOCALE_TRANSLATOR); ?>"><?php echo t('Downgrate to translators'); ?></a>
-                                        <a class="btn btn-mini btn-danger" onclick="<?php echo $th->specialchars('return confirm('.json_encode(t('Are you sure?')).')'); ?>" href="<?php echo $this->action('kickuser', $viewingLocale->getID(), $member->getUserID()); ?>"><?php echo t('Remove from translators'); ?></a>
+                                        <a class="btn btn-mini btn-danger" onclick="<?php echo $th->specialchars('return confirm('.json_encode(t('Are you sure?')).')'); ?>" href="<?php echo $this->action('kick_user', $viewingLocale->getID(), $member->getUserID()); ?>"><?php echo t('Remove from translators'); ?></a>
                                         <?php
                                         break;
                                 }
