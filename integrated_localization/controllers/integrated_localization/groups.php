@@ -50,10 +50,9 @@ class IntegratedLocalizationGroupsController extends Controller
             $this->view();
         }
     }
+
     public function leave_group($localeID, $groupID)
     {
-        $th = Loader::helper('text');
-        /* @var $th TextHelper */
         Loader::model('integrated_locale', 'integrated_localization');
         $locale = IntegratedLocale::getByID($localeID);
         if ($locale) {
@@ -62,17 +61,36 @@ class IntegratedLocalizationGroupsController extends Controller
                 $me = User::isLoggedIn() ? new User() : null;
                 if (is_object($me)) {
                     $me->exitGroup($group);
-                    $this->set('message', t('You left the group "%s"', $th->specialchars($group->getGroupName())));
+                    $this->redirect('/integrated_localization/groups', 'left_group', $locale->getID(), $group->getGroupID());
                 } else {
                     $this->set('error', t('No logged-in user.'));
                 }
             }
             $this->group($locale->getID());
         } else {
+            $th = Loader::helper('text');
+            /* @var $th TextHelper */
             $this->set('error', t('Unable to find the locale with id %s', $th->specialchars($localeID)));
             $this->view();
         }
     }
+    public function left_group($localeID, $groupID)
+    {
+        Loader::model('integrated_locale', 'integrated_localization');
+        $locale = IntegratedLocale::getByID($localeID);
+        if (isset($locale)) {
+            $group = Group::getByID(@intval($groupID));
+            if (is_object($group)) {
+                $th = Loader::helper('text');
+                /* @var $th TextHelper */
+                $this->set('message', t('You left the group "%s"', $th->specialchars($group->getGroupName())));
+            }
+            $this->group($locale->getID());
+        } else {
+            $this->view();
+        }
+    }
+
     public function enter_group($localeID)
     {
         $th = Loader::helper('text');
@@ -88,7 +106,7 @@ class IntegratedLocalizationGroupsController extends Controller
                     $g = $locale->getAspirantTranslatorsGroup();
                     if ($g) {
                         $me->enterGroup($g);
-                        $this->set('message', t('You asked to join the translators group for "%s"', $th->specialchars($locale->getName())));
+                        $this->redirect('/integrated_localization/groups', 'entered_group', $locale->getID());
                     } else {
                         $this->set('error', t('Internal error: no applicant group found!'));
                     }
@@ -102,7 +120,21 @@ class IntegratedLocalizationGroupsController extends Controller
             $this->view();
         }
     }
-    public function kickuser($localeID, $userID)
+    public function entered_group($localeID)
+    {
+        Loader::model('integrated_locale', 'integrated_localization');
+        $locale = IntegratedLocale::getByID($localeID);
+        if (isset($locale)) {
+            $th = Loader::helper('text');
+            /* @var $th TextHelper */
+            $this->set('message', t('You asked to join the translators group for "%s"', $th->specialchars($locale->getName())));
+            $this->group($locale->getID());
+        } else {
+            $this->view();
+        }
+    }
+
+    public function kick_user($localeID, $userID)
     {
         $th = Loader::helper('text');
         /* @var $th TextHelper */
@@ -119,7 +151,7 @@ class IntegratedLocalizationGroupsController extends Controller
                             $user->exitGroup($g);
                         }
                     }
-                    $this->set('message', t('The user has been removed from the language translators!'));
+                    $this->redirect('/integrated_localization/groups', 'kicked_user', $locale->getID());
                 } else {
                     $this->set('error', t('Unable to find the user with id %s', $th->specialchars($userID)));
                 }
@@ -132,6 +164,18 @@ class IntegratedLocalizationGroupsController extends Controller
             $this->view();
         }
     }
+    public function kicked_user($localeID)
+    {
+        Loader::model('integrated_locale', 'integrated_localization');
+        $locale = IntegratedLocale::getByID($localeID);
+        if (isset($locale)) {
+            $this->set('message', t('The user has been removed from the language translators!'));
+            $this->group($locale->getID());
+        } else {
+            $this->view();
+        }
+    }
+
     public function update_user_group($localeID, $userID, $from, $to)
     {
         $th = Loader::helper('text');
@@ -182,8 +226,7 @@ class IntegratedLocalizationGroupsController extends Controller
                             if ($user->inGroup($gFrom)) {
                                 $user->enterGroup($gTo);
                                 $user->exitGroup($gFrom);
-                                $this->set('message', t('The user %s has been updated', $user->getUserName()));
-                                $this->group($locale->getID());
+                                $this->redirect('/integrated_localization/groups', 'updated_user_group', $locale->getID(), $user->getUserID());
                             } else {
                                 $this->set('error', t('The specified user does not belong to the specified group'));
                             }
@@ -202,6 +245,20 @@ class IntegratedLocalizationGroupsController extends Controller
             $this->group($locale->getID());
         } else {
             $this->set('error', t('Unable to find the locale with id %s', $th->specialchars($localeID)));
+            $this->view();
+        }
+    }
+    public function updated_user_group($localeID, $userID)
+    {
+        Loader::model('integrated_locale', 'integrated_localization');
+        $locale = IntegratedLocale::getByID($localeID, true);
+        if (isset($locale)) {
+            $user = User::getByUserID($userID);
+            if (isset($user)) {
+                $this->set('message', t('The user %s has been updated', $user->getUserName()));
+            }
+            $this->group($locale->getID());
+        } else {
             $this->view();
         }
     }
@@ -286,8 +343,7 @@ class IntegratedLocalizationGroupsController extends Controller
                                 $this->new_locale();
                             }
                             if (isset($newLocale)) {
-                                $this->set('message', t("Your request to create the translation group for '%s' has been submitted.", $newLocale->getName()));
-                                $this->view();
+                                $this->redirect('/integrated_localization/groups', 'new_locale_added', $newLocale->getID());
                             }
                         }
                     }
@@ -295,6 +351,16 @@ class IntegratedLocalizationGroupsController extends Controller
             }
         }
     }
+    public function new_locale_added($localeID)
+    {
+        Loader::model('integrated_locale', 'integrated_localization');
+        $newLocale = IntegratedLocale::getByID($localeID, true);
+        if (isset($newLocale)) {
+            $this->set('message', t("Your request to create the translation group for '%s' has been submitted.", $newLocale->getName()));
+        }
+        $this->view();
+    }
+
     public function cancel_group_request($localeID)
     {
         $th = Loader::helper('text');
@@ -307,7 +373,7 @@ class IntegratedLocalizationGroupsController extends Controller
                 if ((!$locale->getIsSource()) && (!$locale->getApproved()) && ($locale->getRequestedBy() == $me->getUserID())) {
                     $name = $locale->getName();
                     $locale->delete();
-                    $this->set('message', t("Your request to create the '%s' language group has been cancelled.", $name));
+                    $this->redirect('/integrated_localization/groups', 'group_request_canceled', $name);
                 } else {
                     $this->set('error', t('Access denied.'));
                 }
@@ -317,6 +383,13 @@ class IntegratedLocalizationGroupsController extends Controller
         } else {
             $this->set('error', t('Access denied.'));
         }
+        $this->view();
+    }
+    public function group_request_canceled($name)
+    {
+        $th = Loader::helper('text');
+        /* @var $th TextHelper */
+        $this->set('message', t("Your request to create the '%s' language group has been cancelled.", $th->specialchars($name)));
         $this->view();
     }
 

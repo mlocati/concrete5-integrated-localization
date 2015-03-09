@@ -4,6 +4,9 @@ class IntegratedLocalizationLocalesController extends Controller
 {
     public function on_start()
     {
+        if (!User::isLoggedIn()) {
+            $this->redirect('/login?rcID='.$this->c->getCollectionID());
+        }
         $th = Loader::helper('translators', 'integrated_localization');
         /* @var $th TranslatorsHelper */
         if ($th->getCurrentUserAccess() < TranslatorAccess::GLOBAL_ADMINISTRATOR) {
