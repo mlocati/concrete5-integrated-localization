@@ -149,7 +149,7 @@ class TranslationsHelper
                 $translated = true;
                 $plural = $translation->hasPlural();
                 if ($plural) {
-                    for ($i = 0; $i < $pluralCount; $i++) {
+                    for ($i = 0; $i < $pluralCount - 1; $i++) {
                         if ($translation->getPluralTranslation($i) === '') {
                             $translated = false;
                             break;
